@@ -16,7 +16,7 @@ Commands are npm scripts in a `package.json` at the repo root, with `frontend/` 
 - `npm run seed` resets the database to the sample data
 - `npm run check` runs every check (formatting, linting, complexity, type checks, the secrets scan and `npm test`); `npm run check:quick` leaves out the end-to-end tests; `npm run format` fixes the formatting
 
-Checks: Prettier and ESLint for the frontend, ruff (format and lint) and ty for the backend, gitleaks for secrets. Git hooks use lefthook (`lefthook.yml`), installed by `npm install`; Claude Code hooks live in `.claude/settings.json` and `.claude/hooks/`. ESLint and its plugins are installed at the repo root with TypeScript 6 (`@typescript/typescript6`), because typescript-eslint doesn't support TypeScript 7 yet; the frontend itself type-checks with TypeScript 7.
+Checks: Prettier and ESLint for the frontend, ruff (format and lint) and ty for the backend, gitleaks for secrets. Git hooks use lefthook (`lefthook.yml`), installed by `npm install`; Claude Code hooks live in `.claude/settings.json` and `.claude/hooks/`. GitHub Actions (`.github/workflows/ci.yml`) runs gitleaks, then `npm run check`, on every push. ESLint and its plugins are installed at the repo root with TypeScript 6 (`@typescript/typescript6`), because typescript-eslint doesn't support TypeScript 7 yet; the frontend itself type-checks with TypeScript 7.
 
 `docs/STATUS.md` says how to run the app. `README.md` is the course's own guide, so leave it as it is.
 
