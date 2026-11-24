@@ -83,3 +83,9 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 - **Coverage:** frontend unit test coverage went from 47% to 99% with 172 new behavior tests, most of them rendering the whole app against a fake API (`src/test/renderApp.tsx`). Backend coverage is 98%.
 
 `npm run check` passes: 186 backend, 257 frontend and 26 end-to-end tests.
+
+## Hooks (2026-11-24, `harness` branch)
+
+- **Git pre-commit (lefthook):** `npm install` installs it. It formats the staged files (Prettier, `ruff format`) and stages the fixes, then runs ESLint, `ruff check`, `tsc`, `ty` and gitleaks on the staged changes, in about 3 seconds. No tests. Tested with `lefthook run pre-commit`: badly formatted files came back formatted and staged; a type error, an unused import and a fake GitHub token each failed their check; a real `git commit` with a `debugger` statement was refused and made no commit.
+- **Claude Code, end of turn:** runs `npm run check:quick` (about 25 seconds) and sends failures back to the agent. It blocks once, then lets the agent stop. Tested by piping input to the script: a clean tree passed (exit 0), a type error blocked with the tsc error and the summary (exit 2), and `stop_hook_active: true` let it through without running anything.
+- **Claude Code, `.env` guard:** refuses Edit, Write, MultiEdit and NotebookEdit on `.env` and `.env.*` (not `.env.example`). Tested by piping input to the script and by a live Write to `.env.hooktest`, which Claude Code refused. It doesn't stop shell commands (such as `echo > .env`) from writing the file.

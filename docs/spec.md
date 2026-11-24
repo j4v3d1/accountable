@@ -228,6 +228,8 @@ Each requirement has an ID, so tests and status notes can point at it.
   All dates are worked out relative to the day the seed runs, so the data never looks stale. Names are invented and use reserved domains such as `example.com`. The data is built from a fixed random seed, so every reset gives the same result.
 - **R43** `npm test` runs the pytest tests, the TypeScript check, the Vitest tests and the Playwright tests, against a database and ports of their own. It runs all four even when one fails, prints a summary, and fails if any of them fails. It also fails when the backend's or the frontend's unit tests cover less than 80% of their code.
 - **R44** `npm run check` runs every check and fails if any of them fails: Prettier and ESLint (recommended TypeScript, React Hooks and accessibility rules) for the frontend, `ruff format` and `ruff check` for the backend, a cyclomatic complexity of at most 15 per function (ESLint's `complexity`, ruff's `C901`), `tsc` for the frontend and `ty` for the backend, gitleaks across the working files and the git history (the git-ignored `.env` is allowed), and `npm test`. `npm run check:quick` runs the same checks without the end-to-end tests. `npm run format` fixes the formatting.
+- **R45** A git pre-commit hook (lefthook, installed by `npm install`) formats the staged files with Prettier and `ruff format` and stages the result, then runs ESLint, `ruff check`, `tsc`, `ty` and gitleaks on the staged changes. It skips the tests so commits stay quick, and refuses the commit if any of them fails.
+- **R46** Claude Code hooks in `.claude/settings.json`: when the agent finishes a turn, `npm run check:quick` runs and any failure is sent back to the agent to fix. It blocks the stop once, then lets the agent stop, so it can't loop. The agent can't write or edit `.env` or `.env.*` files (`.env.example` is allowed).
 
 ## Design
 
@@ -359,6 +361,8 @@ frontend/src/
 
 e2e/                   Playwright tests, and fixtures.ts shared by all of them
 scripts/              test-all.mjs (npm test), check.mjs (npm run check), run-steps.mjs (runs steps, prints the summary)
+lefthook.yml           the git pre-commit hook
+.claude/hooks/         Claude Code hooks: check-on-stop.mjs (check:quick when a turn ends), protect-env.mjs
 ```
 
 Rules that keep it this way:

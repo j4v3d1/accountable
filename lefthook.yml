@@ -1,0 +1,32 @@
+# Git hooks, installed by `npm install` (the `prepare` script runs `lefthook install`).
+# pre-commit formats the staged files and stages the fixes, then runs lint, type
+# checks and the secrets scan. Tests are left to `npm run check`, so commits stay quick.
+pre-commit:
+  piped: true
+  jobs:
+    - name: format
+      group:
+        jobs:
+          - name: frontend (Prettier)
+            root: frontend/
+            run: npx prettier --write --ignore-unknown {staged_files}
+            stage_fixed: true
+          - name: backend (ruff format)
+            root: backend/
+            glob: "*.py"
+            run: uv run ruff format {staged_files}
+            stage_fixed: true
+    - name: checks
+      group:
+        parallel: true
+        jobs:
+          - name: frontend lint (ESLint)
+            run: npm run lint --workspace frontend
+          - name: backend lint (ruff check)
+            run: uv run ruff check backend
+          - name: frontend types (tsc)
+            run: npm run typecheck --workspace frontend
+          - name: backend types (ty)
+            run: uv run ty check backend
+          - name: secrets (gitleaks)
+            run: gitleaks git --staged --no-banner --redact
