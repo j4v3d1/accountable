@@ -14,8 +14,9 @@ const staticSteps = [
   { name: "Secrets in git history (gitleaks)", command: "gitleaks", args: ["git", ".", "--no-banner", "--redact"] },
 ];
 
-// Left out of --quick along with the end-to-end tests, so the end-of-turn hook
-// doesn't keep blocking on Linux baselines that only CI can make.
+// Runs before the tests: Playwright writes any missing baseline as it fails, which
+// would make this pass afterwards. Left out of --quick along with the end-to-end
+// tests, so the end-of-turn hook doesn't keep blocking on baselines only CI can make.
 const baselineStep = {
   name: "Baseline screenshots for Mac and Linux",
   command: process.execPath,
@@ -23,4 +24,4 @@ const baselineStep = {
   endToEnd: true,
 };
 
-runSteps([...staticSteps, ...testSteps, baselineStep].filter((step) => !(quick && step.endToEnd)));
+runSteps([...staticSteps, baselineStep, ...testSteps].filter((step) => !(quick && step.endToEnd)));
