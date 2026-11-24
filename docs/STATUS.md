@@ -13,7 +13,8 @@
 
 ## History
 
-- Intent, spec, mockups and plan agreed: see `docs/intent.md`, `docs/spec.md`, `docs/mockups/` (mockup D is the approved look) and `docs/plan.md`. Phase 0 settled the spec gaps found while planning.
+- Intent, spec, mockups and plan agreed: see `docs/changes/mvp/intent.md`, `docs/spec.md`, `docs/mockups/` (mockup D is the approved look) and `docs/changes/mvp/plan.md`. Phase 0 settled the spec gaps found while planning.
+- Docs reorganized for future changes (2026-11-24, `harness` branch): the MVP's intent and plan moved to `docs/changes/mvp/`, and each change now gets its own `docs/changes/<branch name>/` folder. `docs/spec.md` now describes the whole product as it stands, with the problem statement, users, what's not built yet, and behavior the MVP added during the build (Edit, Delete and Back on record pages, the not-found page, the dashboard's "Log activity" picker, the delete dialog's retry). No code changed.
 
 ## Build progress
 
@@ -62,7 +63,7 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 
 5. **Search skipped some text columns (R2).** The Deals search didn't match the stage, and the Contacts search didn't match the status. **Fixed:** both are searched. Stages still sort in pipeline order.
 6. **Closed (Won) and Lost cards hid the probability (R20).** R20 says every card shows it. Mockup D hides it too, but the spec says the requirements decide what a screen does. **Fixed:** every card shows the five-dot meter and the percentage.
-7. **Files not listed in the plan:** `backend/app/core/errors.py`, `backend/app/core/fields.py`, `frontend/src/ui/NotFoundPage.tsx` and `.vscode/settings.json`. **Fixed:** all four are kept and now listed in `docs/plan.md`, along with `lib/validation.ts`. `errors.py` and `fields.py` are also in the spec's code structure.
+7. **Files not listed in the plan:** `backend/app/core/errors.py`, `backend/app/core/fields.py`, `frontend/src/ui/NotFoundPage.tsx` and `.vscode/settings.json`. **Fixed:** all four are kept and now listed in `docs/changes/mvp/plan.md`, along with `lib/validation.ts`. `errors.py` and `fields.py` are also in the spec's code structure.
 8. **The walkthrough with Wi-Fi off hasn't been done** (see Not checked below). **Still open:** it needs a person to switch Wi-Fi off, run `npm run dev` and go through every screen.
 
 ## Not checked
