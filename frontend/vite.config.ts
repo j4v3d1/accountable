@@ -19,5 +19,7 @@ export default defineConfig({
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["src/test/setup.ts"],
+    // A stray it.only would quietly skip the other tests in its file, so it's always an error.
+    allowOnly: false,
   },
 });

@@ -387,6 +387,16 @@
   line-height: 1.35;
 }
 
+/* The follow-up's deal or contact: muted, as in mockup D, until pointed at. */
+.follow-up-on a {
+  color: var(--ink-muted);
+}
+
+.follow-up-on a:hover {
+  color: var(--cerulean-text);
+  text-decoration: underline;
+}
+
 .follow-up-on {
   font-size: 12.5px;
   margin-top: 2px;

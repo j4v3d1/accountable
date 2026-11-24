@@ -9,7 +9,7 @@
     "dev:api": "uv sync && uv run --directory backend uvicorn app.main:app --host 127.0.0.1 --port 8000",
     "dev:web": "npm run dev --workspace frontend",
     "seed": "uv run --directory backend python -m app.seed",
-    "test": "npm run test:api && npm run test:web && npm run test:e2e",
+    "test": "node scripts/test-all.mjs",
     "test:api": "uv run pytest",
     "test:web": "npm run typecheck --workspace frontend && npm run test --workspace frontend",
     "test:e2e": "playwright test"

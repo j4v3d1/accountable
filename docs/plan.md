@@ -28,7 +28,7 @@ The npm scripts all work the same in macOS, Linux and Windows shells:
 | `dev:api` | `uv sync`, then Uvicorn serving `app.main:app` from `backend/` on port 8000 (concern 4). |
 | `dev:web` | The Vite dev server in `frontend/` on port 5173. |
 | `seed` | `uv run --directory backend python -m app.seed` (R41). |
-| `test` | `test:api`, then `test:web`, then `test:e2e`, stopping at the first failure (R43). |
+| `test` | `scripts/test-all.mjs`: pytest, the TypeScript check, Vitest, then Playwright, running every one even after a failure, then a summary. It fails if any test fails (R43). |
 | `test:api` | `uv run pytest`. |
 | `test:web` | The TypeScript check (`tsc --noEmit`), then `vitest run`, in `frontend/`. |
 | `test:e2e` | `playwright test`. |

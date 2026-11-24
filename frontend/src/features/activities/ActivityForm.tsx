@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
-import { FileText, Mail, Phone } from "lucide-react";
+import { FileIcon, Mail, Phone } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { TextAreaField, TextField } from "../../ui/fields";
@@ -8,7 +8,7 @@ import { FormActions } from "../../ui/FormDialog";
 import type { ActivityInput } from "./types";
 
 const TYPES = [
-  { key: "note", label: "Note", icon: FileText },
+  { key: "note", label: "Note", icon: FileIcon },
   { key: "call", label: "Call", icon: Phone },
   { key: "email", label: "Email", icon: Mail },
 ] as const;

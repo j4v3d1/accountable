@@ -1,17 +1,63 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, LabelList, ResponsiveContainer, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis } from "recharts";
 import { money, moneyShort } from "../../lib/format";
 import type { Dashboard } from "./types";
 import { revenueChange } from "./wording";
 
+// The chart follows mockup D's drawing: two faint guide lines, a line from each
+// point down to the axis, and the current month as a larger solid dot.
 const SEA_GREEN = "#06D6A0";
 const SEA_MIST = "#CDD8DB";
+const MIDNIGHT = "#073B4C";
+const LABEL = "#9FB6BD";
+const CHART_HEIGHT = 198;
+const MARGIN = { top: 30, right: 40, bottom: 0, left: 40 };
+const X_AXIS_HEIGHT = 28;
+const PLOT_BOTTOM = CHART_HEIGHT - MARGIN.bottom - X_AXIS_HEIGHT;
+const PLOT_HEIGHT = PLOT_BOTTOM - MARGIN.top;
+const GUIDE_LINES = [MARGIN.top + PLOT_HEIGHT / 3, MARGIN.top + (2 * PLOT_HEIGHT) / 3];
+
+interface PointProps {
+  cx?: number;
+  cy?: number;
+  index?: number;
+}
 
 /** Revenue won this month, the change from last month, and a line chart of the six months (R32). */
 export function RevenuePanel({ revenue, monthName }: { revenue: Dashboard["revenue"]; monthName: string }) {
   const change = revenueChange(revenue.change_percent, revenue.last_month_label);
   const Arrow = change.direction === "down" ? ArrowDown : change.direction === "up" ? ArrowUp : null;
   const current = revenue.months[revenue.months.length - 1]?.label;
+  const lastIndex = revenue.months.length - 1;
+
+  function Point({ cx = 0, cy = 0, index = 0 }: PointProps) {
+    const isCurrent = index === lastIndex;
+    return (
+      <g key={`point-${index}`}>
+        <line
+          x1={cx}
+          x2={cx}
+          y1={cy + 6}
+          y2={PLOT_BOTTOM}
+          stroke={SEA_MIST}
+          strokeOpacity={isCurrent ? 0.3 : 0.08}
+          strokeDasharray={isCurrent ? "3 3" : undefined}
+        />
+        <circle cx={cx} cy={cy} r={isCurrent ? 6 : 3.5} fill={isCurrent ? SEA_GREEN : MIDNIGHT} stroke={SEA_GREEN} strokeWidth={2.5} />
+        <text
+          x={cx}
+          y={cy - 14}
+          textAnchor="middle"
+          fontFamily="var(--font-mono)"
+          fontSize={11}
+          fontWeight={isCurrent ? 600 : 400}
+          fill={isCurrent ? "#FFFFFF" : LABEL}
+        >
+          {moneyShort(revenue.months[index]?.won_value ?? 0)}
+        </text>
+      </g>
+    );
+  }
 
   return (
     <section className="revenue-panel" aria-label="Revenue won">
@@ -42,21 +88,22 @@ export function RevenuePanel({ revenue, monthName }: { revenue: Dashboard["reven
         </dl>
       </div>
       <div className="revenue-chart" role="img" aria-label={`Revenue won per month: ${revenue.months.map((m) => `${m.label} ${moneyShort(m.won_value)}`).join(", ")}`}>
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={revenue.months} margin={{ top: 28, right: 28, bottom: 0, left: 28 }}>
-            <CartesianGrid vertical horizontal={false} stroke="rgba(205, 216, 219, 0.12)" />
+        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+          <AreaChart data={revenue.months} margin={MARGIN}>
+            <CartesianGrid vertical={false} horizontalPoints={GUIDE_LINES} stroke={SEA_MIST} strokeOpacity={0.12} />
             <XAxis
               dataKey="label"
               axisLine={false}
               tickLine={false}
               interval={0}
+              height={X_AXIS_HEIGHT}
               tick={({ x, y, payload }) => (
                 <text
                   x={x}
-                  y={Number(y) + 12}
+                  y={Number(y) + 14}
                   textAnchor="middle"
-                  fontSize={11.5}
-                  fill={payload.value === current ? "#FFFFFF" : SEA_MIST}
+                  fontSize={12}
+                  fill={payload.value === current ? "#FFFFFF" : LABEL}
                   fontWeight={payload.value === current ? 600 : 400}
                 >
                   {payload.value}
@@ -67,20 +114,14 @@ export function RevenuePanel({ revenue, monthName }: { revenue: Dashboard["reven
               type="monotone"
               dataKey="won_value"
               stroke={SEA_GREEN}
-              strokeWidth={2.5}
-              fill="rgba(6, 214, 160, 0.16)"
-              dot={{ r: 4, fill: "#073B4C", stroke: SEA_GREEN, strokeWidth: 2 }}
+              strokeWidth={3}
+              strokeLinecap="round"
+              fill={SEA_GREEN}
+              fillOpacity={0.1}
+              dot={Point}
               activeDot={false}
               isAnimationActive={false}
-            >
-              <LabelList
-                dataKey="won_value"
-                position="top"
-                offset={10}
-                formatter={(value) => moneyShort(Number(value))}
-                style={{ fill: SEA_MIST, fontSize: 11, fontFamily: "var(--font-mono)" }}
-              />
-            </Area>
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

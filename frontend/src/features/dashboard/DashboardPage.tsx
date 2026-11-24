@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
-import { ArrowRight, FileText, Plus } from "lucide-react";
+import { ArrowRight, FileIcon, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../api/client";
@@ -50,7 +50,7 @@ export function DashboardPage() {
           actions={
             <>
               <button type="button" className="btn btn-quiet" onClick={() => setLogging(true)}>
-                <FileText size={16} aria-hidden="true" />
+                <FileIcon size={16} aria-hidden="true" />
                 Log activity
               </button>
               <button type="button" className="btn btn-primary" onClick={() => setAddingDeal(true)}>

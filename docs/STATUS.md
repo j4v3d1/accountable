@@ -9,7 +9,7 @@
 
 - `npm run dev` starts Accountable. Open the address it prints (http://localhost:5173).
 - `npm run seed` resets the data to the sample data.
-- `npm test` runs every test: backend (pytest), frontend (TypeScript check and Vitest) and end to end (Playwright in Chrome). The tests use their own database and ports, so they never touch your data.
+- `npm test` runs every test: backend (pytest), frontend (TypeScript check and Vitest) and end to end (Playwright in Chrome). It runs all of them even when one fails, prints a summary, and fails if any test fails. The tests use their own database and ports, so they never touch your data.
 
 ## History
 
@@ -31,6 +31,15 @@
   - the console stayed clear, and the browser asked for nothing outside the computer.
 
   The walkthrough found four small things, now fixed: "None yet" and "No closed deals yet" were set in the figure font; every "Mark done" button, and every column's "Add deal" button, had the same name for screen readers; and form dialogs read their title twice to screen readers.
+- **Mockup check (done):** the dashboard and pipeline were compared with mockup D at its own sizes (1600 by 1066 and 1600 by 1461) using Playwright, measured against the mockup's HTML. Fixed to match:
+  - page titles had a tighter line height, so every header sat 8px higher;
+  - the revenue chart now has the mockup's two guide lines, a line from each point down to the axis, and the current month as a larger solid dot with a white label;
+  - the won and lost bars are rounded on every corner and stop just short of the centre line, with lost counts in Coral;
+  - the pipeline summary's figures are spaced as in the mockup;
+  - each follow-up's deal or contact is muted until pointed at;
+  - notes and stage changes use the mockup's icons.
+
+  Still different on purpose, as agreed in Phase 0: the board fills the window and each column scrolls, and Closed (Won) and Lost say "All time" rather than "Last 6 months".
 
 ## Not checked
 

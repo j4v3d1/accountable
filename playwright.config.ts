@@ -16,7 +16,8 @@ export default defineConfig({
   testMatch: "**/*.spec.ts",
   workers: 1,
   fullyParallel: false,
-  forbidOnly: !!process.env.CI,
+  // A stray test.only would quietly skip every other test, so it's always an error.
+  forbidOnly: true,
   retries: 0,
   timeout: 30_000,
   expect: { timeout: 5_000 },
