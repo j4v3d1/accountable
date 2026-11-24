@@ -81,7 +81,7 @@ Each requirement has an ID, so tests and status notes can point at it.
 
 - **R13** Fields:
   - name (required);
-  - main contact and organization (both optional);
+  - main contact and organization (both optional, each chosen from a searchable list);
   - stage (required, default New Lead);
   - value (whole US dollars, 0 or more, required);
   - probability (0 to 100, whole number);
@@ -99,7 +99,7 @@ Each requirement has an ID, so tests and status notes can point at it.
 ### Pipeline
 
 - **R20** A board with seven columns in the fixed stage order.
-  - Each column heading shows the stage name, the number of deals and their total value. Open stages also show their expected revenue and a thin bar for their share of open value. Closed (Won) and Lost are labelled "Last 6 months".
+  - Each column heading shows the stage name, the number of deals and their total value. Open stages also show their expected revenue and a thin bar for their share of open value. Closed (Won) and Lost are labelled "All time", because they keep every deal ever won or lost (concern 9).
   - Each card shows:
     - the main contact's initials in a colored circle (the organization's if there's no contact, and no circle if there's neither);
     - the deal name, with the contact and organization;
@@ -135,16 +135,16 @@ Each requirement has an ID, so tests and status notes can point at it.
 - **R31** A **summary line** under the title, such as "18 open deals worth $10,151,500. 2 follow-ups are overdue and 3 deals are past their close date." A part that would be zero is left out.
 - **R32** A **revenue panel** with:
   - revenue won this month, as the large figure;
-  - the change from last month, as a percentage;
+  - the change from last month, as a percentage. When last month's revenue was $0, it reads "No revenue won in October" (naming last month) instead;
   - the total for the last six months and the best month;
   - a **line chart** of revenue won per month over those six months (concern 12), with each month's figure labelled.
 - **R33** Three **figure cards**:
   - **Open pipeline**, the total value of open deals, with the number of open deals and a mini stage strip;
-  - **Expected revenue**, the sum of value times probability over open deals, with a ring showing it as a share of open value;
+  - **Expected revenue**, the sum of value times probability over open deals, with a ring showing it as a share of open value. With no open deals, the ring shows 0%;
   - **Deals won this month**, with last month's count, the win rate, and a small six-month chart of deals won.
 
-  The **win rate** is deals won divided by deals won plus deals lost, over the last six months by close date.
-- **R34** A **sales funnel** showing, for each stage from New Lead to Closed (Won), the number of deals and the value that reached it (concern 8). For every stage after New Lead, it also shows the share of deals that moved on from the stage before (deals reaching this stage divided by deals reaching the previous one).
+  The **win rate** is deals won divided by deals won plus deals lost, over the last six months by close date. When none have been won or lost in that time, it reads "No closed deals yet".
+- **R34** A **sales funnel** showing, for each stage from New Lead to Closed (Won), the number of deals and the value that reached it (concern 8). For every stage after New Lead, it also shows the share of deals that moved on from the stage before (deals reaching this stage divided by deals reaching the previous one). The share is left blank when the stage before had no deals.
 - **R34a** A **won and lost chart** for the same six months: deals won as bars above a centre line and deals lost as bars below it, each labelled with its count. Underneath it go the six-month totals won and lost, and the win rate.
 - **R35** A **pipeline strip**: one horizontal bar split by open stage, each part as wide as that stage's share of open value, labelled with the stage, value and count. Clicking it opens the Pipeline.
 - **R36** **Follow-ups**, in three groups:
@@ -152,7 +152,7 @@ Each requirement has an ID, so tests and status notes can point at it.
   - **This week**, from today to Sunday;
   - **Later**.
 
-  Each group is nearest first. Each follow-up has a round checkbox to mark it done, which removes it from the list, and links to its contact or deal.
+  Each group is in date order, oldest first. Each follow-up has a round checkbox to mark it done, which removes it from the list, and links to its contact or deal.
 - **R37** **Recent activity**: the latest 10 activities of every kind, including stage changes, each linked to its contact or deal.
 - **R38** Every dashboard figure is worked out by the backend from the current data. It changes as soon as the data changes, such as a deal moving to Closed (Won) or a new follow-up being saved.
 
@@ -178,7 +178,8 @@ browser
 ```
 
 - The backend owns all the business rules: stage probabilities, close dates, stage-change entries, delete cascades, positions and dashboard figures. The frontend never works these out for saved data. Its only exception is the instant totals while a card is being dragged (R24), which are then replaced by the server's answer.
-- The database path comes from the environment variable `ACCOUNTABLE_DB`, which defaults to `backend/data/accountable.db`. Tests point it at a temporary file.
+- The database comes from the environment variable `ACCOUNTABLE_DATABASE_URL`, a SQLAlchemy database URL. It defaults to the SQLite file `backend/data/accountable.db`, found from the backend folder rather than the folder a command runs in. Tests point it at a temporary file. Moving to Supabase's Postgres later means changing this setting, not the code.
+- Each API request runs in one database transaction, so a change either saves completely or not at all.
 
 ### Libraries
 
@@ -191,6 +192,7 @@ browser
 | Drag and drop | dnd-kit (`@dnd-kit/core`, `@dnd-kit/sortable`) |
 | Forms and validation | React Hook Form with Zod |
 | Dialogs, menus, selects (accessible building blocks) | Radix UI primitives |
+| Searchable pickers (choosing a contact or organization) | `cmdk`, inside a Radix Popover |
 | Icons | Lucide |
 | Dates | date-fns |
 | Fonts, offline | Fontsource packages |
@@ -201,7 +203,7 @@ Sorting and searching happen in the browser. With a few hundred rows at most, th
 
 ### Data model
 
-All tables have an integer `id` primary key and `created_at` / `updated_at` timestamps. Foreign keys are switched on in SQLite (`PRAGMA foreign_keys = ON`).
+All tables have an integer `id` primary key and `created_at` / `updated_at` timestamps. Timestamps (these two and `occurred_at`) are stored in UTC and shown in local time. Plain dates (`close_date`, `follow_up_date`) are stored as dates. Foreign keys are switched on in SQLite (`PRAGMA foreign_keys = ON`).
 
 **organizations**: `name` text not null; `website` text; `industry` text, one of the R7 values; `notes` text.
 
@@ -248,19 +250,47 @@ Rules the backend applies:
 - `move` takes the deal out of its old column and inserts it at `index` in the new one. It renumbers `position` in both columns, in one transaction. A move within the same column changes the order only.
 - A new deal goes to position 0 in its column, and the others move down one.
 
-### Frontend structure
+### Code structure
+
+The code is grouped by area of the product, not by technical layer, so a new area (such as invoicing) is a new folder on each side and nothing else has to move.
 
 ```
+backend/app/
+  main.py              creates the app and adds each area's routes
+  core/
+    config.py          database URL, today()
+    db.py              engine, one transaction per request
+    tables.py          all tables, in one place
+  organizations/       routes.py, schemas.py, service.py
+  contacts/            routes.py, schemas.py, service.py
+  deals/               routes.py, schemas.py, service.py, stages.py
+  activities/          routes.py, schemas.py, service.py
+  dashboard/           routes.py, schemas.py, service.py
+  seed.py              the sample data, and the reset command
+
 frontend/src/
-  main.tsx, App.tsx           routes and layout
-  api/                        typed fetch functions and TanStack Query hooks
-  components/                 Sidebar, PageHeader, DataTable, ConfirmDeleteDialog,
-                              RecordForm parts, Timeline, ActivityForm, Badge, Money
-  pages/                      Dashboard, Organizations, OrganizationDetail, Contacts,
-                              ContactDetail, Deals, DealDetail, Pipeline
-  styles/                     tokens.css (brand variables), base.css
-  lib/                        formatting (money, dates, percent)
+  main.tsx, App.tsx    providers and routes
+  api/client.ts        the one fetch wrapper and its error type
+  ui/                  app-wide pieces: Rail, PageHeader, DataTable, ConfirmDeleteDialog,
+                       Toast, form fields, RecordPicker, Avatar, empty/loading/error states
+  lib/                 formatting (money, dates, percent) and initials
+  features/
+    organizations/     pages, form, query hooks, types
+    contacts/          pages, form, query hooks, types
+    deals/             pages, form, query hooks, types, StageChip, LateBadge, ProbabilityDots
+    activities/        Timeline, ActivityForm, query hooks, types
+    pipeline/          Board, Column, DealCard, BoardSummary, PipelineStrip, board logic
+    dashboard/         the dashboard page and its panels
+  styles/              tokens.css (brand variables), base.css
 ```
+
+Rules that keep it this way:
+
+- Route files are thin. They check the request, call one function in their area's `service.py`, and return the result.
+- Services are plain functions that take the request's database connection, and later the signed-in user. There are no repository classes, no ORM models and no dependency-injection framework.
+- `core/`, `ui/` and `lib/` never import from an area. Areas may call each other where they need to; for example, deals calls activities to log a stage change.
+- Frontend types are written by hand, one `types.ts` per area. After any change to data, the frontend refreshes all its queries, which keeps every screen current, the dashboard included (R38).
+- Left out on purpose until they pay off: API versioning, types generated from the API, and Alembic schema migrations. Alembic comes with the first schema change after the MVP, starting from a baseline that matches the existing database, so no data is lost.
 
 Routes: `/`, `/organizations`, `/organizations/:id`, `/contacts`, `/contacts/:id`, `/deals`, `/deals/:id`, `/pipeline`.
 
@@ -316,7 +346,7 @@ Light mode only, laid out for screens 1280px wide and up. Narrower windows down 
 - **Pipeline**:
   - **Header:** the open-deal count above the title. On the right are a hint about keyboard dragging and "New deal".
   - **Summary panel** (R21): open value, expected revenue, the late count in Raspberry, and a thin strip with stage names lined up under their segments.
-  - **Columns:** seven columns, each a rounded light-gray panel holding its heading, its cards and an "Add deal" button at the bottom. They scroll sideways as a group on narrow screens. Closed (Won) and Lost columns are a shade lighter, and their cards are off-white with no shadow, so open deals stand out.
+  - **Columns:** seven columns, each a rounded light-gray panel holding its heading, its cards and an "Add deal" button at the bottom. The board fills the window height, and each column scrolls on its own inside it, so its heading and totals stay in view (concern 9). The columns scroll sideways as a group on narrow screens. Closed (Won) and Lost columns are a shade lighter, and their cards are off-white with no shadow, so open deals stand out.
   - **Cards** (R20): the value is in full (`$585,000`). The five-dot probability meter is Cerulean. The late label is a Raspberry pill.
   - **Dragging:** while a card is being dragged, it tilts slightly, gains a Sea Green outline and a deeper shadow, and leaves a hatched gap where it came from.
 
