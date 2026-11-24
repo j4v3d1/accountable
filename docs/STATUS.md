@@ -15,6 +15,7 @@
 ## History
 
 - Intent, spec, mockups and plan agreed: see `docs/changes/mvp/intent.md`, `docs/spec.md`, `docs/mockups/` (mockup D is the approved look) and `docs/changes/mvp/plan.md`. Phase 0 settled the spec gaps found while planning.
+- Dark mode intent and spec (2026-11-24, `dark-mode` branch): `docs/changes/dark-mode/intent.md` agreed, and `docs/spec.md` now describes dark mode (R6a, concerns 13 to 15, dark color tokens, the visual test). No code changed yet.
 - Docs reorganized for future changes (2026-11-24, `harness` branch): the MVP's intent and plan moved to `docs/changes/mvp/`, and each change now gets its own `docs/changes/<branch name>/` folder. `docs/spec.md` now describes the whole product as it stands, with the problem statement, users, what's not built yet, and behavior the MVP added during the build (Edit, Delete and Back on record pages, the not-found page, the dashboard's "Log activity" picker, the delete dialog's retry). No code changed.
 
 ## Build progress
