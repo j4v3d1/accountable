@@ -1,0 +1,45 @@
+.stage-chip {
+  color: var(--ink);
+}
+
+.stage-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.late-badge {
+  background: var(--raspberry-pill);
+  color: var(--raspberry-text);
+  font: 600 11.5px var(--font-mono);
+  padding: 3px 8px;
+  gap: 5px;
+}
+
+.late-date {
+  color: var(--raspberry-text);
+}
+
+.close-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prob-dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.prob-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--soft);
+}
+
+.prob-dots span.on {
+  background: var(--cerulean);
+}

@@ -1,0 +1,361 @@
+/* The pipeline fills the window height; each column scrolls on its own (concern 9). */
+.pipeline-page {
+  height: 100%;
+  min-height: 560px;
+  gap: 18px;
+}
+
+.drag-hint {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  margin-right: 8px;
+}
+
+kbd {
+  font: 500 11px var(--font-mono);
+  background: var(--panel);
+  border-radius: 5px;
+  padding: 1px 6px;
+  box-shadow: 0 1px 1px rgba(7, 59, 76, 0.08);
+}
+
+/* Summary (R21) */
+.board-summary {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  align-items: center;
+  padding: 18px 22px;
+  gap: 0;
+}
+
+.summary-stat {
+  padding-right: 32px;
+}
+
+.summary-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.summary-value {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+}
+
+.summary-value.warn {
+  color: var(--raspberry-text);
+}
+
+/* The strip of open value by stage */
+.strip-wrap {
+  min-width: 0;
+}
+
+.strip {
+  display: flex;
+  gap: 3px;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.strip span {
+  display: block;
+  flex-basis: 0;
+  min-width: 4px;
+}
+
+.strip .strip-empty {
+  flex-grow: 1;
+  background: var(--soft);
+}
+
+.strip-labels {
+  display: flex;
+  gap: 3px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.strip-labels span {
+  flex-basis: 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.strip-legend {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.strip-legend > div {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  column-gap: 8px;
+  row-gap: 1px;
+  align-items: center;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.legend-label {
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.legend-value {
+  grid-column: 2;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.legend-count {
+  grid-column: 2;
+  font-size: 12px;
+}
+
+/* Board and columns */
+.board {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(188px, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.column {
+  align-self: start;
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #e6edef;
+  border-radius: var(--radius-panel);
+  padding: 8px;
+}
+
+.column.closed {
+  background: #ebf0f2;
+}
+
+.column-head {
+  padding: 8px 8px 6px;
+}
+
+.column-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.column-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.column-name i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.column-count {
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.column-value {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
+}
+
+.column-sub {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.column-share {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.column-share span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.column-cards {
+  flex: 1 1 auto;
+  min-height: 64px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px;
+  margin: -2px;
+}
+
+.add-deal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  flex: none;
+}
+
+.add-deal:hover {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+}
+
+/* Cards (R20) */
+.deal-card {
+  background: var(--panel);
+  border-radius: var(--radius-card);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  box-shadow: 0 1px 2px rgba(7, 59, 76, 0.06);
+  cursor: grab;
+  flex: none;
+  touch-action: none;
+}
+
+.deal-card:focus-visible {
+  outline: 2px solid var(--cerulean);
+  outline-offset: 2px;
+}
+
+.deal-card.done {
+  background: #f7fafb;
+  box-shadow: none;
+}
+
+.deal-card.done .card-value {
+  color: var(--ink-muted);
+}
+
+.card-top {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.card-title {
+  min-width: 0;
+}
+
+.card-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  line-height: 1.3;
+}
+
+.card-who {
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.card-value {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.card-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.card-prob {
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+
+/* Dragging: the card tilts and lifts; a hatched gap shows where it came from. */
+.deal-card.dragging {
+  transform: rotate(-2.5deg);
+  box-shadow: var(--shadow-lift), 0 2px 6px rgba(7, 59, 76, 0.1);
+  outline: 2px solid var(--sea-green);
+  cursor: grabbing;
+}
+
+.deal-card.slot,
+.card-gap {
+  border-radius: var(--radius-card);
+  background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(7, 59, 76, 0.04) 8px 16px);
+  box-shadow: inset 0 0 0 2px #b9c9ce;
+}
+
+.deal-card.slot > *,
+.deal-card.landing > * {
+  visibility: hidden;
+}
+
+.card-gap {
+  height: 84px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.deal-card.landing {
+  background: rgba(6, 214, 160, 0.08);
+  box-shadow: inset 0 0 0 2px rgba(6, 214, 160, 0.5);
+}

@@ -1,0 +1,51 @@
+/* Brand tokens (docs/spec.md, Visual design). */
+:root {
+  --page: #f0f4f5;
+  --panel: #ffffff;
+  --ink: #073b4c;
+  --ink-muted: #3e6370;
+  --sea-mist: #cdd8db;
+  --soft: #e9eff1;
+  --track: #f3f7f8;
+  --deep: #0b4a5e;
+  --rail-text: #9fb6bd;
+
+  --sea-green: #06d6a0;
+  --sea-green-text: #047a5c;
+  --marigold: #ffc145;
+  --marigold-text: #8a5a00;
+  --coral: #f78c6b;
+  --coral-text: #b24a2a;
+  --cerulean: #118ab2;
+  --cerulean-text: #0e7193;
+  --raspberry: #ef476f;
+  --raspberry-text: #c42d52;
+  --raspberry-wash: #fef1f4;
+  --raspberry-pill: #fddde5;
+
+  /* Stage colors (concern 1): a Cerulean scale for the open stages. */
+  --stage-new_lead: #d0e8f0;
+  --stage-qualified: #b1d8e5;
+  --stage-showing: #93c9db;
+  --stage-offer: #76bbd2;
+  --stage-under_contract: #58adc9;
+  --stage-closed_won: #06d6a0;
+  --stage-lost: #cdd8db;
+
+  --font-sans: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
+
+  --text-title: 30px;
+  --text-section: 16px;
+  --text-body: 14px;
+  --text-small: 12.5px;
+
+  --radius-panel: 16px;
+  --radius-card: 12px;
+  --radius-control: 10px;
+
+  --shadow-panel: 0 1px 2px rgba(7, 59, 76, 0.04), 0 8px 24px -12px rgba(7, 59, 76, 0.1);
+  --shadow-control: 0 1px 2px rgba(7, 59, 76, 0.08);
+  --shadow-lift: 0 18px 40px -12px rgba(7, 59, 76, 0.35);
+}

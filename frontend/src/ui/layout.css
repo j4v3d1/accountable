@@ -1,0 +1,74 @@
+.app {
+  display: flex;
+  height: 100%;
+}
+
+.rail {
+  width: 84px;
+  flex: none;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.rail-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--sea-green);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 19px;
+  margin-bottom: 22px;
+}
+
+.rail-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 68px;
+  padding: 10px 0 8px;
+  border-radius: 12px;
+  color: var(--rail-text);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.rail-link:hover {
+  text-decoration: none;
+  color: #fff;
+}
+
+.rail-link.active {
+  background: var(--deep);
+  color: #fff;
+}
+
+.rail-link.active .rail-icon {
+  color: var(--sea-green);
+}
+
+.rail-link:focus-visible {
+  outline-color: var(--sea-green);
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.page {
+  padding: 28px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+}

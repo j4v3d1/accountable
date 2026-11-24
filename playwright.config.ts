@@ -1,0 +1,46 @@
+import os from "node:os";
+import path from "node:path";
+import { defineConfig } from "@playwright/test";
+
+// The end-to-end tests run their own backend and frontend on test ports, against
+// a temporary database, so they never touch the agent's data or a running dev server.
+const API_PORT = 8100;
+const WEB_PORT = 5180;
+
+// Set once in the runner; the worker processes inherit it, so all share one file.
+process.env.ACCOUNTABLE_E2E_DB ??= path.join(os.tmpdir(), `accountable-e2e-${Date.now()}-${process.pid}.db`);
+export const E2E_DATABASE_URL = `sqlite:///${process.env.ACCOUNTABLE_E2E_DB.replaceAll("\\", "/")}`;
+
+export default defineConfig({
+  testDir: "e2e",
+  testMatch: "**/*.spec.ts",
+  workers: 1,
+  fullyParallel: false,
+  forbidOnly: !!process.env.CI,
+  retries: 0,
+  timeout: 30_000,
+  expect: { timeout: 5_000 },
+  reporter: [["list"]],
+  use: {
+    baseURL: `http://localhost:${WEB_PORT}`,
+    channel: "chrome",
+    viewport: { width: 1440, height: 900 },
+    trace: "retain-on-failure",
+  },
+  webServer: [
+    {
+      command: `uv run --directory backend uvicorn app.main:app --host 127.0.0.1 --port ${API_PORT}`,
+      url: `http://127.0.0.1:${API_PORT}/api/stages`,
+      reuseExistingServer: false,
+      timeout: 60_000,
+      env: { ACCOUNTABLE_DATABASE_URL: E2E_DATABASE_URL },
+    },
+    {
+      command: "npm run dev --workspace frontend",
+      url: `http://localhost:${WEB_PORT}`,
+      reuseExistingServer: false,
+      timeout: 60_000,
+      env: { ACCOUNTABLE_WEB_PORT: String(WEB_PORT), ACCOUNTABLE_API_PORT: String(API_PORT) },
+    },
+  ],
+});

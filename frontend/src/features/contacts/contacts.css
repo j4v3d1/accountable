@@ -1,0 +1,49 @@
+.status-lead {
+  background: #fff3d6;
+  color: var(--marigold-text);
+}
+
+.status-qualified {
+  background: #dcedf3;
+  color: var(--cerulean-text);
+}
+
+.status-customer {
+  background: #d4f6ec;
+  color: var(--sea-green-text);
+}
+
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--page);
+  border-radius: var(--radius-control);
+  padding: 3px;
+  border: 0;
+}
+
+.segmented label {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.segmented label:has(input:checked) {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow-control);
+}
+
+.segmented label:has(input:focus-visible) {
+  outline: 2px solid var(--cerulean);
+}

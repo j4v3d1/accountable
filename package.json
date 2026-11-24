@@ -1,0 +1,21 @@
+{
+  "name": "accountable",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently --names api,web --prefix-colors cyan,green --kill-others-on-fail \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "uv sync && uv run --directory backend uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "dev:web": "npm run dev --workspace frontend",
+    "seed": "uv run --directory backend python -m app.seed",
+    "test": "npm run test:api && npm run test:web && npm run test:e2e",
+    "test:api": "uv run pytest",
+    "test:web": "npm run typecheck --workspace frontend && npm run test --workspace frontend",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "concurrently": "^10.0.7"
+  }
+}

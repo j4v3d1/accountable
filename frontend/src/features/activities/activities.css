@@ -1,0 +1,104 @@
+.activity-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--ink);
+}
+
+.activity-icon.type-note {
+  background: #fde3d9;
+  color: var(--coral-text);
+}
+
+.activity-icon.type-call {
+  background: #d4f6ec;
+  color: var(--sea-green-text);
+}
+
+.activity-icon.type-email {
+  background: #fff0cc;
+  color: var(--marigold-text);
+}
+
+.activity-icon.type-stage_change {
+  background: #dcedf3;
+  color: var(--cerulean-text);
+}
+
+.timeline {
+  list-style: none;
+  margin-top: 16px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  padding: 0 0 16px;
+  position: relative;
+}
+
+.timeline-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 36px;
+  bottom: 2px;
+  width: 2px;
+  background: var(--soft);
+  border-radius: 2px;
+}
+
+.timeline-body {
+  flex: 1;
+  min-width: 0;
+  padding-top: 5px;
+}
+
+.timeline-text {
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.timeline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
+.timeline-actions {
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.timeline-item:hover .timeline-actions,
+.timeline-item:focus-within .timeline-actions {
+  opacity: 1;
+}
+
+.follow-up {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 600 11.5px var(--font-mono);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff3d6;
+  color: var(--marigold-text);
+}
+
+.follow-up.overdue {
+  background: var(--raspberry-pill);
+  color: var(--raspberry-text);
+}
+
+.follow-up.done {
+  background: var(--soft);
+  color: var(--ink-muted);
+}
