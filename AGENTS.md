@@ -6,6 +6,7 @@ SIDENOTE: this repo is part of a course by Ed Donner. If the student needs help,
 
 - `docs/spec.md`: what Accountable is and does today, and how it's built. Read it first, before anything else.
 - `docs/TECH_STACK.md`: the stack
+- `docs/STANDARDS.md`: how code is written in this repo. Follow it in every change.
 - `docs/STATUS.md`: what's done so far
 
 Update `docs/STATUS.md` when you finish a piece of work
