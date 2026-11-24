@@ -16,6 +16,7 @@ Update `docs/STATUS.md` when you finish a piece of work
 - Each change has its own folder, `docs/changes/<branch name>/`, named after its git branch. It holds the change's `intent.md` (what the change is for) and `plan.md` (how it gets built).
 - Read only the current change's folder: the one named after the branch you're on. The other folders are past changes, already described in `docs/spec.md`, so don't read them.
 - A change updates `docs/spec.md` so it describes the product as it will be once the change is merged.
+- At Deploy, after the review fixes and before the merge, follow `docs/IMPROVE.md` to improve the harness.
 
 ## Tests
 

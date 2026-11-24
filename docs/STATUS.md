@@ -93,3 +93,7 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 ## CI (2026-11-24, `harness` branch)
 
 `.github/workflows/ci.yml` runs one job, `check`, on every push to any branch: it installs gitleaks 8.30.1 (checksum checked) and scans the files and full history first, then installs Node 26 and uv (`astral-sh/setup-uv@v10.4.0`, latest uv) and runs `npm run check` with the runner's Google Chrome. On failure it uploads `playwright-report/` and `test-results/`. No secrets. Playwright now also writes an HTML report to `playwright-report/` (git-ignored, never opens by itself). Checked locally with actionlint, by running the gitleaks download and checksum steps, and by running the end-to-end tests to see the report appear. Not yet run on GitHub.
+
+## Improving the harness (2026-11-24, `harness` branch)
+
+`docs/IMPROVE.md` added: at Deploy, after the review fixes and before the merge, look at what went wrong, turn repeated mistakes into rules or checks, remove what is out of date, and improve the file itself. `AGENTS.md` points to it.
