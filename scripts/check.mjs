@@ -14,4 +14,13 @@ const staticSteps = [
   { name: "Secrets in git history (gitleaks)", command: "gitleaks", args: ["git", ".", "--no-banner", "--redact"] },
 ];
 
-runSteps([...staticSteps, ...testSteps.filter((step) => !(quick && step.endToEnd))]);
+// Left out of --quick along with the end-to-end tests, so the end-of-turn hook
+// doesn't keep blocking on Linux baselines that only CI can make.
+const baselineStep = {
+  name: "Baseline screenshots for Mac and Linux",
+  command: process.execPath,
+  args: ["scripts/check-baselines.mjs"],
+  endToEnd: true,
+};
+
+runSteps([...staticSteps, ...testSteps, baselineStep].filter((step) => !(quick && step.endToEnd)));

@@ -10,12 +10,12 @@
 - `npm run dev` starts Accountable. Open the address it prints (http://localhost:5173).
 - `npm run seed` resets the data to the sample data.
 - `npm test` runs every test: backend (pytest), frontend (TypeScript check and Vitest) and end to end (Playwright in Chrome). It runs all of them even when one fails, prints a summary, and fails if any test fails. The tests use their own database and ports, so they never touch your data.
-- `npm run check` runs every check: formatting, linting, complexity, type checks, the secrets scan and `npm test` with at least 80% unit test coverage. `npm run check:quick` leaves out the end-to-end tests. `npm run format` fixes the formatting.
+- `npm run check` runs every check: formatting, linting, complexity, type checks, the secrets scan, `npm test` with at least 80% unit test coverage, and a check that every baseline screenshot has a Mac and a Linux copy. `npm run check:quick` leaves out the end-to-end tests and the baseline check. `npm run format` fixes the formatting.
 
 ## History
 
 - Intent, spec, mockups and plan agreed: see `docs/changes/mvp/intent.md`, `docs/spec.md`, `docs/mockups/` (mockup D is the approved look) and `docs/changes/mvp/plan.md`. Phase 0 settled the spec gaps found while planning.
-- Dark mode intent and spec (2026-11-24, `dark-mode` branch): `docs/changes/dark-mode/intent.md` agreed, and `docs/spec.md` now describes dark mode (R6a, concerns 13 to 15, dark color tokens, the visual test). No code changed yet.
+- Dark mode intent and spec (2026-11-24, `dark-mode` branch): `docs/changes/dark-mode/intent.md` agreed, and `docs/spec.md` now describes dark mode (R6a, concerns 13 to 15, dark color tokens, the visual test). The build is under "Dark mode" below.
 - Docs reorganized for future changes (2026-11-24, `harness` branch): the MVP's intent and plan moved to `docs/changes/mvp/`, and each change now gets its own `docs/changes/<branch name>/` folder. `docs/spec.md` now describes the whole product as it stands, with the problem statement, users, what's not built yet, and behavior the MVP added during the build (Edit, Delete and Back on record pages, the not-found page, the dashboard's "Log activity" picker, the delete dialog's retry). No code changed.
 
 ## Build progress
@@ -93,7 +93,7 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 
 ## CI (2026-11-24, `harness` branch)
 
-`.github/workflows/ci.yml` runs one job, `check`, on every push to any branch: it installs gitleaks 8.30.1 (checksum checked) and scans the files and full history first, then installs Node 26 and uv (`astral-sh/setup-uv@v10.4.0`, latest uv) and runs `npm run check` with the runner's Google Chrome. On failure it uploads `playwright-report/` and `test-results/`. No secrets. Playwright now also writes an HTML report to `playwright-report/` (git-ignored, never opens by itself). Checked locally with actionlint, by running the gitleaks download and checksum steps, and by running the end-to-end tests to see the report appear. Not yet run on GitHub.
+`.github/workflows/ci.yml` runs one job, `check`, on every push to any branch: it installs gitleaks 8.30.1 (checksum checked) and scans the files and full history first, then installs Node 26 and uv (`astral-sh/setup-uv@v10.4.0`, latest uv) and runs `npm run check` with the runner's Google Chrome. On failure it uploads `playwright-report/` and `test-results/`. No secrets. Playwright now also writes an HTML report to `playwright-report/` (git-ignored, never opens by itself). Checked locally with actionlint, by running the gitleaks download and checksum steps, and by running the end-to-end tests to see the report appear. It passed on GitHub for the `harness` branch on the fork (2026-11-24, 3 minutes).
 
 ## Improving the harness (2026-11-24, `harness` branch)
 
@@ -114,3 +114,13 @@ Still open:
 - **Linux baselines.** Only the Mac baselines exist. CI uploads `e2e/**/*-snapshots/` when it fails, so the first push fails and carries the Linux PNGs; download them into `e2e/light-mode.spec.ts-snapshots/` and push again.
 - **Late and overdue pills in light mode** measure 4.33:1 (`--raspberry-text` on `--raspberry-pill`), under 4.5:1. This was already so before dark mode; fixing it would change light mode, which this change mustn't, so the contrast test lists it as a known light-mode gap. Dark mode passes.
 - The walkthrough was done in Chrome through Playwright, which fails on any console error, rather than by hand.
+
+## Improving the harness (2026-11-24, `dark-mode` branch)
+
+`docs/IMPROVE.md` was run before the review fixes. The review's Important finding (no Linux baselines) is still open. Three mistakes had happened at least twice:
+
+- **Plan steps that need the person got skipped or swapped.** On the MVP, the Wi-Fi-off walkthrough wasn't done. On dark mode, step 4 (push and get the Linux baselines before any CSS changed) was skipped, and the walkthrough by hand was done through Playwright instead. `AGENTS.md` now says to stop and ask at such a step, and `docs/REVIEW.md` counts a skipped or swapped plan step as a finding.
+- **Only a Mac checked the work.** The MVP didn't run on Linux (R39), and dark mode had no Linux baselines. `npm run check` now runs `scripts/check-baselines.mjs`, which fails when a baseline screenshot is missing its Mac or Linux copy. It's left out of `check:quick` so the end-of-turn hook doesn't keep blocking. `AGENTS.md` now says a change isn't done until CI has passed on the pushed branch.
+- **The build added things the plan and spec didn't list.** On the MVP, there were four files not in the plan (finding 7). On dark mode, the `--selected` and `--on-selected` tokens aren't in the spec. `AGENTS.md` now says to add them to `plan.md` and `spec.md` in the same step.
+
+Also out of date and fixed: the History line that said dark mode had no code yet, and the CI section's "Not yet run on GitHub". `docs/IMPROVE.md` now checks the review fixes are in first and says where to look for repeats. It also asks for this section each round.

@@ -8,7 +8,7 @@ Make a separate pass over every change for each of these:
 
 - **Bugs:** the code does what it's meant to, including when something goes wrong.
 - **Security:** no secrets or personal data are exposed, and nobody can do what they shouldn't.
-- **Matches spec.md and plan.md:** the change does what `docs/spec.md` and the change's `plan.md` (in `docs/changes/<branch name>/`) say, with nothing missing and nothing extra.
+- **Matches spec.md and plan.md:** the change does what `docs/spec.md` and the change's `plan.md` (in `docs/changes/<branch name>/`) say, with nothing missing and nothing extra. Every step in the plan's order of work was done as written; a step that was skipped, swapped for something else or left to "still open" is a finding.
 - **Described by spec.md:** flag any code that `docs/spec.md` doesn't describe.
 - **Follows STANDARDS.md:** the change follows the coding standards in `docs/STANDARDS.md`.
 
