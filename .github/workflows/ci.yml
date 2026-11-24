@@ -52,6 +52,7 @@ jobs:
       - name: Run every check
         run: npm run check
 
+      # The snapshot folders carry any missing Linux baselines that Playwright wrote.
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v7
@@ -60,5 +61,6 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            e2e/**/*-snapshots/
           if-no-files-found: ignore
           retention-days: 14

@@ -6,10 +6,12 @@ import { revenueChange } from "./wording";
 
 // The chart follows mockup D's drawing: two faint guide lines, a line from each
 // point down to the axis, and the current month as a larger solid dot.
-const SEA_GREEN = "#06D6A0";
-const SEA_MIST = "#CDD8DB";
-const MIDNIGHT = "#073B4C";
-const LABEL = "#9FB6BD";
+// The panel stays Midnight in both modes, so its colors are the fixed ones (concern 13).
+const SEA_GREEN = "var(--sea-green)";
+const SEA_MIST = "var(--sea-mist)";
+const MIDNIGHT = "var(--midnight)";
+const LABEL = "var(--rail-text)";
+const WHITE = "var(--white)";
 const CHART_HEIGHT = 198;
 const MARGIN = { top: 30, right: 40, bottom: 0, left: 40 };
 const X_AXIS_HEIGHT = 28;
@@ -58,7 +60,7 @@ export function RevenuePanel({ revenue, monthName }: { revenue: Dashboard["reven
           fontFamily="var(--font-mono)"
           fontSize={11}
           fontWeight={isCurrent ? 600 : 400}
-          fill={isCurrent ? "#FFFFFF" : LABEL}
+          fill={isCurrent ? WHITE : LABEL}
         >
           {moneyShort(revenue.months[index]?.won_value ?? 0)}
         </text>
@@ -114,7 +116,7 @@ export function RevenuePanel({ revenue, monthName }: { revenue: Dashboard["reven
                   y={Number(y) + 14}
                   textAnchor="middle"
                   fontSize={12}
-                  fill={payload.value === current ? "#FFFFFF" : LABEL}
+                  fill={payload.value === current ? WHITE : LABEL}
                   fontWeight={payload.value === current ? 600 : 400}
                 >
                   {payload.value}

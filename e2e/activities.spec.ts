@@ -1,10 +1,5 @@
 import { expect, test } from "./fixtures";
-
-function inDays(days: number) {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-}
+import { inDays } from "./today";
 
 test("log a call with a follow-up on a contact and a note on a deal; each comes first", async ({ page }) => {
   await page.goto("/contacts");

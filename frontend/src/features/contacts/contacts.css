@@ -1,15 +1,15 @@
 .status-lead {
-  background: #fff3d6;
+  background: var(--marigold-tint-soft);
   color: var(--marigold-text);
 }
 
 .status-qualified {
-  background: #dcedf3;
+  background: var(--cerulean-tint);
   color: var(--cerulean-text);
 }
 
 .status-customer {
-  background: #d4f6ec;
+  background: var(--sea-green-tint);
   color: var(--sea-green-text);
 }
 

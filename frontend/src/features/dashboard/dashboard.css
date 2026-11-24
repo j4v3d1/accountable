@@ -50,8 +50,8 @@
 
 /* Revenue panel, on Midnight */
 .revenue-panel {
-  background: var(--ink);
-  color: #fff;
+  background: var(--midnight);
+  color: var(--white);
   border-radius: var(--radius-panel);
   padding: 24px 24px 12px;
   display: flex;
@@ -94,18 +94,18 @@
 
 .delta-down {
   color: var(--coral);
-  background: rgba(247, 140, 107, 0.14);
+  background: var(--delta-down-wash);
 }
 
 .delta-up {
   color: var(--sea-green);
-  background: rgba(6, 214, 160, 0.14);
+  background: var(--delta-up-wash);
 }
 
 .delta-flat,
 .delta-none {
   color: var(--sea-mist);
-  background: rgba(205, 216, 219, 0.12);
+  background: var(--delta-flat-wash);
 }
 
 .revenue-stats {
@@ -221,6 +221,7 @@
 }
 
 .funnel-bar {
+  color: var(--midnight);
   height: 100%;
   border-radius: 8px;
   display: flex;
@@ -357,7 +358,7 @@
   border-radius: 50%;
   border: 0;
   background: transparent;
-  box-shadow: inset 0 0 0 2px #b9c9ce;
+  box-shadow: inset 0 0 0 2px var(--ring);
   flex: none;
   margin-top: 1px;
   display: grid;
@@ -367,14 +368,14 @@
 }
 
 .follow-up-item.overdue .tick {
-  box-shadow: inset 0 0 0 2px #ef9aae;
+  box-shadow: inset 0 0 0 2px var(--ring-overdue);
 }
 
 .tick:hover,
 .tick:focus-visible {
   background: var(--sea-green);
   box-shadow: none;
-  color: var(--ink);
+  color: var(--midnight);
 }
 
 .follow-up-body {

@@ -1,19 +1,15 @@
 import { expect, test } from "./fixtures";
+import { NOON_TODAY, TIME_ZONE, TODAY } from "./today";
 
 function dollars(text: string | null) {
   return Number((text ?? "").replace(/[^0-9]/g, ""));
-}
-
-function todayIso() {
-  const date = new Date();
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 test("every part of the dashboard renders", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: "Dashboard", level: 1 })).toBeVisible();
-  const weekday = new Date().toLocaleDateString("en-US", { weekday: "long" });
+  const weekday = NOON_TODAY.toLocaleDateString("en-US", { weekday: "long", timeZone: TIME_ZONE });
   await expect(page.locator(".eyebrow")).toContainText(weekday, { ignoreCase: true });
   await expect(page.locator(".summary-line")).toContainText("open deals worth $");
 
@@ -70,7 +66,7 @@ test("a new follow-up shows in the right group, and marking it done removes it",
   await form.getByPlaceholder("Search deal").fill("parkside");
   await form.getByRole("option", { name: /Parkside loft 7C purchase/ }).click();
   await form.getByLabel("Description").fill("Send Nina the HOA documents");
-  await form.getByLabel("Follow-up date").fill(todayIso());
+  await form.getByLabel("Follow-up date").fill(TODAY);
   await form.getByRole("button", { name: "Save" }).click();
   await expect(form).toBeHidden();
 

@@ -1,5 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 import { dragTo, expect, test } from "./fixtures";
+import { inDays } from "./today";
 
 function column(page: Page, label: string) {
   return page.getByRole("region", { name: `${label} column` });
@@ -25,12 +26,6 @@ function dollars(text: string | null) {
 
 async function cardNames(scope: Locator) {
   return scope.locator(".deal-card .card-name").allTextContents();
-}
-
-function inDays(days: number) {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 test("drag a card to another column: its stage, probability and the totals change straight away", async ({ page }) => {

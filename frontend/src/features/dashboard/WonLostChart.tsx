@@ -64,7 +64,7 @@ function countLabel(below: boolean) {
         fontSize={11.5}
         fontWeight={600}
         fontFamily="var(--font-mono)"
-        fill={below ? "#B24A2A" : "#073B4C"}
+        fill={below ? "var(--coral-text)" : "var(--ink)"}
       >
         {count}
       </text>
@@ -104,13 +104,18 @@ export function WonLostChart({ months, won }: { months: Dashboard["revenue"]["mo
       <div role="img" aria-label={`Deals won and lost per month. ${summary}`}>
         <ResponsiveContainer width="100%" height={190}>
           <BarChart data={data} stackOffset="sign" margin={{ top: 18, right: 4, bottom: 0, left: 4 }} barSize={28}>
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#3E6370", fontSize: 12 }} />
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "var(--ink-muted)", fontSize: 12 }}
+            />
             <YAxis hide domain={[-most - 0.6, most + 0.6]} />
-            <ReferenceLine y={0} stroke="#CDD8DB" strokeWidth={1.5} />
-            <Bar dataKey="won" stackId="deals" fill="#06D6A0" shape={WonBar} isAnimationActive={false}>
+            <ReferenceLine y={0} stroke="var(--chart-axis)" strokeWidth={1.5} />
+            <Bar dataKey="won" stackId="deals" fill="var(--sea-green)" shape={WonBar} isAnimationActive={false}>
               <LabelList dataKey="won" content={WonLabel} />
             </Bar>
-            <Bar dataKey="lost" stackId="deals" fill="#F78C6B" shape={LostBar} isAnimationActive={false}>
+            <Bar dataKey="lost" stackId="deals" fill="var(--coral)" shape={LostBar} isAnimationActive={false}>
               <LabelList dataKey="lost" content={LostLabel} />
             </Bar>
           </BarChart>

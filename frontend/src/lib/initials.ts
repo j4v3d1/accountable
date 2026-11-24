@@ -1,5 +1,10 @@
-/** Light brand tints for avatar circles, all readable with Midnight text. */
-export const AVATAR_TINTS = ["#D0E8F0", "#FDE3D9", "#FFEDC2", "#C8F5E8"] as const;
+/** Brand tints for avatar circles, readable with the ink color in both modes. */
+export const AVATAR_TINTS = [
+  "var(--avatar-cerulean)",
+  "var(--avatar-coral)",
+  "var(--avatar-marigold)",
+  "var(--avatar-sea-green)",
+] as const;
 
 export function initials(name: string): string {
   const words = name.split(/[^A-Za-z0-9]+/).filter(Boolean);

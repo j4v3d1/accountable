@@ -9,22 +9,22 @@
 }
 
 .activity-icon.type-note {
-  background: #fde3d9;
+  background: var(--coral-tint);
   color: var(--coral-text);
 }
 
 .activity-icon.type-call {
-  background: #d4f6ec;
+  background: var(--sea-green-tint);
   color: var(--sea-green-text);
 }
 
 .activity-icon.type-email {
-  background: #fff0cc;
+  background: var(--marigold-tint);
   color: var(--marigold-text);
 }
 
 .activity-icon.type-stage_change {
-  background: #dcedf3;
+  background: var(--cerulean-tint);
   color: var(--cerulean-text);
 }
 
@@ -89,7 +89,7 @@
   font: 600 11.5px var(--font-mono);
   padding: 2px 8px;
   border-radius: 999px;
-  background: #fff3d6;
+  background: var(--marigold-tint-soft);
   color: var(--marigold-text);
 }
 

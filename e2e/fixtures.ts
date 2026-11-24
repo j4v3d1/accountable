@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { test as base, expect, type Page } from "@playwright/test";
+import { NOON_TODAY } from "./today";
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
@@ -19,7 +20,7 @@ type Options = {
 };
 
 /**
- * Every test starts from freshly seeded data, and fails if the browser console logs
+ * Every test starts from freshly seeded data at noon on the fixed TODAY, and fails if the browser console logs
  * an error or the page requests anything that isn't on localhost (which proves the
  * app works offline).
  */
@@ -28,6 +29,7 @@ export const test = base.extend<Options & { guard: void }>({
   guard: [
     async ({ page, allowedConsoleErrors }, use) => {
       reseed();
+      await page.clock.setFixedTime(NOON_TODAY);
       const errors: string[] = [];
       const offsite: string[] = [];
       page.on("console", (message) => {

@@ -68,7 +68,7 @@ function MiniBars({ months }: { months: Dashboard["revenue"]["months"] }) {
             width="12"
             height={height}
             rx="4"
-            fill={index === months.length - 1 ? "var(--sea-green)" : "#C1F5E7"}
+            fill={index === months.length - 1 ? "var(--sea-green)" : "var(--sea-green-faded)"}
           />
         );
       })}

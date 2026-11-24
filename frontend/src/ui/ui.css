@@ -27,6 +27,7 @@
 
 .btn-primary {
   background: var(--sea-green);
+  color: var(--midnight);
 }
 
 .btn-quiet {
@@ -37,7 +38,7 @@
 /* White on Raspberry only at 14px semibold or larger (concern 2). */
 .btn-danger {
   background: var(--raspberry);
-  color: #fff;
+  color: var(--white);
 }
 
 .btn-small {
@@ -227,7 +228,7 @@
 }
 
 .data-table tbody tr:hover td {
-  background: #f5f8f9;
+  background: var(--row-hover);
 }
 
 .row-link {
@@ -282,7 +283,7 @@
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(7, 59, 76, 0.35);
+  background: var(--backdrop);
   z-index: 40;
 }
 
@@ -462,8 +463,8 @@ textarea.input {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--ink);
-  color: #fff;
+  background: var(--midnight);
+  color: var(--white);
   border-radius: var(--radius-card);
   padding: 10px 10px 10px 16px;
   box-shadow: var(--shadow-lift);
@@ -481,7 +482,7 @@ textarea.input {
 
 .toast .icon-button:hover {
   background: var(--deep);
-  color: #fff;
+  color: var(--white);
 }
 
 .toast-error {
@@ -518,8 +519,8 @@ textarea.input {
 }
 
 .type-option:has(input:checked) {
-  background: var(--ink);
-  color: #fff;
+  background: var(--selected);
+  color: var(--on-selected);
 }
 
 .type-option:has(input:focus-visible) {
@@ -615,7 +616,7 @@ textarea.input {
 }
 
 .linked-list li:hover {
-  background: #f5f8f9;
+  background: var(--row-hover);
 }
 
 .linked-main {

@@ -98,3 +98,19 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 ## Improving the harness (2026-11-24, `harness` branch)
 
 `docs/IMPROVE.md` added: at Deploy, after the review fixes and before the merge, look at what went wrong, turn repeated mistakes into rules or checks, remove what is out of date, and improve the file itself. `AGENTS.md` points to it.
+
+## Dark mode (2026-11-24, `dark-mode` branch)
+
+Built from `docs/changes/dark-mode/plan.md`, in its order. A Dark button at the bottom of the rail switches every page, chart, dialog, picker and toast to dark at once; the choice is kept in `localStorage` and applied by `index.html` before the app draws.
+
+- **Light mode locked first.** The end-to-end run now fixes today's date (2026-11-18), the browser clock (noon) and the time zone (New York) in `e2e/today.ts`. Four specs that worked out dates from the real clock now use it; all 26 still passed. `e2e/light-mode.spec.ts` screenshots nine pages and the delete dialog, and the Mac baselines were made before any CSS changed, then passed twice in a row. The toggle is masked in the rail's Midnight, so the old baselines still hold with the toggle in place.
+- **Every color is a token.** `styles/tokens.test.ts` fails if a color value (hex, `rgb()`, `hsl()`, `white`, `black`) appears anywhere in `frontend/src` except `tokens.css`. It failed on 48 lines before the move and passes now. The visual test stayed green after every file.
+- **Dark values** sit on `:root[data-theme="dark"]` with `color-scheme: dark`. The contrast test checks every text token on every surface and tint in both modes (4.5:1), white on Cerulean and Raspberry (3:1), activity icons on their tints (3:1) and the selected option (3:1). Text on fixed fills (Sea Green buttons, stage chips, the logo) and the rail, revenue panel and toast backgrounds moved from `--ink` to a fixed `--midnight` during the token move. A walk through every page, dialog, picker and drag in dark mode then found two more, each given a failing test first: text on the funnel's stage bars turned Sea Mist (now Midnight), and the selected option in dialogs barely showed (new `--selected` and `--on-selected` tokens).
+- **Tests:** `lib/theme.test.ts`, `ui/ThemeToggle.test.tsx`, a Rail test, `e2e/theme.spec.ts` (light by default, the button on every route, dark at once, kept after a reload, back to light, `index.html` marks the page with the app blocked, charts and dialogs follow) and the visual test. `npm run check` passes: 186 backend, 275 frontend and 41 end-to-end tests.
+- Screenshots of the dashboard and pipeline in both modes are in `docs/changes/dark-mode/`.
+
+Still open:
+
+- **Linux baselines.** Only the Mac baselines exist. CI uploads `e2e/**/*-snapshots/` when it fails, so the first push fails and carries the Linux PNGs; download them into `e2e/light-mode.spec.ts-snapshots/` and push again.
+- **Late and overdue pills in light mode** measure 4.33:1 (`--raspberry-text` on `--raspberry-pill`), under 4.5:1. This was already so before dark mode; fixing it would change light mode, which this change mustn't, so the contrast test lists it as a known light-mode gap. Dark mode passes.
+- The walkthrough was done in Chrome through Playwright, which fails on any console error, rather than by hand.

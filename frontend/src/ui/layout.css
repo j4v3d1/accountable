@@ -6,7 +6,7 @@
 .rail {
   width: 84px;
   flex: none;
-  background: var(--ink);
+  background: var(--midnight);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,7 +20,7 @@
   height: 40px;
   border-radius: 12px;
   background: var(--sea-green);
-  color: var(--ink);
+  color: var(--midnight);
   display: grid;
   place-items: center;
   font-weight: 700;
@@ -43,15 +43,28 @@
 
 .rail-link:hover {
   text-decoration: none;
-  color: #fff;
+  color: var(--white);
 }
 
 .rail-link.active {
   background: var(--deep);
-  color: #fff;
+  color: var(--white);
 }
 
 .rail-link.active .rail-icon {
+  color: var(--sea-green);
+}
+
+/* The dark mode button sits alone at the bottom of the rail, styled like the links. */
+.rail-toggle {
+  margin-top: auto;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.rail-toggle[aria-pressed="true"] .rail-icon {
   color: var(--sea-green);
 }
 

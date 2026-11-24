@@ -1,6 +1,7 @@
 import { Briefcase, Building2, Kanban, LayoutDashboard, Users, type LucideIcon } from "lucide-react";
 import { NavLink } from "react-router";
 import "./layout.css";
+import { ThemeToggle } from "./ThemeToggle";
 
 const SECTIONS: { to: string; label: string; icon: LucideIcon; end?: boolean }[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -22,6 +23,7 @@ export function Rail() {
           {label}
         </NavLink>
       ))}
+      <ThemeToggle />
     </nav>
   );
 }

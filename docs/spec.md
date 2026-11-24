@@ -372,7 +372,8 @@ frontend/src/
     dashboard/         the dashboard page and its panels
   styles/              tokens.css (every color, light and dark), base.css
 
-e2e/                   Playwright tests, and fixtures.ts shared by all of them; the light-mode
+e2e/                   Playwright tests, and fixtures.ts shared by all of them; today.ts fixes today's
+                       date, the clock and the time zone for the whole run; the light-mode
                        baseline screenshots sit beside the visual test (concern 15)
 scripts/              test-all.mjs (npm test), check.mjs (npm run check), run-steps.mjs (runs steps, prints the summary)
 lefthook.yml           the git pre-commit hook
