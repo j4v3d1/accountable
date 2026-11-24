@@ -1,3 +1,8 @@
+---
+name: brand
+description: "This skill helps you create a brand identity, including brand name, logo, color palette, and brand voice. It can also assist with brand strategy and messaging. The look, for UI work"
+version: 1
+---   
 # Brand
 
 ## Fonts
