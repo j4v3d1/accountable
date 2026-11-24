@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accountable mockup D: Dashboard</title>
+<!-- Mockup only: the real app serves these fonts locally through Fontsource. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--page:#F0F4F5;--panel:#fff;--ink:#073B4C;--muted:#3E6370;--soft:#E9EFF1;--line:#E3EAEC;
+--sea:#06D6A0;--sea-t:#047A5C;--mari:#FFC145;--mari-t:#8A5A00;--coral:#F78C6B;--coral-t:#B24A2A;
+--cer:#118AB2;--cer-t:#0E7193;--rasp:#EF476F;--rasp-t:#C42D52;--mist:#CDD8DB;--deep:#0B4A5E}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Instrument Sans",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--ink);background:var(--page);-webkit-font-smoothing:antialiased}
+.mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.muted{color:var(--muted)}
+.icon{flex:none}
+a{color:var(--cer-t);text-decoration:none}
+.app{display:flex;min-height:100vh}
+.rail{width:84px;background:var(--ink);display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:4px;flex:none;min-height:100vh}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--sea);color:var(--ink);display:grid;place-items:center;font-weight:700;font-size:19px;margin-bottom:22px;letter-spacing:-.02em}
+.rail a{display:flex;flex-direction:column;align-items:center;gap:5px;width:68px;padding:10px 0 8px;border-radius:12px;color:#9FB6BD;font-size:11px;font-weight:500}
+.rail a.on{background:var(--deep);color:#fff}
+.rail a.on .icon{color:var(--sea)}
+.rail .spacer{flex:1}
+.rail .kbd{font:500 10.5px "JetBrains Mono";color:#9FB6BD;background:var(--deep);border-radius:6px;padding:3px 6px}
+main{flex:1;min-width:0;padding:28px 32px 40px;display:flex;flex-direction:column;gap:20px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+.eyebrow{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+h1{font-size:30px;font-weight:600;letter-spacing:-.02em;margin-top:2px}
+.lede{color:var(--muted);margin-top:4px}
+.lede b{color:var(--ink);font-weight:600}
+.actions{display:flex;gap:8px}
+.btn{white-space:nowrap;display:inline-flex;align-items:center;gap:7px;border:0;border-radius:10px;padding:10px 16px;font:600 14px "Instrument Sans";cursor:pointer;color:var(--ink)}
+.btn-primary{background:var(--sea)}
+.btn-quiet{background:#fff;box-shadow:0 1px 2px rgba(7,59,76,.08)}
+.search{display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:10px 14px;width:240px;color:var(--muted);box-shadow:0 1px 2px rgba(7,59,76,.08)}
+.search .k{margin-left:auto;font:500 11px "JetBrains Mono";background:var(--soft);border-radius:5px;padding:1px 6px}
+.panel{background:#fff;border-radius:16px;box-shadow:0 1px 2px rgba(7,59,76,.04),0 8px 24px -12px rgba(7,59,76,.10)}
+.ph{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;gap:12px}
+h2{font-size:16px;font-weight:600;letter-spacing:-.005em}
+.ph .sub{font-size:12.5px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap}
+.av{display:inline-grid;place-items:center;border-radius:50%;font-weight:700;color:var(--ink);flex:none;letter-spacing:.02em}
+.strip{display:flex;gap:3px;border-radius:999px;overflow:hidden}
+.strip span{display:block;height:100%}
+.strip-legend{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:14px}
+.strip-legend>div{display:grid;grid-template-columns:12px 1fr;column-gap:8px;row-gap:1px;align-items:center}
+.sw{width:10px;height:10px;border-radius:3px}
+.sl{font-size:12.5px;font-weight:500}
+.sv{grid-column:2;font-size:14px;font-weight:600}
+.sc{grid-column:2;font-size:12px}
+
+.row1{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:20px}
+.hero{background:var(--ink);color:#fff;border-radius:16px;padding:24px 24px 16px;display:flex;flex-direction:column;gap:6px}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.hero .lab{font-size:13px;color:var(--mist);font-weight:500}
+.hero .big{font:600 46px "JetBrains Mono";letter-spacing:-.03em;line-height:1.1;margin-top:6px}
+.delta{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;font-weight:600;color:#F78C6B;background:rgba(247,140,107,.14);padding:4px 10px;border-radius:999px}
+.hero-stats{display:flex;gap:28px;text-align:right}
+.hero-stats .k{font-size:12px;color:#9FB6BD}
+.hero-stats .v{font:600 16px "JetBrains Mono";margin-top:2px}
+.kpis{display:grid;grid-template-rows:repeat(3,1fr);gap:12px}
+.kpi{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.kpi .lab{font-size:12.5px;color:var(--muted);font-weight:500}
+.kpi .val{font:600 22px "JetBrains Mono";letter-spacing:-.02em;margin-top:2px}
+.kpi .note{font-size:12px;color:var(--muted);margin-top:2px}
+.kpi .mini{width:120px}
+.dots{display:flex;gap:5px;align-items:flex-end;height:36px}
+.dots span{width:12px;border-radius:4px;background:#C1F5E7}
+.dots span.now{background:var(--sea)}
+.row2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px}
+.box{padding:22px}
+.fun{display:flex;flex-direction:column;gap:10px}
+.fr{display:grid;grid-template-columns:116px 1fr 64px 56px;gap:12px;align-items:center}
+.fr .lbl{font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px}
+.fr .lbl i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.fr .track{height:26px;border-radius:8px;background:#F3F7F8;position:relative}
+.fr .bar{height:100%;border-radius:8px;display:flex;align-items:center;padding-left:10px;font:600 12px "JetBrains Mono";color:var(--ink);min-width:34px}
+.fr .val{font:600 13px "JetBrains Mono";text-align:right}
+.fr .conv{font:500 11.5px "JetBrains Mono";color:var(--muted);text-align:right}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.wl-foot{display:flex;gap:24px;margin-top:6px;padding-top:14px}
+.wl-foot .k{font-size:12px;color:var(--muted)}.wl-foot .v{font:600 16px "JetBrains Mono"}
+.side{width:384px;flex:none;background:#fff;padding:28px 24px;display:flex;flex-direction:column;gap:28px;}
+.side h2{display:flex;align-items:center;justify-content:space-between}
+.count{font:600 12px "JetBrains Mono";background:var(--soft);border-radius:999px;padding:2px 9px}
+.group{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+.group.od{color:var(--rasp-t)}
+.fu{list-style:none;display:flex;flex-direction:column;gap:2px}
+.fu li{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:12px}
+.fu li.od{background:#FEF1F4}
+.tick{width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2px #B9C9CE;flex:none;margin-top:1px;display:grid;place-items:center;color:transparent}
+.fu li.od .tick{box-shadow:inset 0 0 0 2px #EF9AAE}
+.fu .t{font-weight:500;line-height:1.35}
+.fu .on{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px}
+.due{margin-left:auto;font:600 11.5px "JetBrains Mono";white-space:nowrap;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.fu li.od .due{background:#FDDDE5;color:var(--rasp-t)}
+.tl{list-style:none;position:relative}
+.tl li{display:flex;gap:12px;padding-bottom:16px;position:relative}
+.tl li:not(:last-child)::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--soft);border-radius:2px}
+.ti{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none}
+.tl .t{line-height:1.35}
+.tl .m{font-size:12.5px;color:var(--muted);margin-top:2px}
+</style></head><body><div class="app"><nav class="rail" aria-label="Main">
+  <div class="logo">A</div>
+  <a class="on" aria-current="page"><svg class="icon"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Dashboard</span></a><a class="" ><svg class="icon"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>Orgs</span></a><a class="" ><svg class="icon"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Contacts</span></a><a class="" ><svg class="icon"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg><span>Deals</span></a><a class="" ><svg class="icon"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v11M12 5v6M18 5v14"/></svg><span>Pipeline</span></a>
+</nav>
+<main>
+  <div class="head">
+    <div><div class="eyebrow">Monday, November 23</div><h1>Dashboard</h1>
+      <p class="lede"><b>18 open deals</b> worth <b>$10,151,500</b>. <b style="color:var(--rasp-t)">2 follow-ups</b> are overdue and <b style="color:var(--rasp-t)">3 deals</b> are past their close date.</p></div>
+    <div class="actions"><button class="btn btn-quiet"><svg class="icon"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Log activity</button><button class="btn btn-primary"><svg class="icon"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> New deal</button></div>
+  </div>
+
+  <div class="row1">
+    <section class="hero" aria-label="Revenue won">
+      <div class="hero-top">
+        <div><div class="lab">Revenue won in November (USD)</div><div class="big">$612,000</div>
+          <span class="delta">↓ 30% from October</span></div>
+        <div class="hero-stats"><div><div class="k">Last 6 months</div><div class="v">$5.16M</div></div>
+          <div><div class="k">Best month</div><div class="v">Sep · $1.31M</div></div></div>
+      </div>
+      <svg viewBox="0 0 720 220" width="100%" role="img" aria-label="Revenue won per month, last six months"><line x1="8" x2="712" y1="136.66666666666666" y2="136.66666666666666" stroke="#CDD8DB" stroke-opacity=".12"/><line x1="8" x2="712" y1="83.33333333333333" y2="83.33333333333333" stroke="#CDD8DB" stroke-opacity=".12"/><path d="M32 131.86666666666667 C53.9 121.5 119.5 72.0 163.2 69.46666666666667 C206.9 66.9 250.7 119.7 294.4 116.50666666666666 C338.1 113.3 381.9 53.4 425.6 50.05333333333334 C469.3 46.7 513.1 84.2 556.8 96.66666666666667 C600.5 109.1 666.1 120.0 688 124.72 L688 190 L32 190 Z" fill="#06D6A0" fill-opacity=".10"/><path d="M32 131.86666666666667 C53.9 121.5 119.5 72.0 163.2 69.46666666666667 C206.9 66.9 250.7 119.7 294.4 116.50666666666666 C338.1 113.3 381.9 53.4 425.6 50.05333333333334 C469.3 46.7 513.1 84.2 556.8 96.66666666666667 C600.5 109.1 666.1 120.0 688 124.72" fill="none" stroke="#06D6A0" stroke-width="3" stroke-linecap="round"/><line x1="32" x2="32" y1="137.86666666666667" y2="190" stroke="#CDD8DB" stroke-opacity="0.08" stroke-dasharray="0"/><circle cx="32" cy="131.86666666666667" r="3.5" fill="#073B4C" stroke="#06D6A0" stroke-width="2.5"/><text x="32" y="117.86666666666667" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="400" fill="#9FB6BD">$545K</text><text x="32" y="212" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" font-weight="400" fill="#9FB6BD">Jun</text><line x1="163.2" x2="163.2" y1="75.46666666666667" y2="190" stroke="#CDD8DB" stroke-opacity="0.08" stroke-dasharray="0"/><circle cx="163.2" cy="69.46666666666667" r="3.5" fill="#073B4C" stroke="#06D6A0" stroke-width="2.5"/><text x="163.2" y="55.46666666666667" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="400" fill="#9FB6BD">$1.13M</text><text x="163.2" y="212" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" font-weight="400" fill="#9FB6BD">Jul</text><line x1="294.4" x2="294.4" y1="122.50666666666666" y2="190" stroke="#CDD8DB" stroke-opacity="0.08" stroke-dasharray="0"/><circle cx="294.4" cy="116.50666666666666" r="3.5" fill="#073B4C" stroke="#06D6A0" stroke-width="2.5"/><text x="294.4" y="102.50666666666666" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="400" fill="#9FB6BD">$689K</text><text x="294.4" y="212" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" font-weight="400" fill="#9FB6BD">Aug</text><line x1="425.6" x2="425.6" y1="56.05333333333334" y2="190" stroke="#CDD8DB" stroke-opacity="0.08" stroke-dasharray="0"/><circle cx="425.6" cy="50.05333333333334" r="3.5" fill="#073B4C" stroke="#06D6A0" stroke-width="2.5"/><text x="425.6" y="36.05333333333334" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="400" fill="#9FB6BD">$1.31M</text><text x="425.6" y="212" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" font-weight="400" fill="#9FB6BD">Sep</text><line x1="556.8" x2="556.8" y1="102.66666666666667" y2="190" stroke="#CDD8DB" stroke-opacity="0.08" stroke-dasharray="0"/><circle cx="556.8" cy="96.66666666666667" r="3.5" fill="#073B4C" stroke="#06D6A0" stroke-width="2.5"/><text x="556.8" y="82.66666666666667" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="400" fill="#9FB6BD">$875K</text><text x="556.8" y="212" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" font-weight="400" fill="#9FB6BD">Oct</text><line x1="688" x2="688" y1="130.72" y2="190" stroke="#CDD8DB" stroke-opacity="0.3" stroke-dasharray="3 3"/><circle cx="688" cy="124.72" r="6" fill="#06D6A0" stroke="#06D6A0" stroke-width="2.5"/><text x="688" y="110.72" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#fff">$612K</text><text x="688" y="212" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" font-weight="600" fill="#fff">Nov</text></svg>
+    </section>
+    <div class="kpis">
+      <section class="panel kpi"><div><div class="lab">Open pipeline (USD)</div><div class="val">$10,151,500</div><div class="note">18 open deals</div></div>
+        <div class="mini">
+  <div class="strip" style="height:10px"><span style="flex:2139000;background:#D0E8F0"></span><span style="flex:2325000;background:#B1D8E5"></span><span style="flex:2527000;background:#93C9DB"></span><span style="flex:1509500;background:#76BBD2"></span><span style="flex:1651000;background:#58ADC9"></span></div>
+  </div></section>
+      <section class="panel kpi"><div><div class="lab">Expected revenue (USD)</div><div class="val">$4,081,300</div><div class="note">Value times probability</div></div>
+        <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="32" cy="32" r="26" fill="none" stroke="#E6EDEF" stroke-width="7"/>
+    <circle cx="32" cy="32" r="26" fill="none" stroke="#FFC145" stroke-width="7" stroke-linecap="round"
+      stroke-dasharray="65.3451271946677 163.36281798666926" transform="rotate(-90 32 32)"/>
+    <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#073B4C">40%</text></svg></section>
+      <section class="panel kpi"><div><div class="lab">Deals won this month</div><div class="val">1</div><div class="note">1 in October · 67% win rate</div></div>
+        <div class="dots" aria-hidden="true"><span class="" style="height:22px"></span><span class="" style="height:36px"></span><span class="" style="height:22px"></span><span class="" style="height:36px"></span><span class="" style="height:22px"></span><span class="now" style="height:22px"></span></div></section>
+    </div>
+  </div>
+
+  <div class="row2">
+    <section class="panel box"><div class="ph"><h2>Sales funnel</h2><span class="sub">Value reaching each stage (USD) · share moving on</span></div>
+      <div class="fun"><div class="fr"><span class="lbl"><i style="background:#D0E8F0"></i>New Lead</span>
+    <div class="track"><div class="bar" style="width:100%;background:#D0E8F0">30</div></div>
+    <span class="val">$17.3M</span><span class="conv">&nbsp;</span></div><div class="fr"><span class="lbl"><i style="background:#B1D8E5"></i>Qualified</span>
+    <div class="track"><div class="bar" style="width:87.6211695940276%;background:#B1D8E5">25</div></div>
+    <span class="val">$15.1M</span><span class="conv">↓ 83%</span></div><div class="fr"><span class="lbl"><i style="background:#93C9DB"></i>Showing</span>
+    <div class="track"><div class="bar" style="width:72.37188576058335%;background:#93C9DB">20</div></div>
+    <span class="val">$12.5M</span><span class="conv">↓ 80%</span></div><div class="fr"><span class="lbl"><i style="background:#76BBD2"></i>Offer</span>
+    <div class="track"><div class="bar" style="width:54.73827367690037%;background:#76BBD2">15</div></div>
+    <span class="val">$9.46M</span><span class="conv">↓ 75%</span></div><div class="fr"><span class="lbl"><i style="background:#58ADC9"></i>Under Contract</span>
+    <div class="track"><div class="bar" style="width:43.36931045458491%;background:#58ADC9">11</div></div>
+    <span class="val">$7.49M</span><span class="conv">↓ 73%</span></div><div class="fr"><span class="lbl"><i style="background:#06D6A0"></i>Closed (Won)</span>
+    <div class="track"><div class="bar" style="width:29.879336786365347%;background:#06D6A0">8</div></div>
+    <span class="val">$5.16M</span><span class="conv">↓ 73%</span></div></div></section>
+    <section class="panel box"><div class="ph"><h2>Won and lost</h2><div class="legend"><span><i style="background:var(--sea)"></i>Won</span><span><i style="background:var(--coral)"></i>Lost</span></div></div>
+      <svg viewBox="0 0 460 200" width="100%" role="img" aria-label="Deals won and lost per month"><line x1="0" x2="460" y1="110.8" y2="110.8" stroke="#CDD8DB" stroke-width="1.5"/><rect x="24.333333333333336" y="71.4" width="28" height="37.4" rx="6" fill="#06D6A0"/><text x="38.333333333333336" y="65.4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#073B4C">1</text><rect x="24.333333333333336" y="112.8" width="28" height="32.28571428571429" rx="6" fill="#F78C6B"/><text x="38.333333333333336" y="159.0857142857143" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#B24A2A">1</text><text x="38.333333333333336" y="194" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Jun</text><rect x="101" y="34" width="28" height="74.8" rx="6" fill="#06D6A0"/><text x="115" y="28" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#073B4C">2</text><text x="115" y="194" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Jul</text><rect x="177.66666666666669" y="71.4" width="28" height="37.4" rx="6" fill="#06D6A0"/><text x="191.66666666666669" y="65.4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#073B4C">1</text><rect x="177.66666666666669" y="112.8" width="28" height="32.28571428571429" rx="6" fill="#F78C6B"/><text x="191.66666666666669" y="159.0857142857143" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#B24A2A">1</text><text x="191.66666666666669" y="194" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Aug</text><rect x="254.33333333333331" y="34" width="28" height="74.8" rx="6" fill="#06D6A0"/><text x="268.3333333333333" y="28" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#073B4C">2</text><rect x="254.33333333333331" y="112.8" width="28" height="32.28571428571429" rx="6" fill="#F78C6B"/><text x="268.3333333333333" y="159.0857142857143" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#B24A2A">1</text><text x="268.3333333333333" y="194" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Sep</text><rect x="331" y="71.4" width="28" height="37.4" rx="6" fill="#06D6A0"/><text x="345" y="65.4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#073B4C">1</text><text x="345" y="194" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Oct</text><rect x="407.6666666666667" y="71.4" width="28" height="37.4" rx="6" fill="#06D6A0"/><text x="421.6666666666667" y="65.4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#073B4C">1</text><rect x="407.6666666666667" y="112.8" width="28" height="32.28571428571429" rx="6" fill="#F78C6B"/><text x="421.6666666666667" y="159.0857142857143" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="600" fill="#B24A2A">1</text><text x="421.6666666666667" y="194" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Nov</text></svg>
+      <div class="wl-foot"><div><div class="k">Won, 6 months</div><div class="v">8</div></div><div><div class="k">Lost, 6 months</div><div class="v">4</div></div><div><div class="k">Win rate</div><div class="v">67%</div></div></div></section>
+  </div>
+
+  <section class="panel box"><div class="ph"><h2>Open pipeline</h2><a>Open the pipeline <svg class="icon"  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
+  <div class="strip" style="height:14px"><span style="flex:2139000;background:#D0E8F0"></span><span style="flex:2325000;background:#B1D8E5"></span><span style="flex:2527000;background:#93C9DB"></span><span style="flex:1509500;background:#76BBD2"></span><span style="flex:1651000;background:#58ADC9"></span></div>
+  <div class="strip-legend"><div><span class="sw" style="background:#D0E8F0"></span><span class="sl">New Lead</span><span class="mono sv">$2.14M</span><span class="muted sc">5 deals</span></div><div><span class="sw" style="background:#B1D8E5"></span><span class="sl">Qualified</span><span class="mono sv">$2.33M</span><span class="muted sc">4 deals</span></div><div><span class="sw" style="background:#93C9DB"></span><span class="sl">Showing</span><span class="mono sv">$2.53M</span><span class="muted sc">4 deals</span></div><div><span class="sw" style="background:#76BBD2"></span><span class="sl">Offer</span><span class="mono sv">$1.51M</span><span class="muted sc">3 deals</span></div><div><span class="sw" style="background:#58ADC9"></span><span class="sl">Under Contract</span><span class="mono sv">$1.65M</span><span class="muted sc">2 deals</span></div></div></section>
+</main>
+
+<aside class="side" aria-label="Follow-ups and activity">
+  <section><h2>Follow-ups <span class="count">6</span></h2>
+    <div class="group od">Overdue</div><ul class="fu"><li class="od"><span class="tick"><svg class="icon"  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+  <div style="min-width:0"><div class="t">Call Lucy Chen about a price drop</div><div class="on">Maple Ridge ranch sale</div></div>
+  <span class="due">Overdue · Nov 18</span></li><li class="od"><span class="tick"><svg class="icon"  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+  <div style="min-width:0"><div class="t">Send Greg Lawson the showing feedback</div><div class="on">26 Ashford Dr sale</div></div>
+  <span class="due">Overdue · Nov 20</span></li></ul>
+    <div class="group">This week</div><ul class="fu"><li class=""><span class="tick"><svg class="icon"  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+  <div style="min-width:0"><div class="t">Remind Janet Moore about the inspection</div><div class="on">410 Sycamore Rd sale</div></div>
+  <span class="due">Nov 24</span></li><li class=""><span class="tick"><svg class="icon"  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+  <div style="min-width:0"><div class="t">Follow up with Omar Haddad on the counteroffer</div><div class="on">55 Juniper St purchase</div></div>
+  <span class="due">Nov 25</span></li><li class=""><span class="tick"><svg class="icon"  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+  <div style="min-width:0"><div class="t">Email Harbor Point Lending about pre-approval</div><div class="on">Ben Foster</div></div>
+  <span class="due">Nov 27</span></li></ul>
+    <div class="group">Later</div><ul class="fu"><li class=""><span class="tick"><svg class="icon"  width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+  <div style="min-width:0"><div class="t">Check in with Priya Nair</div><div class="on">Priya Nair</div></div>
+  <span class="due">Dec 1</span></li></ul>
+  </section>
+  <section><h2>Recent activity</h2>
+    <ul class="tl" style="margin-top:16px"><li><span class="ti" style="background:#D0E8F0"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg></span>
+      <div><div class="t">Moved from Showing to Offer</div><div class="m"><a>55 Juniper St purchase</a> · Today, 10:42 AM</div></div></li><li><span class="ti" style="background:#C1F5E7"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+      <div><div class="t">Rachel Kim will accept $360,000</div><div class="m"><a>Brookside cottage sale</a> · Today, 9:15 AM</div></div></li><li><span class="ti" style="background:#FFECC7"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span>
+      <div><div class="t">Appraisal booked for Dec 2</div><div class="m"><a>Fairview Heights purchase</a> · Nov 22, 2026</div></div></li><li><span class="ti" style="background:#FDE3DA"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+      <div><div class="t">Relocating from Denver in March, needs 3 beds</div><div class="m"><a>Hannah Ortiz</a> · Nov 21, 2026</div></div></li><li><span class="ti" style="background:#D0E8F0"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg></span>
+      <div><div class="t">Moved from Under Contract to Lost</div><div class="m"><a>Northfield purchase</a> · Nov 19, 2026</div></div></li><li><span class="ti" style="background:#C1F5E7"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+      <div><div class="t">Booked a second showing for Saturday</div><div class="m"><a>Sam Okafor</a> · Nov 19, 2026</div></div></li></ul>
+  </section>
+</aside></div></body></html>

@@ -35,7 +35,7 @@ Each requirement has an ID, so tests and status notes can point at it.
 
 ### Shared behavior
 
-- **R1** The app opens on the Dashboard. A left sidebar links to Dashboard, Organizations, Contacts, Deals and Pipeline, and marks the current section.
+- **R1** The app opens on the Dashboard. A navigation rail on the left links to Dashboard, Organizations, Contacts, Deals and Pipeline, and marks the current section.
 - **R2** Every list page (Organizations, Contacts, Deals) has a table with:
   - a search box that filters rows as you type, matching any text column;
   - column headings that sort when clicked (ascending, then descending, then back to the default order);
@@ -98,8 +98,18 @@ Each requirement has an ID, so tests and status notes can point at it.
 
 ### Pipeline
 
-- **R20** A board with seven columns in the fixed stage order. Each column heading shows the stage name, the number of deals, their total value and their expected revenue. The column cards show name, value, contact or organization, close date and a late badge.
-- **R21** Above the board, a summary shows the total value and expected revenue of all open deals (every stage except Closed (Won) and Lost).
+- **R20** A board with seven columns in the fixed stage order.
+  - Each column heading shows the stage name, the number of deals and their total value. Open stages also show their expected revenue and a thin bar for their share of open value. Closed (Won) and Lost are labelled "Last 6 months".
+  - Each card shows:
+    - the main contact's initials in a colored circle (the organization's if there's no contact, and no circle if there's neither);
+    - the deal name, with the contact and organization;
+    - the value;
+    - the probability, as a five-dot meter and a percentage;
+    - the close date, or a "Late" label with the close date when the deal is late (R16).
+- **R21** Above the board, a summary shows:
+  - the total value and expected revenue of all open deals (every stage except Closed (Won) and Lost);
+  - the number of late deals;
+  - a thin strip of open value by stage.
 - **R22** Dragging a card to another column changes the deal's stage. R14, R15 and R19 apply.
 - **R23** A card can be dropped at any place in any column, including higher or lower in its own column. It stays at that place after a refresh.
 - **R24** All totals update as soon as a card is dropped, without waiting for the server. If the server refuses the change, the card goes back and an error message shows.
@@ -122,16 +132,27 @@ Each requirement has an ID, so tests and status notes can point at it.
 
 ### Dashboard
 
-- **R31** Four figure tiles across the top:
-  - **Revenue won this month**, with the change from last month;
-  - **Open pipeline**, the total value of open deals;
-  - **Expected revenue**, the sum of value times probability over open deals;
-  - **Deals won this month**.
-- **R32** A **line chart** of revenue won per month over the last six months (concern 12).
-- **R33** A **bar chart** of deals won and deals lost per month over the same months, as paired bars.
-- **R34** A **sales funnel** showing, for each stage from New Lead to Closed (Won), the number of deals and the value that reached it (concern 8).
+- **R31** A **summary line** under the title, such as "18 open deals worth $10,151,500. 2 follow-ups are overdue and 3 deals are past their close date." A part that would be zero is left out.
+- **R32** A **revenue panel** with:
+  - revenue won this month, as the large figure;
+  - the change from last month, as a percentage;
+  - the total for the last six months and the best month;
+  - a **line chart** of revenue won per month over those six months (concern 12), with each month's figure labelled.
+- **R33** Three **figure cards**:
+  - **Open pipeline**, the total value of open deals, with the number of open deals and a mini stage strip;
+  - **Expected revenue**, the sum of value times probability over open deals, with a ring showing it as a share of open value;
+  - **Deals won this month**, with last month's count, the win rate, and a small six-month chart of deals won.
+
+  The **win rate** is deals won divided by deals won plus deals lost, over the last six months by close date.
+- **R34** A **sales funnel** showing, for each stage from New Lead to Closed (Won), the number of deals and the value that reached it (concern 8). For every stage after New Lead, it also shows the share of deals that moved on from the stage before (deals reaching this stage divided by deals reaching the previous one).
+- **R34a** A **won and lost chart** for the same six months: deals won as bars above a centre line and deals lost as bars below it, each labelled with its count. Underneath it go the six-month totals won and lost, and the win rate.
 - **R35** A **pipeline strip**: one horizontal bar split by open stage, each part as wide as that stage's share of open value, labelled with the stage, value and count. Clicking it opens the Pipeline.
-- **R36** **Follow-ups**: overdue ones first (in Raspberry), then upcoming ones, nearest first. Each one has a checkbox to mark it done, which removes it from the list, and links to its contact or deal.
+- **R36** **Follow-ups**, in three groups:
+  - **Overdue**, in Raspberry;
+  - **This week**, from today to Sunday;
+  - **Later**.
+
+  Each group is nearest first. Each follow-up has a round checkbox to mark it done, which removes it from the list, and links to its contact or deal.
 - **R37** **Recent activity**: the latest 10 activities of every kind, including stage changes, each linked to its contact or deal.
 - **R38** Every dashboard figure is worked out by the backend from the current data. It changes as soon as the data changes, such as a deal moving to Closed (Won) or a new follow-up being saved.
 
@@ -247,6 +268,8 @@ The pipeline board keeps a local copy of the columns while dragging, works out t
 
 ### Visual design
 
+The chosen direction is mockup D (`docs/mockups/d-dashboard.png` and `docs/mockups/d-pipeline.png`), a refined version of C. The mockups show the layout and the look. The requirements above still decide what each screen does.
+
 Light mode only, laid out for screens 1280px wide and up. Narrower windows down to 1024px still work, with tables scrolling sideways.
 
 **Color tokens** (CSS variables in `tokens.css`):
@@ -268,21 +291,34 @@ Light mode only, laid out for screens 1280px wide and up. Narrower windows down 
 | `--raspberry` | `#EF476F` | Late deals, overdue follow-ups, delete buttons |
 | `--raspberry-text` | `#C42D52` | Small Raspberry text |
 
-**Stage colors** (concern 1): New Lead to Under Contract run from a light Cerulean tint to full Cerulean. Exact tints are picked during build so that Midnight text on each one passes 4.5:1. Closed (Won) is Sea Green and Lost is `#CDD8DB` Sea Mist, both with Midnight text.
+**Stage colors** (concern 1): Cerulean tints for the open stages, each passing 4.5:1 with Midnight text: New Lead `#D0E8F0`, Qualified `#B1D8E5`, Showing `#93C9DB`, Offer `#76BBD2`, Under Contract `#58ADC9`. Closed (Won) is `#06D6A0` Sea Green and Lost is `#CDD8DB` Sea Mist, both with Midnight text.
 
 **Type:**
-- Instrument Sans for everything: page titles 28px semibold, section titles 18px semibold, body 14px, table text 14px.
+- Instrument Sans for everything: page titles 30px semibold, with a small uppercase line above them (the date, or a count such as "18 open deals"); section titles 16px semibold; body 14px; table text 14px.
 - JetBrains Mono for money, counts, percentages and dates in tables and tiles, with tabular figures so the columns line up.
-- Instrument Serif is used once, for the short tagline under the logo in the sidebar.
+- Instrument Serif isn't used on the MVP screens, because direction D has no tagline. It stays available for a tagline or quote later.
 
-**Surfaces:** panels and cards are white on the `#F0F4F5` page, with 12px rounded corners, no outline, and a very soft shadow to lift them. No one-sided borders, no rule across the top of the page. Gradients aren't used, except that charts may use one soft fill under the revenue line. Table rows are separated by spacing and a faint row hover, not lines.
+**Surfaces:** panels and cards are white on the `#F0F4F5` page, with 16px rounded corners for panels and 12px for cards, no outline, and a very soft shadow to lift them. No one-sided borders, no rule across the top of the page. Gradients aren't used, except that charts may use one soft fill under the revenue line. Table rows are separated by spacing and a faint row hover, not lines.
 
 **Layout:**
-- **Sidebar**: 240px, white, with the Accountable wordmark, its tagline in Instrument Serif and the five links. The current link has a soft Sea Green tint behind it.
+- **Navigation rail**: 84px wide, Midnight, down the left of every page. It has the Sea Green "A" logo at the top and the five sections as an icon with a short label underneath (Dashboard, Orgs, Contacts, Deals, Pipeline). Icons and labels are Sea Mist. The current section has a slightly lighter Midnight tile behind it, with its icon in Sea Green.
 - **Pages**: a header with the title and the main action on the right ("New contact").
-- **Dashboard**: a row of four figure tiles; then the revenue line chart (two thirds) beside the follow-ups panel (one third); then the won-and-lost bar chart beside the funnel; then the pipeline strip across the full width; then recent activity.
+- **Dashboard**: two areas side by side.
+  - The main area, top to bottom:
+    - the header: the date above the title, the summary line (R31) under it, and "Log activity" and "New deal" on the right;
+    - the Midnight revenue panel (R32), about two thirds wide, beside the three white figure cards stacked (R33). On the dark panel, figures are white, labels are Sea Mist, the change is a Coral pill, and the line is Sea Green with a light fill;
+    - the sales funnel as horizontal bars, with the share moving on at the right of each row (R34), beside the won and lost chart (R34a);
+    - the pipeline strip across the full width, with a legend giving each stage's value and count (R35).
+  - A white panel, 384px wide, on the right:
+    - follow-ups at the top, grouped with small uppercase headings (R36). Overdue rows have a light Raspberry background and the due date in a Raspberry pill;
+    - recent activity below, as a timeline: a tinted icon for each type, joined by a thin line.
 - **Record pages**: details panel on the left (one third), timeline on the right (two thirds), with linked records under the details.
-- **Pipeline**: the summary line above seven columns that scroll sideways as a group. Each column is a panel with its colored stage chip and totals at the top.
+- **Pipeline**:
+  - **Header:** the open-deal count above the title. On the right are a hint about keyboard dragging and "New deal".
+  - **Summary panel** (R21): open value, expected revenue, the late count in Raspberry, and a thin strip with stage names lined up under their segments.
+  - **Columns:** seven columns, each a rounded light-gray panel holding its heading, its cards and an "Add deal" button at the bottom. They scroll sideways as a group on narrow screens. Closed (Won) and Lost columns are a shade lighter, and their cards are off-white with no shadow, so open deals stand out.
+  - **Cards** (R20): the value is in full (`$585,000`). The five-dot probability meter is Cerulean. The late label is a Raspberry pill.
+  - **Dragging:** while a card is being dragged, it tilts slightly, gains a Sea Green outline and a deeper shadow, and leaves a hatched gap where it came from.
 
 **Writing:** short plain labels ("New deal", "Log activity", "Mark done"). No exclamation marks. Empty states say what's missing and offer the action ("No activities yet. Log one to start the timeline."). Confirmations are brief ("Deal saved").
 

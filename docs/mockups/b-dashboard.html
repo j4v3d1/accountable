@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accountable mockup B: Dashboard</title>
+<!-- Mockup only: the real app serves these fonts locally through Fontsource. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--page:#F0F4F5;--panel:#fff;--ink:#073B4C;--muted:#3E6370;--soft:#E6EDEF;
+--sea:#06D6A0;--sea-t:#047A5C;--mari:#FFC145;--mari-t:#8A5A00;--coral:#F78C6B;--coral-t:#B24A2A;
+--cer:#118AB2;--cer-t:#0E7193;--rasp:#EF476F;--rasp-t:#C42D52;--mist:#CDD8DB}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Instrument Sans",system-ui,sans-serif;font-size:14px;color:var(--ink);background:var(--page);-webkit-font-smoothing:antialiased}
+.mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+.serif{font-family:"Instrument Serif",serif}
+.panel{background:var(--panel);border-radius:12px;box-shadow:0 1px 2px rgba(7,59,76,.05),0 4px 16px rgba(7,59,76,.05)}
+h1{font-size:28px;font-weight:600;letter-spacing:-.01em}
+h2{font-size:18px;font-weight:600}
+.muted{color:var(--muted)}
+.icon{flex:none}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:8px;padding:9px 14px;font:600 14px "Instrument Sans";cursor:pointer}
+.btn-primary{background:var(--sea);color:var(--ink)}
+.btn-ghost{background:var(--soft);color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600;color:var(--ink)}
+.badge-late{display:inline-flex;align-items:center;border-radius:6px;padding:2px 7px;font-size:12px;font-weight:600;background:#FDE9EE;color:var(--rasp-t)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.strip{display:flex;gap:3px;border-radius:10px;overflow:hidden}
+.strip .seg{display:flex;flex-direction:column;justify-content:center;padding:0 12px;min-width:0;white-space:nowrap;overflow:hidden}
+.strip .seg span{font-size:12px;font-weight:600}.strip .seg b{font:600 13px "JetBrains Mono"}
+.strip-legend{display:flex;gap:3px;margin-top:10px;font-size:12.5px}
+.strip-legend>div{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip-legend .mono{font-size:12px;color:var(--muted);margin-top:2px}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--muted)}
+.check{width:18px;height:18px;border-radius:5px;background:var(--soft);flex:none;display:inline-block}
+a{color:var(--cer-t);text-decoration:none}
+
+.fu{list-style:none;display:flex;flex-direction:column;gap:4px}
+.fu li{display:flex;align-items:flex-start;gap:12px;padding:10px 8px;border-radius:8px}
+.fu li:nth-child(-n+2){background:#FEF3F6}
+.fu-body{flex:1;min-width:0}.fu-on{font-size:12.5px;margin-top:2px}
+.fu-date{font-size:12px;color:var(--muted);white-space:nowrap;padding-top:2px}
+.fu-date.overdue{color:var(--rasp-t);font-weight:600}
+.act{list-style:none;display:flex;flex-direction:column;gap:14px}
+.act li{display:flex;gap:12px;align-items:flex-start}
+.act-icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none}
+.act-meta{font-size:12.5px;margin-top:2px}
+
+.card{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 2px rgba(7,59,76,.06),0 2px 8px rgba(7,59,76,.05);display:flex;flex-direction:column;gap:6px;cursor:grab}
+.card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.card-name{font-weight:600;font-size:13.5px;line-height:1.3}
+.card-val{font-size:13px;font-weight:600}
+.card-who{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-foot{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.card-foot .mono{display:inline-flex;align-items:center;gap:4px}
+.late-date{color:var(--rasp-t);font-weight:600}
+.meter{height:5px;border-radius:3px;background:var(--soft);overflow:hidden}
+.meter span{display:block;height:100%;background:var(--cer);border-radius:3px}
+.card.dim{background:#F7FAFB;box-shadow:none}
+
+.top{background:var(--ink);color:#CDD8DB;display:flex;align-items:center;gap:40px;padding:0 32px;height:64px}
+.top .brand{display:flex;align-items:center;gap:10px}
+.logo{width:32px;height:32px;border-radius:9px;background:var(--sea);color:var(--ink);display:grid;place-items:center;font-weight:700}
+.word{font-weight:700;font-size:17px;color:#fff}
+.top nav{display:flex;gap:4px}
+.top nav a{color:#CDD8DB;padding:8px 14px;border-radius:999px;font-weight:500}
+.top nav a.on{background:var(--sea);color:var(--ink);font-weight:600}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;background:#0B4A5E;border-radius:8px;padding:8px 14px;width:260px;color:#9FB6BD}
+main{padding:28px 32px 40px;display:flex;flex-direction:column;gap:20px}
+.head{display:flex;justify-content:space-between;align-items:center}
+.hero{display:grid;grid-template-columns:320px 1fr;gap:0;padding:0;overflow:hidden}
+.hero-figs{padding:24px;display:flex;flex-direction:column;gap:22px;background:#F7FAFB}
+.fig .lab{font-size:13px;color:var(--muted);font-weight:500}
+.fig .val{font:600 24px "JetBrains Mono";margin-top:4px;letter-spacing:-.02em}
+.fig .note{font-size:12.5px;margin-top:2px}
+.fig.big .val{font-size:36px}
+.hero-chart{padding:24px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.row2{display:grid;grid-template-columns:7fr 5fr;gap:16px}
+.box{padding:20px}
+.box-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.box-h small{font-weight:500;font-size:13px;color:var(--muted);margin-left:6px}
+.hbars{display:flex;flex-direction:column;gap:16px;margin-top:8px}
+.hb{display:grid;grid-template-columns:120px 1fr 80px;gap:12px;align-items:center}
+.hb .track{height:28px;background:var(--soft);border-radius:6px;overflow:hidden}
+.hb .track span{display:flex;align-items:center;justify-content:flex-end;height:100%;border-radius:6px;padding-right:8px;font:600 12px "JetBrains Mono"}
+.hb .v{text-align:right;font-size:12.5px}
+.sumpills{display:flex;gap:12px}
+.pill{background:#fff;border-radius:12px;padding:10px 16px;box-shadow:0 1px 2px rgba(7,59,76,.05)}
+.pill .muted{font-size:12px}.pill .mono{font-size:18px;font-weight:600}
+.board{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;align-items:start}
+.col{background:#E6EDEF;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.col-h{padding:12px 12px 10px}
+.col-h .name{font-weight:600;font-size:13.5px;display:flex;justify-content:space-between}
+.col-h .tot{display:flex;justify-content:space-between;font-size:12px;margin-top:6px}
+.col-cards{padding:10px;display:flex;flex-direction:column;gap:8px}
+.add{margin:0 10px 10px;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:8px;background:rgba(255,255,255,.6);color:var(--muted);font-weight:500;font-size:13px}
+</style></head>
+<body><header class="top">
+  <div class="brand"><div class="logo">A</div><span class="word">Accountable</span></div>
+  <nav><a class="on">Dashboard</a><a class="">Organizations</a><a class="">Contacts</a><a class="">Deals</a><a class="">Pipeline</a></nav>
+  <div class="search"><svg class="icon"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search</span></div>
+</header>
+<main>
+  <div class="head"><div><h1>Good morning</h1><p class="muted">Monday, November 23, 2026</p></div>
+    <div style="display:flex;gap:8px"><button class="btn btn-ghost"><svg class="icon"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Log activity</button><button class="btn btn-primary"><svg class="icon"  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> New deal</button></div></div>
+  <section class="panel hero">
+    <div class="hero-figs">
+      <div class="fig big"><div class="lab">Revenue won this month (USD)</div><div class="val">$612,000</div><div class="note" style="color:var(--rasp-t);font-weight:600">Down 30% from October</div></div>
+      <div class="fig"><div class="lab">Open pipeline</div><div class="val">$10,151,500</div><div class="note muted">18 open deals</div></div><div class="fig"><div class="lab">Expected revenue</div><div class="val">$4,081,300</div><div class="note muted">Value times probability</div></div><div class="fig"><div class="lab">Deals won this month</div><div class="val">1</div><div class="note muted">1 in October</div></div>
+    </div>
+    <div class="hero-chart"><div class="box-h"><h2>Revenue won <small>USD, last 6 months</small></h2></div><svg viewBox="0 0 900 320" width="100%" role="img" aria-label="Revenue won per month"><line x1="56" x2="876" y1="288" y2="288" stroke="#E3EAEC" stroke-width="1"/><text x="46" y="292" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">$0</text><line x1="56" x2="876" y1="198.66666666666669" y2="198.66666666666669" stroke="#E3EAEC" stroke-width="1"/><text x="46" y="202.66666666666669" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">$500K</text><line x1="56" x2="876" y1="109.33333333333334" y2="109.33333333333334" stroke="#E3EAEC" stroke-width="1"/><text x="46" y="113.33333333333334" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">$1M</text><line x1="56" x2="876" y1="20" y2="20" stroke="#E3EAEC" stroke-width="1"/><text x="46" y="24" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">$1.5M</text><text x="56" y="312" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Jun</text><text x="220" y="312" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Jul</text><text x="384" y="312" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Aug</text><text x="548" y="312" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Sep</text><text x="712" y="312" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Oct</text><text x="876" y="312" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Nov</text><path d="M56.0 190.6 L220.0 86.1 L384.0 164.9 L548.0 53.6 L712.0 131.7 L876.0 178.7 L876 288 L56 288 Z" fill="#118AB2" opacity="0.10"/><path d="M56.0 190.6 L220.0 86.1 L384.0 164.9 L548.0 53.6 L712.0 131.7 L876.0 178.7" fill="none" stroke="#118AB2" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="56" cy="190.62666666666667" r="4" fill="#fff" stroke="#118AB2" stroke-width="2.5"/><circle cx="220" cy="86.10666666666665" r="4" fill="#fff" stroke="#118AB2" stroke-width="2.5"/><circle cx="384" cy="164.89866666666666" r="4" fill="#fff" stroke="#118AB2" stroke-width="2.5"/><circle cx="548" cy="53.58933333333334" r="4" fill="#fff" stroke="#118AB2" stroke-width="2.5"/><circle cx="712" cy="131.66666666666666" r="4" fill="#fff" stroke="#118AB2" stroke-width="2.5"/><circle cx="876" cy="178.656" r="6" fill="#fff" stroke="#118AB2" stroke-width="2.5"/><text x="864" y="204.656" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="12" font-weight="600" fill="#073B4C">$612,000</text></svg></div>
+  </section>
+  <section class="panel box"><div class="box-h"><h2>Open pipeline <small>by stage, USD</small></h2><a>Open the pipeline <svg class="icon"  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div><div class="strip"><div class="seg" style="flex:2139000;background:#D0E8F0;height:56px" title="New Lead"><span>New Lead</span><b>$2.14M</b></div><div class="seg" style="flex:2325000;background:#B1D8E5;height:56px" title="Qualified"><span>Qualified</span><b>$2.33M</b></div><div class="seg" style="flex:2527000;background:#93C9DB;height:56px" title="Showing"><span>Showing</span><b>$2.53M</b></div><div class="seg" style="flex:1509500;background:#76BBD2;height:56px" title="Offer"><span>Offer</span><b>$1.51M</b></div><div class="seg" style="flex:1651000;background:#58ADC9;height:56px" title="Under Contract"><span>Under Contract</span><b>$1.65M</b></div></div></section>
+  <div class="row2">
+    <section class="panel box"><div class="box-h"><h2>Sales funnel <small>value reaching each stage, USD</small></h2></div>
+      <div class="hbars"><div class="hb"><span class="chip" style="background:#D0E8F0;justify-self:start">New Lead</span><div class="track"><span style="width:100%;background:#D0E8F0">30</span></div><span class="v mono">$17.3M</span></div><div class="hb"><span class="chip" style="background:#B1D8E5;justify-self:start">Qualified</span><div class="track"><span style="width:87.6211695940276%;background:#B1D8E5">25</span></div><span class="v mono">$15.1M</span></div><div class="hb"><span class="chip" style="background:#93C9DB;justify-self:start">Showing</span><div class="track"><span style="width:72.37188576058335%;background:#93C9DB">20</span></div><span class="v mono">$12.5M</span></div><div class="hb"><span class="chip" style="background:#76BBD2;justify-self:start">Offer</span><div class="track"><span style="width:54.73827367690037%;background:#76BBD2">15</span></div><span class="v mono">$9.46M</span></div><div class="hb"><span class="chip" style="background:#58ADC9;justify-self:start">Under Contract</span><div class="track"><span style="width:43.36931045458491%;background:#58ADC9">11</span></div><span class="v mono">$7.49M</span></div><div class="hb"><span class="chip" style="background:#06D6A0;justify-self:start">Closed (Won)</span><div class="track"><span style="width:29.879336786365347%;background:#06D6A0">8</span></div><span class="v mono">$5.16M</span></div></div></section>
+    <section class="panel box"><div class="box-h"><h2>Deals won and lost</h2><div class="legend"><span><span class="dot" style="background:var(--sea)"></span>Won</span><span><span class="dot" style="background:var(--coral)"></span>Lost</span></div></div><svg viewBox="0 0 520 250" width="100%" role="img" aria-label="Deals won and lost per month"><line x1="32" x2="508" y1="218" y2="218" stroke="#E3EAEC"/><text x="22" y="222" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">0</text><line x1="32" x2="508" y1="150.66666666666669" y2="150.66666666666669" stroke="#E3EAEC"/><text x="22" y="154.66666666666669" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">1</text><line x1="32" x2="508" y1="83.33333333333334" y2="83.33333333333334" stroke="#E3EAEC"/><text x="22" y="87.33333333333334" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">2</text><line x1="32" x2="508" y1="16" y2="16" stroke="#E3EAEC"/><text x="22" y="20" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="#3E6370">3</text><rect x="47.66666666666666" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#06D6A0"/><rect x="73.66666666666666" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#F78C6B"/><text x="71.66666666666666" y="242" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Jun</text><rect x="127" y="83.33333333333334" width="22" height="134.66666666666666" rx="4" fill="#06D6A0"/><text x="151" y="242" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Jul</text><rect x="206.33333333333331" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#06D6A0"/><rect x="232.33333333333331" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#F78C6B"/><text x="230.33333333333331" y="242" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Aug</text><rect x="285.6666666666667" y="83.33333333333334" width="22" height="134.66666666666666" rx="4" fill="#06D6A0"/><rect x="311.6666666666667" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#F78C6B"/><text x="309.6666666666667" y="242" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Sep</text><rect x="365" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#06D6A0"/><text x="389" y="242" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Oct</text><rect x="444.3333333333333" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#06D6A0"/><rect x="470.3333333333333" y="150.66666666666669" width="22" height="67.33333333333331" rx="4" fill="#F78C6B"/><text x="468.3333333333333" y="242" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="12" fill="#3E6370">Nov</text></svg></section>
+  </div>
+  <div class="row3" style="grid-template-columns:1fr 1fr">
+    <section class="panel box"><div class="box-h"><h2>Follow-ups</h2><span class="muted">2 overdue · 4 upcoming</span></div><ul class="fu ">
+  <li><span class="check"></span><div class="fu-body"><div>Call Lucy Chen about a price drop</div><div class="fu-on muted">Maple Ridge ranch sale</div></div>
+  <span class="fu-date mono overdue">Overdue · Nov 18</span></li>
+  <li><span class="check"></span><div class="fu-body"><div>Send Greg Lawson the showing feedback</div><div class="fu-on muted">26 Ashford Dr sale</div></div>
+  <span class="fu-date mono overdue">Overdue · Nov 20</span></li>
+  <li><span class="check"></span><div class="fu-body"><div>Remind Janet Moore about the inspection</div><div class="fu-on muted">410 Sycamore Rd sale</div></div>
+  <span class="fu-date mono ">Nov 24</span></li>
+  <li><span class="check"></span><div class="fu-body"><div>Follow up with Omar Haddad on the counteroffer</div><div class="fu-on muted">55 Juniper St purchase</div></div>
+  <span class="fu-date mono ">Nov 25</span></li>
+  <li><span class="check"></span><div class="fu-body"><div>Email Harbor Point Lending about pre-approval</div><div class="fu-on muted">Ben Foster</div></div>
+  <span class="fu-date mono ">Nov 27</span></li>
+  <li><span class="check"></span><div class="fu-body"><div>Check in with Priya Nair</div><div class="fu-on muted">Priya Nair</div></div>
+  <span class="fu-date mono ">Dec 1</span></li></ul></section>
+    <section class="panel box"><div class="box-h"><h2>Recent activity</h2></div><ul class="act ">
+  <li><span class="act-icon" style="background:#E2F1F6"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg></span>
+  <div><div>Moved from Showing to Offer</div><div class="muted act-meta"><a>55 Juniper St purchase</a> · Today, 10:42 AM</div></div></li>
+  <li><span class="act-icon" style="background:#C1F5E7"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+  <div><div>Rachel Kim will accept $360,000</div><div class="muted act-meta"><a>Brookside cottage sale</a> · Today, 9:15 AM</div></div></li>
+  <li><span class="act-icon" style="background:#FFECC7"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span>
+  <div><div>Appraisal booked for Dec 2</div><div class="muted act-meta"><a>Fairview Heights purchase</a> · Nov 22, 2026</div></div></li>
+  <li><span class="act-icon" style="background:#FDE3DA"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+  <div><div>Relocating from Denver in March, needs 3 beds</div><div class="muted act-meta"><a>Hannah Ortiz</a> · Nov 21, 2026</div></div></li>
+  <li><span class="act-icon" style="background:#E2F1F6"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg></span>
+  <div><div>Moved from Under Contract to Lost</div><div class="muted act-meta"><a>Northfield purchase</a> · Nov 19, 2026</div></div></li>
+  <li><span class="act-icon" style="background:#C1F5E7"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+  <div><div>Booked a second showing for Saturday</div><div class="muted act-meta"><a>Sam Okafor</a> · Nov 19, 2026</div></div></li>
+  <li><span class="act-icon" style="background:#FFECC7"><svg class="icon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span>
+  <div><div>Sent four new listings in Summit View</div><div class="muted act-meta"><a>Elena Rossi</a> · Nov 18, 2026</div></div></li></ul></section>
+  </div>
+</main></body></html>
