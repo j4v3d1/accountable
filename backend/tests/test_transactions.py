@@ -18,7 +18,7 @@ def test_a_request_that_fails_after_writing_leaves_the_database_unchanged(test_e
         conn.execute(insert(organizations).values(name="Half saved"))
         raise RuntimeError("failed after writing")
 
-    with TestClient(app, raise_server_exceptions=False) as client:
+    with TestClient(app, base_url="http://localhost", raise_server_exceptions=False) as client:
         assert client.post("/api/test-only/fail-after-write").status_code == 500
         assert client.get("/api/organizations").json() == []
 
@@ -34,6 +34,6 @@ def test_a_request_that_refuses_after_writing_leaves_the_database_unchanged(test
         conn.execute(insert(organizations).values(name="Half saved"))
         raise HTTPException(status_code=409, detail="refused")
 
-    with TestClient(app) as client:
+    with TestClient(app, base_url="http://localhost") as client:
         assert client.post("/api/test-only/refuse-after-write").status_code == 409
         assert client.get("/api/organizations").json() == []

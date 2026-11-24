@@ -49,7 +49,7 @@ def seeded(test_env, today):
 
 
 def test_a_new_database_is_seeded_on_first_start(test_env):
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(), base_url="http://localhost") as client:
         assert len(client.get("/api/organizations").json()) == 12
         assert len(client.get("/api/deals").json()) == 30
 
@@ -57,12 +57,12 @@ def test_a_new_database_is_seeded_on_first_start(test_env):
 def test_an_existing_database_is_not_reseeded_on_start(test_env):
     make_empty_database(test_env)
 
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(), base_url="http://localhost") as client:
         assert client.get("/api/organizations").json() == []
 
 
 def test_the_seed_command_resets_the_data_while_the_app_holds_the_database_open(test_env):
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(), base_url="http://localhost") as client:
         client.post("/api/organizations", json={"name": "Added by hand"})
         client.delete(f"/api/deals/{client.get('/api/deals').json()[0]['id']}")
         with client.app.state.engine.connect() as held_open:

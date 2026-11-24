@@ -58,6 +58,8 @@ export function DeleteDealDialog({
       open={target !== null}
       onOpenChange={(open) => !open && onClose()}
       recordName={target?.name ?? ""}
+      impactError={impact.error?.message}
+      onRetry={() => impact.refetch()}
       impact={impact.data && [{ count: impact.data.activities, noun: "activity", plural: "activities", outcome: "deleted" }]}
       onConfirm={() => {
         const id = target!.id;

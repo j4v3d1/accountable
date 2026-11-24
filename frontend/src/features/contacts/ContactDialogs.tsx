@@ -45,6 +45,8 @@ export function DeleteContactDialog({
       open={target !== null}
       onOpenChange={(open) => !open && onClose()}
       recordName={target?.name ?? ""}
+      impactError={impact.error?.message}
+      onRetry={() => impact.refetch()}
       impact={
         impact.data && [
           { count: impact.data.deals, noun: "deal", outcome: "unlinked" },

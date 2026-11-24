@@ -3,6 +3,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy import inspect
 
 from app import seed
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
 
     app = FastAPI(title="Accountable", lifespan=lifespan)
     app.state.engine = make_engine(config.database_url())
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.ALLOWED_HOSTS)
     add_error_handlers(app)
     for router in (organizations_router, contacts_router, deals_router, activities_router, dashboard_router):
         app.include_router(router)

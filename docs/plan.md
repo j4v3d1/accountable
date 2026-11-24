@@ -19,6 +19,7 @@ Every file below is new unless it says otherwise. `README.md` stays as it is.
 | `pyproject.toml`, `uv.lock`, `.python-version` | The Python 3.12 app. It has no build system, so uv treats it as an app rather than a package.<br>- Dependencies: FastAPI, Uvicorn and SQLAlchemy.<br>- Dev dependencies: pytest and httpx.<br>- pytest settings: `pythonpath = ["backend"]` and `testpaths = ["backend/tests"]`. |
 | `playwright.config.ts` | Runs one test at a time (`workers: 1`) in the installed Google Chrome (`channel: "chrome"`). Starts its own backend and frontend on test ports (8100 and 5180), and never reuses a server that's already running. Points `ACCOUNTABLE_DATABASE_URL` at a temporary SQLite file. |
 | `.gitignore` (changed) | Adds `backend/data/`. `*.db` files are already ignored. |
+| `.vscode/settings.json` | Words the VS Code spell checker accepts, such as WCAG. Editor-only: the app doesn't use it. |
 
 The npm scripts all work the same in macOS, Linux and Windows shells:
 
@@ -42,8 +43,10 @@ The npm scripts all work the same in macOS, Linux and Windows shells:
 
 | File | What it holds |
 |---|---|
-| `main.py` | Creates the FastAPI app. On startup it creates the database and seeds it if it's new (R40), then adds each area's routes. |
-| `core/config.py` | The database URL from `ACCOUNTABLE_DATABASE_URL`. The default SQLite file, `backend/data/accountable.db`, is found from this file's location rather than the folder the command runs in, and its folder is created if it's missing. Also `today()`, which tests can fix with `ACCOUNTABLE_TODAY`. |
+| `main.py` | Creates the FastAPI app. On startup it creates the database and seeds it if it's new (R40), then adds each area's routes. It refuses requests addressed to any host but `localhost` or `127.0.0.1`. |
+| `core/config.py` | The database URL from `ACCOUNTABLE_DATABASE_URL`. The default SQLite file, `backend/data/accountable.db`, is found from this file's location rather than the folder the command runs in, and its folder is created if it's missing. Also `today()`, which tests can fix with `ACCOUNTABLE_TODAY`, and the host names the API answers to. |
+| `core/errors.py` | The errors services raise for a missing record, a refused change and unusable input, turned into 404, 409 and 422 responses in one place. |
+| `core/fields.py` | Field types every area's request schemas share: required and optional text, email, website, and partial updates that can't set a required field to empty. |
 | `core/db.py` | The engine; `PRAGMA foreign_keys = ON` for every SQLite connection; creating the tables if they're missing; and the FastAPI dependency that opens one transaction per request and passes its connection to the routes. |
 | `core/tables.py` | All four tables in one place, with their foreign keys, `on delete` rules and the activity check constraint. Timestamps are stored in UTC. |
 | `organizations/` | Lists with contact and open-deal counts (R8). One organization with its contacts and deals (R9). Create, update, delete and `delete-impact` (R4, R7). |
@@ -64,9 +67,9 @@ The backend tests, in `backend/tests/`, are listed under Proof. `tests/conftest.
 | `vite.config.ts` | The dev server port and the `/api` proxy, both read from environment variables so the end-to-end tests can use their own ports. The Vitest settings: jsdom, and only `src/**/*.test.ts(x)`. |
 | `src/main.tsx`, `src/App.tsx` | Providers (TanStack Query) and the spec's eight routes, inside the layout with the rail. |
 | `src/api/client.ts` | The one fetch wrapper and its error type. After any change to data, all queries are refreshed (R38). |
-| `src/ui/` | App-wide pieces that know nothing about deals or contacts:<br>- `Rail`, `PageHeader` and `Toast`;<br>- `DataTable` (search, sort and row actions; R2) and `ConfirmDeleteDialog` (R4);<br>- `EmptyState`, `LoadingState` and `ErrorState`;<br>- `Avatar`;<br>- form fields: text, select, date, and the searchable `RecordPicker`. |
-| `src/lib/` | `format.ts` (money, dates and percentages; R6, concern 10) and `initials.ts` (initials and tint for the avatar; R20). |
-| `src/features/organizations/` | List page, detail page, `OrganizationForm`, `queries.ts` and `types.ts` (R7 to R9). |
+| `src/ui/` | App-wide pieces that know nothing about deals or contacts:<br>- `Rail`, `PageHeader` and `Toast`;<br>- `DataTable` (search, sort and row actions; R2) and `ConfirmDeleteDialog` (R4);<br>- `EmptyState`, `LoadingState` and `ErrorState`;<br>- `Avatar`;<br>- form fields: text, select, date, and the searchable `RecordPicker`;<br>- `NotFoundPage`, for an address that matches no route. |
+| `src/lib/` | `format.ts` (money, dates and percentages; R6, concern 10), `initials.ts` (initials and tint for the avatar; R20) and `validation.ts` (the same email and website checks as the backend). |
+| `src/features/organizations/` | List page, detail page, `OrganizationForm`, `queries.ts`, `types.ts` and `website.ts` (how a website is linked and shown) (R7 to R9). |
 | `src/features/contacts/` | List page with the status filter, detail page, `ContactForm`, `queries.ts` and `types.ts` (R10 to R12). |
 | `src/features/deals/` | List page, detail page, `DealForm`, `queries.ts` (including the stages), `types.ts`, `StageChip`, `LateBadge` and `ProbabilityDots` (R13 to R18). |
 | `src/features/activities/` | `Timeline`, `ActivityForm`, `queries.ts` and `types.ts` (R28 to R30). |
@@ -222,15 +225,20 @@ Done when: the dashboard end-to-end tests pass, and the page matches mockup D by
 | `test_dashboard.py` | R31 to R38, on a small hand-built dataset with today fixed:<br>- revenue won this month, and the change from last month;<br>- the six-month total and the best month;<br>- open value, expected revenue and the expected share;<br>- deals won this month and last month, and the win rate;<br>- the monthly won and lost counts;<br>- the funnel's counts, values and conversion shares, from each deal's furthest stage (concern 8);<br>- the follow-up groups in date order, with done ones left out, including when today is a Sunday;<br>- the latest 10 activities;<br>- the summary line's counts.<br>Also: figures change after a deal is won or a follow-up is added; months are right across a year end; an empty database gives zeros and the agreed wording for figures with nothing to measure, without errors. |
 | `test_seed.py` | R40 to R42:<br>- a new database is seeded on first start;<br>- `seed` resets the data, even while the app holds the database open;<br>- there are about 12 organizations, 40 contacts, 30 deals and 80 activities;<br>- every status and stage appears;<br>- there are deals won and lost in each of the last six months, 3 or 4 late deals, and follow-ups both overdue and due soon;<br>- deals past New Lead have stage-change history;<br>- every email uses a reserved domain such as `example.com`;<br>- two runs give the same data. |
 | `test_persistence.py` | Data written through the API is still there when a new app instance opens the same database, which is what a restart does (R5, success criterion 2). |
+| `test_hosts.py` | The API answers requests addressed to `localhost` or `127.0.0.1`, and refuses any other host with 400, so a web page can't reach it through DNS rebinding. |
 
 ### Frontend unit tests (Vitest, `frontend/src/`)
 
 | File | What it proves |
 |---|---|
-| `lib/format.test.ts` | Money as `$485,000`, and in short form as `$612K`, `$1.2M` and `$10.2M`. Dates as `Nov 23, 2026`. Percentages as `60%` (R6, concern 10). |
+| `lib/format.test.ts` | Money as `$485,000`, and in short form as `$612K`, `$1.2M` and `$10.2M`. Dates as `Nov 23, 2026`, and a timestamp's date in local time even when its UTC date differs. Percentages as `60%` (R6, concern 10). |
 | `lib/initials.test.ts` | Initials come from the contact, then the organization, then none. The same name always gets the same tint (R20). |
 | `ui/DataTable.test.tsx` | Search filters across text columns. Clicking a heading sorts ascending, then descending, then back to the default order (R2). |
-| `ui/ConfirmDeleteDialog.test.tsx` | The dialog shows the impact counts and leaves out zero counts (R4). |
+| `ui/ConfirmDeleteDialog.test.tsx` | The dialog shows the impact counts and leaves out zero counts. When the counts can't be loaded, it says so, keeps Delete disabled and offers to try again (R4). |
+| `features/deleteDialogs.test.tsx` | The organization, contact and deal delete dialogs each show the error when their counts can't be loaded (R4). |
+| `features/contacts/ContactsPage.test.tsx`, `features/deals/DealsPage.test.tsx` | The last activity shows the local day it happened. Search matches a contact's status and a deal's stage (R2, R11). |
+| `features/organizations/website.test.ts` | A website links to itself when it has a scheme in any case, and gets `https://` otherwise, even when it starts with "http". |
+| `features/pipeline/PipelineBoard.test.tsx` | Each column's Add deal button is named after its stage. Every card shows its probability, closed deals included (R20, R25). |
 | `features/*/…Form.test.tsx` | Required fields and invalid emails or websites show errors next to the field. Choosing a stage in the deal form fills in its usual probability, and a typed probability is kept (R3, R14). |
 | `features/pipeline/board.test.ts` | Moving a card across columns, within one, or into an empty column gives the right order. Column totals, expected revenue, board totals and the late count update straight away. Moving a late deal to Closed (Won) clears its late flag. A rollback restores the board exactly (R21, R24). |
 | `features/dashboard/SummaryLine.test.tsx` | Parts that would be zero are left out (R31). |

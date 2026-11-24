@@ -180,6 +180,7 @@ browser
 - The backend owns all the business rules: stage probabilities, close dates, stage-change entries, delete cascades, positions and dashboard figures. The frontend never works these out for saved data. Its only exception is the instant totals while a card is being dragged (R24), which are then replaced by the server's answer.
 - The database comes from the environment variable `ACCOUNTABLE_DATABASE_URL`, a SQLAlchemy database URL. It defaults to the SQLite file `backend/data/accountable.db`, found from the backend folder rather than the folder a command runs in. Tests point it at a temporary file. Moving to Supabase's Postgres later means changing this setting, not the code.
 - Each API request runs in one database transaction, so a change either saves completely or not at all.
+- The API only answers requests addressed to `localhost` or `127.0.0.1`, so a web page can't reach it by pointing its own domain name at this computer (DNS rebinding).
 
 ### Libraries
 
@@ -258,9 +259,11 @@ The code is grouped by area of the product, not by technical layer, so a new are
 backend/app/
   main.py              creates the app and adds each area's routes
   core/
-    config.py          database URL, today()
+    config.py          database URL, today(), allowed hosts
     db.py              engine, one transaction per request
     tables.py          all tables, in one place
+    errors.py          404, 409 and 422 errors, raised by services
+    fields.py          field types shared by the request schemas
   organizations/       routes.py, schemas.py, service.py
   contacts/            routes.py, schemas.py, service.py
   deals/               routes.py, schemas.py, service.py, stages.py

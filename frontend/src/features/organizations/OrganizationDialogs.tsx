@@ -44,6 +44,8 @@ export function DeleteOrganizationDialog({
       open={target !== null}
       onOpenChange={(open) => !open && onClose()}
       recordName={target?.name ?? ""}
+      impactError={impact.error?.message}
+      onRetry={() => impact.refetch()}
       impact={
         impact.data && [
           { count: impact.data.contacts, noun: "contact", outcome: "unlinked" },

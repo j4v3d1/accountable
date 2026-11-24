@@ -38,6 +38,11 @@ export function formatDateTime(isoTimestamp: string): string {
   return format(parseISO(isoTimestamp), "MMM d, yyyy, h:mm a");
 }
 
+/** The local date of a UTC timestamp, such as Nov 23, 2026. Its UTC date can be a day earlier or later. */
+export function formatTimestampDate(isoTimestamp: string): string {
+  return format(parseISO(isoTimestamp), "MMM d, yyyy");
+}
+
 /** "Today, 10:42 AM" for today's timestamps, otherwise the date. */
 export function formatWhen(isoTimestamp: string, now: Date = new Date()): string {
   const when = parseISO(isoTimestamp);

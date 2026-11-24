@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { formatDate } from "../../lib/format";
+import { formatTimestampDate } from "../../lib/format";
 import { DataTable, type TableColumn } from "../../ui/DataTable";
 import { PageHeader } from "../../ui/PageHeader";
 import { ErrorState, LoadingState } from "../../ui/States";
@@ -10,9 +10,9 @@ import { StatusChip, statusLabel } from "./StatusChip";
 import { STATUSES, type Contact, type ContactStatus } from "./types";
 import "./contacts.css";
 
-const columns: TableColumn<Contact>[] = [
+export const contactColumns: TableColumn<Contact>[] = [
   { id: "name", header: "Name", value: (c) => c.name, search: true },
-  { id: "status", header: "Status", value: (c) => statusLabel(c.status), cell: (c) => <StatusChip status={c.status} /> },
+  { id: "status", header: "Status", value: (c) => statusLabel(c.status), cell: (c) => <StatusChip status={c.status} />, search: true },
   { id: "organization", header: "Organization", value: (c) => c.organization_name, search: true },
   { id: "email", header: "Email", value: (c) => c.email, search: true, nowrap: true },
   { id: "phone", header: "Phone", value: (c) => c.phone, search: true, nowrap: true },
@@ -20,7 +20,7 @@ const columns: TableColumn<Contact>[] = [
     id: "last_activity",
     header: "Last activity",
     value: (c) => c.last_activity_at,
-    cell: (c) => (c.last_activity_at ? formatDate(c.last_activity_at.slice(0, 10)) : <span className="muted">None yet</span>),
+    cell: (c) => (c.last_activity_at ? formatTimestampDate(c.last_activity_at) : <span className="muted">None yet</span>),
     mono: true,
   },
 ];
@@ -74,7 +74,7 @@ export function ContactsPage() {
       ) : (
         <DataTable
           rows={rows}
-          columns={columns}
+          columns={contactColumns}
           searchLabel="Search contacts"
           rowHref={(c) => `/contacts/${c.id}`}
           rowLabel={(c) => c.name}

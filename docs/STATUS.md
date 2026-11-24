@@ -39,7 +39,31 @@
   - each follow-up's deal or contact is muted until pointed at;
   - notes and stage changes use the mockup's icons.
 
-  Still different on purpose, as agreed in Phase 0: the board fills the window and each column scrolls, and Closed (Won) and Lost say "All time" rather than "Last 6 months".
+  Still different on purpose, as agreed in Phase 0: the board fills the window and each column scrolls, and Closed (Won) and Lost say "All time" rather than "Last 6 months". Since the review, Closed (Won) and Lost cards also show their probability, as R20 asks, where mockup D leaves it out.
+
+## Review findings (2026-11-24)
+
+The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` passed before the review (178 backend, 72 frontend and 26 end-to-end tests). Seven of the eight findings are fixed, each with a test written first and watched failing. `npm test` now passes with 185 backend, 85 frontend and 26 end-to-end tests. What the review found:
+
+**Important (blocks the merge)**
+
+1. **Contacts table shows the wrong day for evening activities.** The "Last activity" column cut the date off the UTC timestamp instead of showing the local date. A call logged at 7:30pm on Nov 23 in New York (stored as `2026-11-24T00:30:00Z`) showed as Nov 24, while the contact's timeline said Nov 23. **Fixed:** the column shows the timestamp's local date (`formatTimestampDate` in `lib/format.ts`).
+
+**Bugs**
+
+2. **The delete dialog hangs when the counts can't be loaded.** If `delete-impact` failed (server down, or the record already deleted elsewhere), the dialog said "Checking linked records..." forever, with Delete disabled and no error. **Fixed:** the dialog says "Couldn't check linked records" with the reason, keeps Delete disabled, and has a "Try again" button.
+3. **Some website links break.** A bare domain starting with "http" (such as `httpie.io`) was treated as already having a scheme, so it became a link inside the app. An uppercase `HTTPS://` got a second scheme added. **Fixed:** `features/organizations/website.ts` checks for `http://` or `https://` in any case.
+
+**Security**
+
+4. **The API answers requests for any host name.** Uvicorn on port 8000 didn't check the `Host` header, so a malicious web page could reach the local API with DNS rebinding. Low risk for a local app, but cheap to close. **Fixed:** the API refuses any host but `localhost` and `127.0.0.1` with 400. Checked on a running server as well as in `test_hosts.py`. When the app is deployed to Render, its address has to be added to `ALLOWED_HOSTS` in `core/config.py`.
+
+**Differences from the spec and plan**
+
+5. **Search skipped some text columns (R2).** The Deals search didn't match the stage, and the Contacts search didn't match the status. **Fixed:** both are searched. Stages still sort in pipeline order.
+6. **Closed (Won) and Lost cards hid the probability (R20).** R20 says every card shows it. Mockup D hides it too, but the spec says the requirements decide what a screen does. **Fixed:** every card shows the five-dot meter and the percentage.
+7. **Files not listed in the plan:** `backend/app/core/errors.py`, `backend/app/core/fields.py`, `frontend/src/ui/NotFoundPage.tsx` and `.vscode/settings.json`. **Fixed:** all four are kept and now listed in `docs/plan.md`, along with `lib/validation.ts`. `errors.py` and `fields.py` are also in the spec's code structure.
+8. **The walkthrough with Wi-Fi off hasn't been done** (see Not checked below). **Still open:** it needs a person to switch Wi-Fi off, run `npm run dev` and go through every screen.
 
 ## Not checked
 

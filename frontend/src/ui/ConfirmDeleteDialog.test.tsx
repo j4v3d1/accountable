@@ -79,3 +79,29 @@ describe("ConfirmDeleteDialog", () => {
     expect(screen.getByText(/Checking linked records/)).toBeInTheDocument();
   });
 });
+
+describe("ConfirmDeleteDialog when the counts can't be loaded", () => {
+  it("says so, keeps Delete disabled and offers to try again", async () => {
+    const user = userEvent.setup();
+    const onRetry = vi.fn();
+    render(
+      <ConfirmDeleteDialog
+        open
+        onOpenChange={() => {}}
+        recordName="Lucy Chen"
+        impact={undefined}
+        impactError="Can't reach Accountable's server. Is it running?"
+        onRetry={onRetry}
+        onConfirm={() => {}}
+      />,
+    );
+
+    expect(screen.getByText(/Couldn't check linked records/)).toBeInTheDocument();
+    expect(screen.getByText(/Can't reach Accountable's server/)).toBeInTheDocument();
+    expect(screen.queryByText(/Checking linked records/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Delete" })).toBeDisabled();
+
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+});

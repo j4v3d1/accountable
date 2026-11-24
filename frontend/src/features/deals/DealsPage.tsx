@@ -19,11 +19,13 @@ export function CloseDate({ deal }: { deal: Deal }) {
   );
 }
 
-function makeColumns(stages: Stage[]): TableColumn<Deal>[] {
+export function dealColumns(stages: Stage[]): TableColumn<Deal>[] {
   const order = (deal: Deal) => stages.findIndex((s) => s.key === deal.stage);
+  const label = (deal: Deal) => stages.find((s) => s.key === deal.stage)?.label ?? "";
   return [
     { id: "name", header: "Name", value: (d) => d.name, search: true },
-    { id: "stage", header: "Stage", value: order, cell: (d) => <StageChip stage={d.stage} /> },
+    // Sorted in pipeline order, searched by the stage's name.
+    { id: "stage", header: "Stage", value: order, searchText: label, cell: (d) => <StageChip stage={d.stage} /> },
     { id: "value", header: "Value (USD)", value: (d) => d.value, cell: (d) => money(d.value), align: "right", mono: true },
     { id: "probability", header: "Probability", value: (d) => d.probability, cell: (d) => percent(d.probability), align: "right", mono: true },
     {
@@ -45,7 +47,7 @@ export function DealsPage() {
   const stages = useStages();
   const [editing, setEditing] = useState<Deal | null | undefined>(undefined);
   const [deleting, setDeleting] = useState<Deal | null>(null);
-  const columns = useMemo(() => makeColumns(stages.data ?? []), [stages.data]);
+  const columns = useMemo(() => dealColumns(stages.data ?? []), [stages.data]);
   const open = deals.data?.filter((d) => stages.data?.find((s) => s.key === d.stage)?.open).length;
 
   return (

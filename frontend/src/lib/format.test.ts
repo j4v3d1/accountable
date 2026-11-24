@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateTime, formatShortDate, formatWhen, money, moneyShort, percent } from "./format";
+import {
+  formatDate,
+  formatDateTime,
+  formatShortDate,
+  formatTimestampDate,
+  formatWhen,
+  money,
+  moneyShort,
+  percent,
+} from "./format";
 
 describe("money", () => {
   it("writes whole US dollars with separators", () => {
@@ -57,5 +66,17 @@ describe("percent", () => {
     expect(percent(60)).toBe("60%");
     expect(percent(66.666)).toBe("67%");
     expect(percent(0)).toBe("0%");
+  });
+});
+
+describe("formatTimestampDate", () => {
+  it("shows a timestamp's date in local time, even when the UTC date is a different day", () => {
+    // Just after midnight and just before midnight on Nov 23, local time. One of
+    // these falls on another day in UTC in every time zone except UTC itself.
+    const earlyMorning = new Date(2026, 10, 23, 0, 30).toISOString();
+    const lateEvening = new Date(2026, 10, 23, 23, 30).toISOString();
+
+    expect(formatTimestampDate(earlyMorning)).toBe("Nov 23, 2026");
+    expect(formatTimestampDate(lateEvening)).toBe("Nov 23, 2026");
   });
 });

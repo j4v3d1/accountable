@@ -9,6 +9,10 @@ from sqlalchemy.engine import URL
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_DATABASE_PATH = BACKEND_DIR / "data" / "accountable.db"
 
+# The API only answers requests addressed to this computer, so a web page can't
+# reach it by pointing its own domain name at 127.0.0.1 (DNS rebinding).
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
 
 def database_url() -> str:
     """The SQLAlchemy URL from ACCOUNTABLE_DATABASE_URL, or the default SQLite file."""

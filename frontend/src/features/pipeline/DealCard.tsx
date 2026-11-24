@@ -9,7 +9,7 @@ import type { Deal } from "../deals/types";
 import "./pipeline.css";
 
 /** A deal on the board (R20): who it's with, the value, the probability and the close date. */
-export function DealCardBody({ deal, closed }: { deal: Deal; closed: boolean }) {
+export function DealCardBody({ deal }: { deal: Deal }) {
   const who = [deal.contact_name, deal.organization_name].filter(Boolean).join(" · ");
   return (
     <>
@@ -22,7 +22,7 @@ export function DealCardBody({ deal, closed }: { deal: Deal; closed: boolean }) 
       </div>
       <div className="card-row">
         <span className="card-value mono">{money(deal.value)}</span>
-        {!closed && <ProbabilityDots probability={deal.probability} />}
+        <ProbabilityDots probability={deal.probability} />
       </div>
       <div className="card-row">
         {deal.late ? (
@@ -33,7 +33,7 @@ export function DealCardBody({ deal, closed }: { deal: Deal; closed: boolean }) 
             {formatShortDate(deal.close_date)}
           </span>
         )}
-        {!closed && <span className="card-prob mono">{percent(deal.probability)}</span>}
+        <span className="card-prob mono">{percent(deal.probability)}</span>
       </div>
     </>
   );
@@ -73,7 +73,7 @@ export function SortableDealCard({ deal, closed, landing, onOpen }: Props) {
         openWithEnter(event);
       }}
     >
-      <DealCardBody deal={deal} closed={closed} />
+      <DealCardBody deal={deal} />
     </div>
   );
 }

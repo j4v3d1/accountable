@@ -2,7 +2,6 @@ import {
   columnFilteringFeature,
   createFilteredRowModel,
   createSortedRowModel,
-  filterFn_includesString,
   globalFilteringFeature,
   rowSortingFeature,
   sortFn_alphanumeric,
@@ -22,12 +21,14 @@ export type CellValue = string | number | null | undefined;
 export interface TableColumn<T> {
   id: string;
   header: string;
-  /** The value used for sorting and searching. */
+  /** The value used for sorting, and for searching unless searchText is given. */
   value: (row: T) => CellValue;
   /** What to show, if it differs from the value. */
   cell?: (row: T) => ReactNode;
   /** Whether the search box matches this column (text columns). */
   search?: boolean;
+  /** The text the search box matches, when the value is for sorting only, such as a stage's place in the pipeline. */
+  searchText?: (row: T) => string;
   align?: "left" | "right";
   mono?: boolean;
   /** Keep the value on one line, such as a phone number. */
@@ -40,7 +41,6 @@ const features = tableFeatures({
   rowSortingFeature,
   filteredRowModel: createFilteredRowModel(),
   sortedRowModel: createSortedRowModel(),
-  filterFns: { includesString: filterFn_includesString },
   sortFns: { alphanumeric: sortFn_alphanumeric, basic: sortFn_basic },
 });
 
@@ -82,7 +82,7 @@ export function DataTable<T extends RowData>({
           id: column.id,
           header: column.header,
           accessorFn: (row: T) => column.value(row) ?? undefined,
-          enableGlobalFilter: column.search === true,
+          enableGlobalFilter: column.search === true || column.searchText !== undefined,
           sortFn: typeof sample === "number" ? ("basic" as const) : ("alphanumeric" as const),
           sortDescFirst: false,
           sortUndefined: "last" as const,
@@ -90,6 +90,7 @@ export function DataTable<T extends RowData>({
       }),
     [columns, rows],
   );
+  const byId = new Map(columns.map((column) => [column.id, column]));
 
   const table = useTable({
     features,
@@ -97,11 +98,15 @@ export function DataTable<T extends RowData>({
     data: rows,
     state: { globalFilter: search },
     onGlobalFilterChange: (updater) => setSearch((current) => (typeof updater === "function" ? updater(current) : updater) ?? ""),
-    globalFilterFn: "includesString",
+    // Matches the column's search text if it has one, otherwise its value, ignoring case.
+    globalFilterFn: (row, columnId, filterValue) => {
+      const column = byId.get(columnId);
+      const text = column?.searchText ? column.searchText(row.original) : row.getValue(columnId);
+      return text != null && String(text).toLowerCase().includes(String(filterValue).toLowerCase());
+    },
     enableMultiSort: false,
   });
 
-  const byId = new Map(columns.map((column) => [column.id, column]));
   const visibleRows = table.getRowModel().rows;
   const hasActions = Boolean(onEdit || onDelete);
 

@@ -236,7 +236,7 @@ export function Board({ deals, stages, onAdd }: Props) {
         <DragOverlay dropAnimation={null}>
           {active ? (
             <div className={active.stage === "closed_won" || active.stage === "lost" ? "deal-card dragging done" : "deal-card dragging"}>
-              <DealCardBody deal={active} closed={!activeStage?.open} />
+              <DealCardBody deal={active} />
             </div>
           ) : null}
         </DragOverlay>

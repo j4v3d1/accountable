@@ -8,8 +8,8 @@ import { ErrorState, LoadingState } from "../../ui/States";
 import { StatusChip } from "../contacts/StatusChip";
 import { StageChip } from "../deals/StageChip";
 import { DeleteOrganizationDialog, OrganizationFormDialog } from "./OrganizationDialogs";
-import { displayWebsite } from "./OrganizationsPage";
 import { useOrganization } from "./queries";
+import { displayWebsite, websiteHref } from "./website";
 
 export function OrganizationPage() {
   const id = Number(useParams().id);
@@ -57,7 +57,7 @@ export function OrganizationPage() {
             <dt>Website</dt>
             <dd>
               {org.website ? (
-                <a href={org.website.startsWith("http") ? org.website : `https://${org.website}`} target="_blank" rel="noreferrer">
+                <a href={websiteHref(org.website)} target="_blank" rel="noreferrer">
                   {displayWebsite(org.website)}
                 </a>
               ) : (

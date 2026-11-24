@@ -6,10 +6,7 @@ import { ErrorState, LoadingState } from "../../ui/States";
 import { DeleteOrganizationDialog, OrganizationFormDialog } from "./OrganizationDialogs";
 import { useOrganizations } from "./queries";
 import type { Organization } from "./types";
-
-export function displayWebsite(website: string) {
-  return website.replace(/^https?:\/\//, "").replace(/\/$/, "");
-}
+import { displayWebsite } from "./website";
 
 const columns: TableColumn<Organization>[] = [
   { id: "name", header: "Name", value: (o) => o.name, search: true },

@@ -40,7 +40,7 @@ def client(test_env):
     from app.main import create_app
 
     make_empty_database(test_env)
-    with TestClient(create_app()) as c:
+    with TestClient(create_app(), base_url="http://localhost") as c:
         yield c
 
 

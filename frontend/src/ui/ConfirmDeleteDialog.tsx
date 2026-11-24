@@ -25,13 +25,17 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   recordName: string;
-  /** Undefined while the counts are loading. */
+  /** Undefined while the counts are loading, or when they couldn't be loaded. */
   impact: ImpactItem[] | undefined;
+  /** Why the counts couldn't be loaded. Delete stays disabled until they are. */
+  impactError?: string;
+  onRetry?: () => void;
   onConfirm: () => void;
   pending?: boolean;
 }
 
-export function ConfirmDeleteDialog({ open, onOpenChange, recordName, impact, onConfirm, pending }: Props) {
+export function ConfirmDeleteDialog({ open, onOpenChange, recordName, impact, impactError, onRetry, onConfirm, pending }: Props) {
+  const failed = impact === undefined && impactError !== undefined;
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -39,9 +43,18 @@ export function ConfirmDeleteDialog({ open, onOpenChange, recordName, impact, on
         <Dialog.Content className="dialog dialog-small" role="alertdialog">
           <Dialog.Title className="dialog-title">Delete {recordName}?</Dialog.Title>
           <Dialog.Description className="dialog-text">
-            {impact === undefined ? "Checking linked records..." : describeImpact(impact)}
+            {failed
+              ? `Couldn't check linked records. ${impactError}`
+              : impact === undefined
+                ? "Checking linked records..."
+                : describeImpact(impact)}
           </Dialog.Description>
           <div className="dialog-actions">
+            {failed && onRetry && (
+              <button type="button" className="btn btn-quiet" onClick={onRetry}>
+                Try again
+              </button>
+            )}
             <Dialog.Close asChild>
               <button type="button" className="btn btn-quiet">
                 Cancel
