@@ -43,7 +43,14 @@ export function RevenuePanel({ revenue, monthName }: { revenue: Dashboard["reven
           strokeOpacity={isCurrent ? 0.3 : 0.08}
           strokeDasharray={isCurrent ? "3 3" : undefined}
         />
-        <circle cx={cx} cy={cy} r={isCurrent ? 6 : 3.5} fill={isCurrent ? SEA_GREEN : MIDNIGHT} stroke={SEA_GREEN} strokeWidth={2.5} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={isCurrent ? 6 : 3.5}
+          fill={isCurrent ? SEA_GREEN : MIDNIGHT}
+          stroke={SEA_GREEN}
+          strokeWidth={2.5}
+        />
         <text
           x={cx}
           y={cy - 14}
@@ -87,7 +94,11 @@ export function RevenuePanel({ revenue, monthName }: { revenue: Dashboard["reven
           </div>
         </dl>
       </div>
-      <div className="revenue-chart" role="img" aria-label={`Revenue won per month: ${revenue.months.map((m) => `${m.label} ${moneyShort(m.won_value)}`).join(", ")}`}>
+      <div
+        className="revenue-chart"
+        role="img"
+        aria-label={`Revenue won per month: ${revenue.months.map((m) => `${m.label} ${moneyShort(m.won_value)}`).join(", ")}`}
+      >
         <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
           <AreaChart data={revenue.months} margin={MARGIN}>
             <CartesianGrid vertical={false} horizontalPoints={GUIDE_LINES} stroke={SEA_MIST} strokeOpacity={0.12} />

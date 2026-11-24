@@ -41,7 +41,9 @@ function Group({ title, items, overdue }: { title: string; items: Activity[]; ov
               </p>
             </div>
             <span className="due mono">
-              {overdue ? `Overdue · ${formatShortDate(activity.follow_up_date!)}` : formatShortDate(activity.follow_up_date!)}
+              {overdue
+                ? `Overdue · ${formatShortDate(activity.follow_up_date!)}`
+                : formatShortDate(activity.follow_up_date!)}
             </span>
           </li>
         ))}

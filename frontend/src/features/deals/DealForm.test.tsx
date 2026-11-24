@@ -16,7 +16,9 @@ const stages: Stage[] = [
 
 function renderForm(props: Partial<Parameters<typeof DealForm>[0]> = {}) {
   const onSubmit = vi.fn();
-  render(<DealForm stages={stages} contacts={[]} organizations={[]} onSubmit={onSubmit} onCancel={() => {}} {...props} />);
+  render(
+    <DealForm stages={stages} contacts={[]} organizations={[]} onSubmit={onSubmit} onCancel={() => {}} {...props} />,
+  );
   return onSubmit;
 }
 

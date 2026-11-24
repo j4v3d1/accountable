@@ -12,11 +12,7 @@ const schema = z.object({
   contact_id: z.number().nullable(),
   organization_id: z.number().nullable(),
   stage: z.string().transform((v) => v as StageKey),
-  value: z
-    .string()
-    .trim()
-    .regex(/^\d+$/, "Enter a whole dollar amount, 0 or more")
-    .transform(Number),
+  value: z.string().trim().regex(/^\d+$/, "Enter a whole dollar amount, 0 or more").transform(Number),
   probability: z
     .string()
     .trim()
@@ -26,6 +22,34 @@ const schema = z.object({
   close_date: z.string().min(1, "Choose a close date"),
   notes: z.string().transform(blankToNull),
 });
+
+type FormValues = z.input<typeof schema>;
+
+/** The form starts blank for a new deal, or with the deal's details when editing. */
+function startingValues(initial: DealInput | null | undefined, stage: StageKey, probability: number): FormValues {
+  if (!initial) {
+    return {
+      name: "",
+      contact_id: null,
+      organization_id: null,
+      stage,
+      value: "",
+      probability: String(probability),
+      close_date: "",
+      notes: "",
+    };
+  }
+  return {
+    name: initial.name,
+    contact_id: initial.contact_id,
+    organization_id: initial.organization_id,
+    stage,
+    value: String(initial.value),
+    probability: String(initial.probability),
+    close_date: initial.close_date,
+    notes: initial.notes ?? "",
+  };
+}
 
 interface Props {
   stages: Stage[];
@@ -39,21 +63,21 @@ interface Props {
   pending?: boolean;
 }
 
-export function DealForm({ stages, contacts, organizations, initial, defaultStage, onSubmit, onCancel, pending }: Props) {
+export function DealForm({
+  stages,
+  contacts,
+  organizations,
+  initial,
+  defaultStage,
+  onSubmit,
+  onCancel,
+  pending,
+}: Props) {
   const startStage = initial?.stage ?? defaultStage ?? "new_lead";
   const usual = (key: string) => stages.find((stage) => stage.key === key)?.probability ?? 0;
-  const form = useForm<z.input<typeof schema>, unknown, z.output<typeof schema>>({
+  const form = useForm<FormValues, unknown, z.output<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      name: initial?.name ?? "",
-      contact_id: initial?.contact_id ?? null,
-      organization_id: initial?.organization_id ?? null,
-      stage: startStage,
-      value: initial ? String(initial.value) : "",
-      probability: String(initial?.probability ?? usual(startStage)),
-      close_date: initial?.close_date ?? "",
-      notes: initial?.notes ?? "",
-    },
+    defaultValues: startingValues(initial, startStage, usual(startStage)),
   });
   const { errors } = form.formState;
   const stageField = form.register("stage", {
@@ -64,7 +88,13 @@ export function DealForm({ stages, contacts, organizations, initial, defaultStag
   return (
     <form onSubmit={form.handleSubmit((values) => onSubmit(values))} noValidate>
       <div className="form-grid">
-        <TextField label="Name" fieldClassName="span-2" placeholder="142 Maple Ave purchase" error={errors.name?.message} {...form.register("name")} />
+        <TextField
+          label="Name"
+          fieldClassName="span-2"
+          placeholder="142 Maple Ave purchase"
+          error={errors.name?.message}
+          {...form.register("name")}
+        />
         <Controller
           control={form.control}
           name="contact_id"

@@ -10,12 +10,23 @@
     "dev:web": "npm run dev --workspace frontend",
     "seed": "uv run --directory backend python -m app.seed",
     "test": "node scripts/test-all.mjs",
-    "test:api": "uv run pytest",
+    "test:api": "uv run pytest --cov --cov-report=term-missing:skip-covered",
     "test:web": "npm run typecheck --workspace frontend && npm run test --workspace frontend",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check": "node scripts/check.mjs",
+    "check:quick": "node scripts/check.mjs --quick",
+    "format": "npm run format --workspace frontend && uv run ruff format backend"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.65.1",
-    "concurrently": "^10.0.7"
+    "concurrently": "^10.0.7",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.74.0"
   }
 }

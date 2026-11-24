@@ -1,11 +1,14 @@
 """The only list of pipeline stages, in board order."""
 
 from dataclasses import dataclass
+from typing import Literal
+
+StageKey = Literal["new_lead", "qualified", "showing", "offer", "under_contract", "closed_won", "lost"]
 
 
 @dataclass(frozen=True)
 class Stage:
-    key: str
+    key: StageKey
     label: str
     probability: int
     open: bool

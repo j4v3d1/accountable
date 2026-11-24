@@ -43,7 +43,12 @@ export function TextField({ label, error, id, fieldClassName, className, ...prop
   const inputId = id ?? autoId;
   return (
     <Field label={label} htmlFor={inputId} error={error} className={fieldClassName}>
-      <input id={inputId} className={className ? `input ${className}` : "input"} {...errorProps(inputId, error)} {...props} />
+      <input
+        id={inputId}
+        className={className ? `input ${className}` : "input"}
+        {...errorProps(inputId, error)}
+        {...props}
+      />
     </Field>
   );
 }

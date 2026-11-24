@@ -64,8 +64,13 @@ export function SortableDealCard({ deal, closed, landing, onOpen }: Props) {
     <div
       ref={setNodeRef}
       style={style}
-      className={["deal-card", closed && "done", isDragging && (landing ? "landing" : "slot")].filter(Boolean).join(" ")}
+      className={["deal-card", closed && "done", isDragging && (landing ? "landing" : "slot")]
+        .filter(Boolean)
+        .join(" ")}
       {...attributes}
+      // The same role and tab stop dnd-kit gives a draggable, written out so the linter can see them.
+      role="button"
+      tabIndex={0}
       {...listeners}
       onClick={open}
       onKeyDown={(event) => {

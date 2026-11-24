@@ -33,7 +33,9 @@ function wonLost(win_rate: number | null): Dashboard["deals_won"] {
 
 describe("figure font", () => {
   it("sets the best month in the figure font, and 'None yet' in the text font", () => {
-    const { unmount } = render(<RevenuePanel revenue={revenue({ month: "2026-09", label: "Sep", value: 1310000 })} monthName="November" />);
+    const { unmount } = render(
+      <RevenuePanel revenue={revenue({ month: "2026-09", label: "Sep", value: 1310000 })} monthName="November" />,
+    );
     expect(screen.getByText("Sep · $1.31M")).toHaveClass("mono");
     unmount();
 

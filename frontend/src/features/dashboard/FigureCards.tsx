@@ -11,7 +11,9 @@ function MiniStrip({ stages }: { stages: Dashboard["open_pipeline"]["stages"] })
       {shown.length === 0 ? (
         <span style={{ flexGrow: 1, background: "var(--soft)" }} />
       ) : (
-        shown.map((stage) => <span key={stage.key} style={{ flexGrow: stage.value, background: stageColor(stage.key) }} />)
+        shown.map((stage) => (
+          <span key={stage.key} style={{ flexGrow: stage.value, background: stageColor(stage.key) }} />
+        ))
       )}
     </div>
   );
@@ -36,7 +38,15 @@ function Ring({ share }: { share: number }) {
         strokeDasharray={`${filled} ${circumference}`}
         transform="rotate(-90 30 30)"
       />
-      <text x="30" y="34" textAnchor="middle" fontSize="12" fontWeight="600" fontFamily="var(--font-mono)" fill="var(--ink)">
+      <text
+        x="30"
+        y="34"
+        textAnchor="middle"
+        fontSize="12"
+        fontWeight="600"
+        fontFamily="var(--font-mono)"
+        fill="var(--ink)"
+      >
         {Math.round(share)}%
       </text>
     </svg>

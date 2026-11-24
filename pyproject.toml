@@ -13,6 +13,9 @@ dependencies = [
 dev = [
     "httpx>=0.28.1",
     "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.6",
+    "ty>=0.0.109",
 ]
 
 [tool.uv]
@@ -25,3 +28,22 @@ filterwarnings = [
     # Starlette suggests a successor package to httpx for its TestClient; httpx stays until that is vetted.
     "ignore:Using `httpx` with `starlette.testclient` is deprecated:starlette.exceptions.StarletteDeprecationWarning",
 ]
+
+[tool.ruff]
+line-length = 120
+src = ["backend", "backend/tests"]
+
+[tool.ruff.lint]
+extend-select = ["C901"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ty.environment]
+extra-paths = ["backend"]
+
+[tool.coverage.run]
+source = ["backend/app"]
+
+[tool.coverage.report]
+fail_under = 80

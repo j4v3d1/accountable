@@ -29,7 +29,12 @@ export function DashboardPage() {
   const [logging, setLogging] = useState(false);
   const [addingDeal, setAddingDeal] = useState(false);
 
-  if (dashboard.isPending) return <div className="page"><LoadingState label="Loading the dashboard..." /></div>;
+  if (dashboard.isPending)
+    return (
+      <div className="page">
+        <LoadingState label="Loading the dashboard..." />
+      </div>
+    );
   if (dashboard.isError) {
     return (
       <div className="page">

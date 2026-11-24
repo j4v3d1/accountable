@@ -21,5 +21,14 @@ export default defineConfig({
     setupFiles: ["src/test/setup.ts"],
     // A stray it.only would quietly skip the other tests in its file, so it's always an error.
     allowOnly: false,
+    // `npm test` fails when unit tests cover less than 80% of the code.
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.{ts,tsx}", "src/test/**"],
+      reporter: ["text-summary", "text"],
+      skipFull: true,
+      thresholds: { statements: 80, branches: 80, functions: 80, lines: 80 },
+    },
   },
 });

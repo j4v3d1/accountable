@@ -19,7 +19,12 @@ export function OrganizationPage() {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  if (organization.isPending) return <div className="page"><LoadingState label="Loading organization..." /></div>;
+  if (organization.isPending)
+    return (
+      <div className="page">
+        <LoadingState label="Loading organization..." />
+      </div>
+    );
   if (organization.isError) {
     return (
       <div className="page">

@@ -77,17 +77,36 @@ describe("moveCard", () => {
   });
 
   it("reorders within a column, using the index in the final order", () => {
-    const columns = toColumns([deal("A", "offer", 0), deal("B", "offer", 1), deal("C", "offer", 2), deal("D", "offer", 3)], stages);
+    const columns = toColumns(
+      [deal("A", "offer", 0), deal("B", "offer", 1), deal("C", "offer", 2), deal("D", "offer", 3)],
+      stages,
+    );
 
-    expect(names(moveCard(columns, findId(columns, "A"), "offer", 2, stages, TODAY), "offer")).toEqual(["B", "C", "A", "D"]);
-    expect(names(moveCard(columns, findId(columns, "D"), "offer", 1, stages, TODAY), "offer")).toEqual(["A", "D", "B", "C"]);
+    expect(names(moveCard(columns, findId(columns, "A"), "offer", 2, stages, TODAY), "offer")).toEqual([
+      "B",
+      "C",
+      "A",
+      "D",
+    ]);
+    expect(names(moveCard(columns, findId(columns, "D"), "offer", 1, stages, TODAY), "offer")).toEqual([
+      "A",
+      "D",
+      "B",
+      "C",
+    ]);
   });
 
   it("moves a card into an empty column, and past the end puts it last", () => {
     const columns = sampleBoard();
 
-    expect(names(moveCard(columns, findId(columns, "S2"), "under_contract", 0, stages, TODAY), "under_contract")).toEqual(["S2"]);
-    expect(names(moveCard(columns, findId(columns, "S2"), "offer", 99, stages, TODAY), "offer")).toEqual(["O1", "O2", "S2"]);
+    expect(
+      names(moveCard(columns, findId(columns, "S2"), "under_contract", 0, stages, TODAY), "under_contract"),
+    ).toEqual(["S2"]);
+    expect(names(moveCard(columns, findId(columns, "S2"), "offer", 99, stages, TODAY), "offer")).toEqual([
+      "O1",
+      "O2",
+      "S2",
+    ]);
   });
 
   it("gives a card its new stage's probability and expected value, but keeps a hand-set one within its column", () => {

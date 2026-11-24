@@ -73,7 +73,15 @@ describe("ConfirmDeleteDialog", () => {
   });
 
   it("waits for the counts before allowing the delete", () => {
-    render(<ConfirmDeleteDialog open onOpenChange={() => {}} recordName="Lucy Chen" impact={undefined} onConfirm={() => {}} />);
+    render(
+      <ConfirmDeleteDialog
+        open
+        onOpenChange={() => {}}
+        recordName="Lucy Chen"
+        impact={undefined}
+        onConfirm={() => {}}
+      />,
+    );
 
     expect(screen.getByRole("button", { name: "Delete" })).toBeDisabled();
     expect(screen.getByText(/Checking linked records/)).toBeInTheDocument();

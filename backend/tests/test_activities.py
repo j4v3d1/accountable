@@ -1,6 +1,6 @@
 """R28 to R30, concerns 5 and 6: activities, timelines and stage-change entries."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def test_an_activity_belongs_to_a_contact_or_a_deal(api):
@@ -19,12 +19,17 @@ def test_an_activity_on_both_or_neither_is_refused(api, client):
     deal = api.deal()
     base = {"type": "note", "description": "x"}
 
-    assert client.post("/api/activities", json={**base, "contact_id": contact["id"], "deal_id": deal["id"]}).status_code == 422
+    assert (
+        client.post("/api/activities", json={**base, "contact_id": contact["id"], "deal_id": deal["id"]}).status_code
+        == 422
+    )
     assert client.post("/api/activities", json=base).status_code == 422
 
 
 def test_an_activity_on_a_missing_contact_or_deal_is_refused(client):
-    assert client.post("/api/activities", json={"type": "note", "description": "x", "contact_id": 999}).status_code == 422
+    assert (
+        client.post("/api/activities", json={"type": "note", "description": "x", "contact_id": 999}).status_code == 422
+    )
     assert client.post("/api/activities", json={"type": "note", "description": "x", "deal_id": 999}).status_code == 422
 
 
@@ -94,18 +99,18 @@ def test_occurred_at_is_stored_in_utc_and_comes_back_with_its_time_zone(api):
 
     returned = datetime.fromisoformat(activity["occurred_at"])
     assert returned.utcoffset() is not None
-    assert returned == datetime(2026, 11, 18, 14, 30, tzinfo=timezone.utc)
+    assert returned == datetime(2026, 11, 18, 14, 30, tzinfo=UTC)
     assert api.get(f"/api/contacts/{contact['id']}")["timeline"][0]["occurred_at"] == activity["occurred_at"]
 
 
 def test_occurred_at_defaults_to_now(api):
     contact = api.contact()
-    before = datetime.now(timezone.utc)
+    before = datetime.now(UTC)
 
     activity = api.activity(contact_id=contact["id"])
 
     returned = datetime.fromisoformat(activity["occurred_at"])
-    assert before.replace(microsecond=0) <= returned <= datetime.now(timezone.utc)
+    assert before.replace(microsecond=0) <= returned <= datetime.now(UTC)
 
 
 def test_done_defaults_to_false_and_follow_up_date_is_optional(api):

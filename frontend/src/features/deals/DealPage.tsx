@@ -18,7 +18,12 @@ export function DealPage() {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  if (query.isPending) return <div className="page"><LoadingState label="Loading deal..." /></div>;
+  if (query.isPending)
+    return (
+      <div className="page">
+        <LoadingState label="Loading deal..." />
+      </div>
+    );
   if (query.isError) {
     return (
       <div className="page">
@@ -59,7 +64,8 @@ export function DealPage() {
             <dd className="mono">{money(deal.value)}</dd>
             <dt>Probability</dt>
             <dd className="prob-row">
-              <ProbabilityDots probability={deal.probability} /> <span className="mono">{percent(deal.probability)}</span>
+              <ProbabilityDots probability={deal.probability} />{" "}
+              <span className="mono">{percent(deal.probability)}</span>
             </dd>
             <dt>Expected (USD)</dt>
             <dd className="mono">{money(deal.expected_value)}</dd>
@@ -69,7 +75,11 @@ export function DealPage() {
             </dd>
             <dt>Main contact</dt>
             <dd>
-              {deal.contact ? <Link to={`/contacts/${deal.contact.id}`}>{deal.contact.name}</Link> : <span className="muted">None</span>}
+              {deal.contact ? (
+                <Link to={`/contacts/${deal.contact.id}`}>{deal.contact.name}</Link>
+              ) : (
+                <span className="muted">None</span>
+              )}
             </dd>
             <dt>Organization</dt>
             <dd>
@@ -88,10 +98,14 @@ export function DealPage() {
         </div>
       </div>
       {editing && <DealFormDialog open onOpenChange={setEditing} deal={deal} />}
-      <DeleteDealDialog target={deleting ? deal : null} onClose={() => setDeleting(false)} onDeleting={() => {
+      <DeleteDealDialog
+        target={deleting ? deal : null}
+        onClose={() => setDeleting(false)}
+        onDeleting={() => {
           setLeaving(true);
           navigate("/deals");
-        }} />
+        }}
+      />
     </div>
   );
 }

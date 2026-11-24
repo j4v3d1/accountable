@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
 import { FileIcon, Mail, Phone } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { TextAreaField, TextField } from "../../ui/fields";
 import { FormActions } from "../../ui/FormDialog";
@@ -50,7 +50,7 @@ export function ActivityForm({ initial, onSubmit, onCancel, pending }: Props) {
     },
   });
   const { errors } = form.formState;
-  const hasFollowUp = Boolean(form.watch("follow_up_date"));
+  const hasFollowUp = Boolean(useWatch({ control: form.control, name: "follow_up_date" }));
 
   function submit(values: z.output<typeof schema>) {
     onSubmit({ ...values, done: values.follow_up_date ? values.done : false });
@@ -75,7 +75,12 @@ export function ActivityForm({ initial, onSubmit, onCancel, pending }: Props) {
           error={errors.description?.message}
           {...form.register("description")}
         />
-        <TextField label="When" type="datetime-local" error={errors.occurred_at?.message} {...form.register("occurred_at")} />
+        <TextField
+          label="When"
+          type="datetime-local"
+          error={errors.occurred_at?.message}
+          {...form.register("occurred_at")}
+        />
         <TextField label="Follow-up date" type="date" {...form.register("follow_up_date")} />
         {hasFollowUp && (
           <label className="checkbox span-2">

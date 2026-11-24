@@ -26,8 +26,22 @@ export function dealColumns(stages: Stage[]): TableColumn<Deal>[] {
     { id: "name", header: "Name", value: (d) => d.name, search: true },
     // Sorted in pipeline order, searched by the stage's name.
     { id: "stage", header: "Stage", value: order, searchText: label, cell: (d) => <StageChip stage={d.stage} /> },
-    { id: "value", header: "Value (USD)", value: (d) => d.value, cell: (d) => money(d.value), align: "right", mono: true },
-    { id: "probability", header: "Probability", value: (d) => d.probability, cell: (d) => percent(d.probability), align: "right", mono: true },
+    {
+      id: "value",
+      header: "Value (USD)",
+      value: (d) => d.value,
+      cell: (d) => money(d.value),
+      align: "right",
+      mono: true,
+    },
+    {
+      id: "probability",
+      header: "Probability",
+      value: (d) => d.probability,
+      cell: (d) => percent(d.probability),
+      align: "right",
+      mono: true,
+    },
     {
       id: "expected",
       header: "Expected (USD)",
@@ -36,7 +50,13 @@ export function dealColumns(stages: Stage[]): TableColumn<Deal>[] {
       align: "right",
       mono: true,
     },
-    { id: "close_date", header: "Close date", value: (d) => d.close_date, cell: (d) => <CloseDate deal={d} />, mono: true },
+    {
+      id: "close_date",
+      header: "Close date",
+      value: (d) => d.close_date,
+      cell: (d) => <CloseDate deal={d} />,
+      mono: true,
+    },
     { id: "contact", header: "Contact", value: (d) => d.contact_name, search: true },
     { id: "organization", header: "Organization", value: (d) => d.organization_name, search: true },
   ];

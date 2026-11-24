@@ -100,7 +100,9 @@ export function Board({ deals, stages, onAdd }: Props) {
   );
 
   const stageOf = (id: UniqueIdentifier): StageKey | null =>
-    isColumn(id) ? (String(id).slice(COLUMN_PREFIX.length) as StageKey) : (findCard(columns, Number(id))?.stage ?? null);
+    isColumn(id)
+      ? (String(id).slice(COLUMN_PREFIX.length) as StageKey)
+      : (findCard(columns, Number(id))?.stage ?? null);
 
   // Over a column that has cards, aim at the nearest card, so a drop lands between cards.
   const collisionDetection: CollisionDetection = (args) => {
@@ -181,7 +183,12 @@ export function Board({ deals, stages, onAdd }: Props) {
 
   const totals = boardTotals(columns, stages);
   const openStages = stages.filter((stage) => stage.open);
-  const active = activeId === null ? null : (Object.values(columns).flat().find((deal) => deal.id === activeId) ?? null);
+  const active =
+    activeId === null
+      ? null
+      : (Object.values(columns)
+          .flat()
+          .find((deal) => deal.id === activeId) ?? null);
   const activeStage = active ? stages.find((s) => s.key === active.stage) : undefined;
   const movedAway = origin && active && active.stage !== origin.stage;
 
@@ -207,7 +214,11 @@ export function Board({ deals, stages, onAdd }: Props) {
           </p>
         </div>
         <PipelineStrip
-          segments={openStages.map((stage) => ({ key: stage.key, label: stage.label, ...columnTotals(columns[stage.key]) }))}
+          segments={openStages.map((stage) => ({
+            key: stage.key,
+            label: stage.label,
+            ...columnTotals(columns[stage.key]),
+          }))}
         />
       </section>
       <DndContext
@@ -229,13 +240,21 @@ export function Board({ deals, stages, onAdd }: Props) {
               onAdd={onAdd}
               onOpen={openDeal}
               landingId={movedAway ? activeId : null}
-              gap={movedAway && origin.stage === stage.key ? { index: origin.index, to: activeStage?.label ?? "" } : null}
+              gap={
+                movedAway && origin.stage === stage.key ? { index: origin.index, to: activeStage?.label ?? "" } : null
+              }
             />
           ))}
         </div>
         <DragOverlay dropAnimation={null}>
           {active ? (
-            <div className={active.stage === "closed_won" || active.stage === "lost" ? "deal-card dragging done" : "deal-card dragging"}>
+            <div
+              className={
+                active.stage === "closed_won" || active.stage === "lost"
+                  ? "deal-card dragging done"
+                  : "deal-card dragging"
+              }
+            >
               <DealCardBody deal={active} />
             </div>
           ) : null}
@@ -297,7 +316,12 @@ function Column({ stage, deals, openValue, onAdd, onOpen, landingId, gap }: Colu
           {gap && gap.index >= deals.length && slot}
         </div>
       </SortableContext>
-      <button type="button" className="add-deal" aria-label={`Add deal to ${stage.label}`} onClick={() => onAdd(stage.key)}>
+      <button
+        type="button"
+        className="add-deal"
+        aria-label={`Add deal to ${stage.label}`}
+        onClick={() => onAdd(stage.key)}
+      >
         <Plus size={15} aria-hidden="true" />
         Add deal
       </button>

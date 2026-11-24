@@ -5,6 +5,7 @@ The data is small, so the deals are read once and the figures are added up here.
 
 import calendar
 from datetime import date, timedelta
+from typing import TypedDict
 
 from sqlalchemy import Connection, select
 
@@ -16,6 +17,22 @@ from app.deals.stages import BY_KEY, OPEN_STAGE_KEYS, STAGE_KEYS
 
 FUNNEL_STAGES = STAGE_KEYS[: STAGE_KEYS.index("closed_won") + 1]
 RECENT_ACTIVITY = 10
+
+
+class MonthRow(TypedDict):
+    month: str
+    label: str
+    won_value: int
+    won_count: int
+    lost_count: int
+
+
+class FunnelRow(TypedDict):
+    key: str
+    label: str
+    count: int
+    value: int
+    share_from_previous: float | None
 
 
 def _month(day: date, months_back: int = 0) -> tuple[int, int]:
@@ -35,7 +52,7 @@ def _revenue(all_deals: list[dict], today: date) -> tuple[dict, dict]:
     months = [_month(today, back) for back in range(5, -1, -1)]
     won = [d for d in all_deals if d["stage"] == "closed_won"]
     lost = [d for d in all_deals if d["stage"] == "lost"]
-    rows = []
+    rows: list[MonthRow] = []
     for year, month in months:
         won_here = [d for d in won if _in_month(d, (year, month))]
         rows.append(
@@ -94,7 +111,7 @@ def _open_pipeline(open_deals: list[dict]) -> dict:
     }
 
 
-def _funnel(all_deals: list[dict], history: list[tuple[int, str, str]]) -> list[dict]:
+def _funnel(all_deals: list[dict], history: list[tuple[int, str, str]]) -> list[FunnelRow]:
     """Each deal counts in every stage up to its furthest one, from its stage-change history (concern 8)."""
     reached: dict[int, set[str]] = {d["id"]: {d["stage"]} for d in all_deals}
     for deal_id, from_stage, to_stage in history:
@@ -103,13 +120,19 @@ def _funnel(all_deals: list[dict], history: list[tuple[int, str, str]]) -> list[
     for deal_id, stages in reached.items():
         indexes = [FUNNEL_STAGES.index(s) for s in stages if s in FUNNEL_STAGES]
         furthest[deal_id] = max(indexes, default=0)
-    rows = []
+    rows: list[FunnelRow] = []
     for index, key in enumerate(FUNNEL_STAGES):
         here = [d for d in all_deals if furthest[d["id"]] >= index]
-        rows.append({"key": key, "label": BY_KEY[key].label, "count": len(here), "value": sum(d["value"] for d in here)})
-    for index, row in enumerate(rows):
-        # The share that moved on from the stage before; blank when that stage had none (R34).
-        row["share_from_previous"] = _percent(row["count"], rows[index - 1]["count"]) if index > 0 else None
+        rows.append(
+            {
+                "key": key,
+                "label": BY_KEY[key].label,
+                "count": len(here),
+                "value": sum(d["value"] for d in here),
+                # The share that moved on from the stage before; blank when that stage had none (R34).
+                "share_from_previous": _percent(len(here), rows[-1]["count"]) if rows else None,
+            }
+        )
     return rows
 
 

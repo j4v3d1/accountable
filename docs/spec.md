@@ -226,7 +226,8 @@ Each requirement has an ID, so tests and status notes can point at it.
   - 80 activities, with follow-ups both overdue and due soon, plus stage-change history for deals past New Lead.
 
   All dates are worked out relative to the day the seed runs, so the data never looks stale. Names are invented and use reserved domains such as `example.com`. The data is built from a fixed random seed, so every reset gives the same result.
-- **R43** `npm test` runs the pytest tests, the TypeScript check, the Vitest tests and the Playwright tests, against a database and ports of their own. It runs all four even when one fails, prints a summary, and fails if any of them fails.
+- **R43** `npm test` runs the pytest tests, the TypeScript check, the Vitest tests and the Playwright tests, against a database and ports of their own. It runs all four even when one fails, prints a summary, and fails if any of them fails. It also fails when the backend's or the frontend's unit tests cover less than 80% of their code.
+- **R44** `npm run check` runs every check and fails if any of them fails: Prettier and ESLint (recommended TypeScript, React Hooks and accessibility rules) for the frontend, `ruff format` and `ruff check` for the backend, a cyclomatic complexity of at most 15 per function (ESLint's `complexity`, ruff's `C901`), `tsc` for the frontend and `ty` for the backend, gitleaks across the working files and the git history (the git-ignored `.env` is allowed), and `npm test`. `npm run check:quick` runs the same checks without the end-to-end tests. `npm run format` fixes the formatting.
 
 ## Design
 
@@ -357,7 +358,7 @@ frontend/src/
   styles/              tokens.css (brand variables), base.css
 
 e2e/                   Playwright tests, and fixtures.ts shared by all of them
-scripts/test-all.mjs   runs every suite for npm test
+scripts/              test-all.mjs (npm test), check.mjs (npm run check), run-steps.mjs (runs steps, prints the summary)
 ```
 
 Rules that keep it this way:

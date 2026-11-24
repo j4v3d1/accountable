@@ -3,6 +3,7 @@
 from sqlalchemy import Connection, delete, exists, insert, or_, select, update
 
 from app.activities.schemas import ActivityCreate
+from app.core.db import insert_row
 from app.core.errors import Conflict, Invalid, NotFound
 from app.core.tables import activities, contacts, deals, utcnow
 from app.deals.stages import BY_KEY
@@ -53,7 +54,7 @@ def create_activity(conn: Connection, data: ActivityCreate) -> dict:
         raise Invalid("deal_id", "That deal doesn't exist", data.deal_id)
     values = data.model_dump()
     values["occurred_at"] = values["occurred_at"] or utcnow()
-    activity_id = conn.execute(insert(activities).values(**values)).inserted_primary_key[0]
+    activity_id = insert_row(conn, activities, **values)
     return get_activity(conn, activity_id)
 
 

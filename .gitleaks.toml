@@ -1,0 +1,16 @@
+# Secret scanning for `npm run check`. Uses gitleaks' default rules, and skips
+# files git ignores: the local .env (secrets belong there) and generated folders.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Git-ignored files"
+paths = [
+  '''(^|/)\.env$''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.venv/''',
+  '''(^|/)\.git/''',
+  '''(^|/)(dist|coverage|htmlcov|test-results|playwright-report|blob-report)/''',
+  '''(^|/)\.(playwright-mcp|pytest_cache|ruff_cache|superpowers|claude/worktrees)/''',
+  '''(^|/)backend/data/''',
+]

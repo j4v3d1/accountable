@@ -39,7 +39,9 @@ describe("FollowUps", () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
-    expect(screen.getByRole("button", { name: "Mark done: Call Rachel about the inspection report" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Mark done: Call Rachel about the inspection report" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Mark done: Email the pre-approval letter" })).toBeInTheDocument();
   });
 });

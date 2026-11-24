@@ -14,15 +14,14 @@ def test_database_url_comes_from_the_environment(monkeypatch):
     assert config.database_url() == "sqlite:///somewhere/else.db"
 
 
-def test_default_database_is_found_from_the_backend_folder_whatever_the_working_folder(
-    monkeypatch, tmp_path
-):
+def test_default_database_is_found_from_the_backend_folder_whatever_the_working_folder(monkeypatch, tmp_path):
     monkeypatch.delenv("ACCOUNTABLE_DATABASE_URL")
     monkeypatch.chdir(tmp_path)
 
     url = make_url(config.database_url())
 
     assert url.drivername == "sqlite"
+    assert url.database is not None
     assert Path(url.database) == BACKEND_DIR / "data" / "accountable.db"
     assert (BACKEND_DIR / "data").is_dir()
 

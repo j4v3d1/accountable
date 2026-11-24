@@ -23,3 +23,9 @@ Update `docs/STATUS.md` when you finish a piece of work
 - The tests use their own database and ports, so they never touch your data or a running `npm run dev`.
 - `.only` is refused in Vitest and Playwright, so no test can be skipped by accident.
 - Run `npm test`, and get it passing, before calling a piece of work done.
+
+## Checks
+
+- `npm run check` runs every check: Prettier and ESLint (frontend), `ruff format` and `ruff check` (backend), complexity of at most 15 per function, `tsc` and `ty`, gitleaks, and `npm test` with at least 80% unit test coverage. It fails if any of them fails.
+- `npm run check:quick` runs the same without the end-to-end tests; `npm run format` fixes the formatting.
+- Run `npm run check`, and get it passing, before calling a piece of work done. Fix what it finds; don't weaken a rule, add a disable or ignore comment, or exclude code from coverage. If a rule doesn't suit the project, ask first.

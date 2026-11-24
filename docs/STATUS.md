@@ -2,7 +2,7 @@
 
 ## Setup (once)
 
-1. Install [Node.js](https://nodejs.org) 24 or later, [uv](https://docs.astral.sh/uv/getting-started/installation/) and [Google Chrome](https://www.google.com/chrome/).
+1. Install [Node.js](https://nodejs.org) 24 or later, [uv](https://docs.astral.sh/uv/getting-started/installation/), [Google Chrome](https://www.google.com/chrome/) and [gitleaks](https://github.com/gitleaks/gitleaks#installing) (for `npm run check`).
 2. In this folder, run `npm install`.
 
 ## Everyday commands
@@ -10,6 +10,7 @@
 - `npm run dev` starts Accountable. Open the address it prints (http://localhost:5173).
 - `npm run seed` resets the data to the sample data.
 - `npm test` runs every test: backend (pytest), frontend (TypeScript check and Vitest) and end to end (Playwright in Chrome). It runs all of them even when one fails, prints a summary, and fails if any test fails. The tests use their own database and ports, so they never touch your data.
+- `npm run check` runs every check: formatting, linting, complexity, type checks, the secrets scan and `npm test` with at least 80% unit test coverage. `npm run check:quick` leaves out the end-to-end tests. `npm run format` fixes the formatting.
 
 ## History
 
@@ -71,3 +72,14 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 - **Linux and Windows (R39).** Only a Mac was available. The scripts avoid shell-specific commands, and paths are worked out in code, but `npm run dev` and `npm run seed` haven't been run on either system.
 - **With Wi-Fi switched off.** The walkthrough couldn't turn off the network. Instead, every end-to-end test fails if the page requests anything outside the computer, and none did during the walkthrough.
 - `npm install` notes that `fsevents` (a Mac file-watching helper) has an install script that npm didn't run. This is harmless: the app and its tests run without it.
+
+## Checks (2026-11-24, `harness` branch)
+
+`npm run check` and `npm run check:quick` added (see `docs/changes/harness/`). What the checks found is fixed, with no rule weakened and no disable or ignore comments:
+
+- **Formatting:** Prettier and `ruff format` applied across the frontend and backend.
+- **Backend (ruff and ty):** a typed `insert_row` helper in `core/db.py` for new ids; stage keys declared once as a `Literal` in `deals/stages.py`, with a test that they match the stages; typed rows in the dashboard service; `seed.py`'s `load` split into short functions (same seed output, checked row by row); small rule fixes such as `itertools.pairwise`.
+- **Frontend (ESLint):** `ContactForm`, `DealForm` and `SummaryLine` brought under the complexity limit by moving the starting values and the summary's clauses into helpers; pipeline cards state their `role="button"` and tab stop; `ActivityForm` uses `useWatch`.
+- **Coverage:** frontend unit test coverage went from 47% to 99% with 172 new behavior tests, most of them rendering the whole app against a fake API (`src/test/renderApp.tsx`). Backend coverage is 98%.
+
+`npm run check` passes: 186 backend, 257 frontend and 26 end-to-end tests.

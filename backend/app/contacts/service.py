@@ -1,9 +1,10 @@
 """Contacts, with their organization, deals and timeline."""
 
-from sqlalchemy import Connection, delete, exists, func, insert, select, update
+from sqlalchemy import Connection, delete, exists, func, select, update
 
 from app.activities import service as activities_service
 from app.contacts.schemas import ContactCreate
+from app.core.db import insert_row
 from app.core.errors import Invalid, NotFound
 from app.core.tables import activities, contacts, deals, organizations
 from app.deals import service as deals_service
@@ -59,15 +60,15 @@ def _exists(conn: Connection, contact_id: int) -> None:
 
 
 def _check_links(conn: Connection, values: dict) -> None:
-    if values.get("organization_id") is not None:
-        if not conn.scalar(select(exists().where(organizations.c.id == values["organization_id"]))):
-            raise Invalid("organization_id", "That organization doesn't exist", values["organization_id"])
+    organization_id = values.get("organization_id")
+    if organization_id is not None and not conn.scalar(select(exists().where(organizations.c.id == organization_id))):
+        raise Invalid("organization_id", "That organization doesn't exist", organization_id)
 
 
 def create_contact(conn: Connection, data: ContactCreate) -> dict:
     values = data.model_dump()
     _check_links(conn, values)
-    contact_id = conn.execute(insert(contacts).values(**values)).inserted_primary_key[0]
+    contact_id = insert_row(conn, contacts, **values)
     return get_contact(conn, contact_id)
 
 

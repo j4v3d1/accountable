@@ -97,7 +97,8 @@ export function DataTable<T extends RowData>({
     columns: columnDefs,
     data: rows,
     state: { globalFilter: search },
-    onGlobalFilterChange: (updater) => setSearch((current) => (typeof updater === "function" ? updater(current) : updater) ?? ""),
+    onGlobalFilterChange: (updater) =>
+      setSearch((current) => (typeof updater === "function" ? updater(current) : updater) ?? ""),
     // Matches the column's search text if it has one, otherwise its value, ignoring case.
     globalFilterFn: (row, columnId, filterValue) => {
       const column = byId.get(columnId);
@@ -173,7 +174,11 @@ export function DataTable<T extends RowData>({
                   {row.getAllCells().map((cell, index) => {
                     const column = byId.get(cell.column.id)!;
                     const content = column.cell ? column.cell(row.original) : (column.value(row.original) ?? "");
-                    const className = [column.align === "right" && "align-right", column.mono && "mono", column.nowrap && "nowrap"]
+                    const className = [
+                      column.align === "right" && "align-right",
+                      column.mono && "mono",
+                      column.nowrap && "nowrap",
+                    ]
                       .filter(Boolean)
                       .join(" ");
                     return (

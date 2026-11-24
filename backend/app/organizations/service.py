@@ -1,8 +1,9 @@
 """Organizations, with their contacts and deals."""
 
-from sqlalchemy import Connection, delete, exists, func, insert, select, update
+from sqlalchemy import Connection, delete, exists, func, select, update
 
 from app.contacts import service as contacts_service
+from app.core.db import insert_row
 from app.core.errors import NotFound
 from app.core.tables import contacts, deals, organizations
 from app.deals import service as deals_service
@@ -43,7 +44,7 @@ def _exists(conn: Connection, organization_id: int) -> None:
 
 
 def create_organization(conn: Connection, data: OrganizationCreate) -> dict:
-    organization_id = conn.execute(insert(organizations).values(**data.model_dump())).inserted_primary_key[0]
+    organization_id = insert_row(conn, organizations, **data.model_dump())
     return get_organization(conn, organization_id)
 
 

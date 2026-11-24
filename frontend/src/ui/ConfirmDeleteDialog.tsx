@@ -34,7 +34,16 @@ interface Props {
   pending?: boolean;
 }
 
-export function ConfirmDeleteDialog({ open, onOpenChange, recordName, impact, impactError, onRetry, onConfirm, pending }: Props) {
+export function ConfirmDeleteDialog({
+  open,
+  onOpenChange,
+  recordName,
+  impact,
+  impactError,
+  onRetry,
+  onConfirm,
+  pending,
+}: Props) {
   const failed = impact === undefined && impactError !== undefined;
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>

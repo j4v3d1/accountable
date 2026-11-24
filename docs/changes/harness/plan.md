@@ -1,0 +1,8 @@
+# Plan: harness
+
+1. Tools: ESLint 9 (`@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-jsx-a11y`, `eslint-config-prettier`) at the repo root with `@typescript/typescript6`, since typescript-eslint doesn't support TypeScript 7; Prettier and `@vitest/coverage-v8` in `frontend/`; ruff, ty and pytest-cov as uv dev dependencies; gitleaks installed on the machine.
+2. Config: `frontend/eslint.config.js` (recommended rules, `complexity` 15, `--max-warnings 0`), `frontend/.prettierrc.json` (print width 120, as the code was written), ruff in `pyproject.toml` (line length 120, `C901` at 15), ty with `backend` on its path, `.gitleaks.toml` (default rules, git-ignored paths such as `.env` allowed).
+3. Coverage: 80% for statements, branches, functions and lines in Vitest (`vite.config.ts`), 80% in pytest (`[tool.coverage.report]`). `npm test` enforces both.
+4. Scripts: `scripts/run-steps.mjs` runs steps and prints the summary; `scripts/test-all.mjs` (`npm test`) and `scripts/check.mjs` (`npm run check`, `--quick` without end-to-end) use it. `npm run format` runs Prettier and `ruff format`.
+5. Fix what the checks find: Prettier and ruff formatting, ruff and ty findings in the backend, ESLint findings in the frontend, and new frontend unit tests (shared helper `src/test/renderApp.tsx`: the whole app against a fake API) to reach 80% coverage.
+6. Docs: AGENTS.md, `docs/spec.md` (R43, R44, code structure), `docs/TECH_STACK.md`, `docs/STATUS.md`.

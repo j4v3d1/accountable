@@ -40,7 +40,12 @@ export function OrganizationForm({ initial, onSubmit, onCancel, pending }: Props
     <form onSubmit={form.handleSubmit((values) => onSubmit(values))} noValidate>
       <div className="form-grid">
         <TextField label="Name" fieldClassName="span-2" error={errors.name?.message} {...form.register("name")} />
-        <TextField label="Website" placeholder="example.com" error={errors.website?.message} {...form.register("website")} />
+        <TextField
+          label="Website"
+          placeholder="example.com"
+          error={errors.website?.message}
+          {...form.register("website")}
+        />
         <SelectField label="Industry" {...form.register("industry")}>
           <option value="">Not set</option>
           {INDUSTRIES.map((industry) => (

@@ -1,13 +1,12 @@
 from datetime import date, datetime
-from typing import Annotated, Literal
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
 from app.activities.schemas import ActivityOut
 from app.core.fields import Link, OptionalText, PatchModel, RequiredText
-from app.deals.stages import STAGE_KEYS
+from app.deals.stages import StageKey
 
-StageKey = Literal[tuple(STAGE_KEYS)]  # type: ignore[valid-type]
 Value = Annotated[int, Field(ge=0)]
 Probability = Annotated[int, Field(ge=0, le=100)]
 

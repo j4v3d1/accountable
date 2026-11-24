@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from typing import Annotated
 
 from fastapi import Depends, Request
-from sqlalchemy import Connection, Engine, create_engine, event
+from sqlalchemy import Connection, Engine, Table, create_engine, event, insert
 
 from app.core.tables import metadata
 
@@ -25,6 +25,14 @@ def make_engine(url: str) -> Engine:
 
 def create_tables(engine: Engine) -> None:
     metadata.create_all(engine)
+
+
+def insert_row(conn: Connection, table: Table, **values) -> int:
+    """Insert one row and return its new id."""
+    primary_key = conn.execute(insert(table).values(**values)).inserted_primary_key
+    if primary_key is None:
+        raise RuntimeError(f"Inserting into {table.name} gave back no id")
+    return primary_key[0]
 
 
 def get_conn(request: Request) -> Iterator[Connection]:

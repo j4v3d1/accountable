@@ -22,7 +22,9 @@ describe("SummaryLine", () => {
     expect(line({ open_deals: 18, open_value: 10151500, overdue_follow_ups: 2, late_deals: 0 })).toBe(
       "18 open deals worth $10,151,500. 2 follow-ups are overdue.",
     );
-    expect(line({ open_deals: 0, open_value: 0, overdue_follow_ups: 2, late_deals: 0 })).toBe("2 follow-ups are overdue.");
+    expect(line({ open_deals: 0, open_value: 0, overdue_follow_ups: 2, late_deals: 0 })).toBe(
+      "2 follow-ups are overdue.",
+    );
   });
 
   it("uses the singular for one", () => {

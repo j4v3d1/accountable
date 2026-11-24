@@ -6,6 +6,7 @@ import subprocess
 import sys
 from collections import Counter
 from datetime import date, datetime, timedelta
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -75,6 +76,7 @@ def test_the_seed_command_resets_the_data_while_the_app_holds_the_database_open(
                 capture_output=True,
                 text=True,
                 timeout=60,
+                check=False,
             )
 
         assert result.returncode == 0, result.stderr
@@ -145,13 +147,17 @@ def test_deals_past_new_lead_have_stage_change_history_that_ends_at_their_stage(
             continue
         assert history, deal["name"]
         assert history[0]["from_stage"] == "new_lead"
-        assert all(a["to_stage"] == b["from_stage"] for a, b in zip(history, history[1:]))
+        assert all(a["to_stage"] == b["from_stage"] for a, b in pairwise(history))
         assert history[-1]["to_stage"] == deal["stage"]
         assert all(a["description"].startswith("Moved from ") for a in history)
 
 
 def test_closed_deals_moved_to_their_last_stage_on_their_close_date(seeded):
-    changes = {a["deal_id"]: a for a in sorted(rows(seeded, activities), key=lambda a: a["occurred_at"]) if a["type"] == "stage_change"}
+    changes = {
+        a["deal_id"]: a
+        for a in sorted(rows(seeded, activities), key=lambda a: a["occurred_at"])
+        if a["type"] == "stage_change"
+    }
     for deal in rows(seeded, deals):
         if deal["stage"] in ("closed_won", "lost"):
             assert changes[deal["id"]]["occurred_at"].astimezone().date() == deal["close_date"], deal["name"]

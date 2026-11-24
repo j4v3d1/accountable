@@ -37,11 +37,25 @@ function withStage(deal: Deal, stage: Stage, today: string): Deal {
 }
 
 /** Put a card at `index` in `stage`'s column, the index counted in the final order. */
-export function moveCard(columns: Columns, dealId: number, stage: StageKey, index: number, stages: Stage[], today: string): Columns {
+export function moveCard(
+  columns: Columns,
+  dealId: number,
+  stage: StageKey,
+  index: number,
+  stages: Stage[],
+  today: string,
+): Columns {
   const from = findCard(columns, dealId);
   if (!from) return columns;
   const card = columns[from.stage][from.index];
-  const moved = from.stage === stage ? card : withStage(card, stages.find((s) => s.key === stage)!, today);
+  const moved =
+    from.stage === stage
+      ? card
+      : withStage(
+          card,
+          stages.find((s) => s.key === stage)!,
+          today,
+        );
   const next = { ...columns, [from.stage]: columns[from.stage].filter((deal) => deal.id !== dealId) };
   const target = [...next[stage]];
   target.splice(Math.min(index, target.length), 0, moved);

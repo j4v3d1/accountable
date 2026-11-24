@@ -79,7 +79,13 @@ export function Timeline({ entries, owner, showDealNames }: Props) {
               </div>
               {activity.type !== "stage_change" && (
                 <div className="row-actions timeline-actions">
-                  <button type="button" className="icon-button" aria-label="Edit activity" title="Edit" onClick={() => setEditing(activity)}>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label="Edit activity"
+                    title="Edit"
+                    onClick={() => setEditing(activity)}
+                  >
                     <Pencil size={14} aria-hidden="true" />
                   </button>
                   <button

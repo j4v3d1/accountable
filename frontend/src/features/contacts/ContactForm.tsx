@@ -5,7 +5,7 @@ import { blankToNull, isEmail } from "../../lib/validation";
 import { SelectField, TextField } from "../../ui/fields";
 import { FormActions } from "../../ui/FormDialog";
 import { RecordPicker, type PickerOption } from "../../ui/RecordPicker";
-import { STATUSES, type ContactInput, type ContactStatus } from "./types";
+import { STATUSES, type ContactInput } from "./types";
 
 const schema = z.object({
   first_name: z.string().trim().min(1, "Enter a first name"),
@@ -21,6 +21,32 @@ const schema = z.object({
   status: z.enum(["lead", "qualified", "customer"]),
 });
 
+type FormValues = z.input<typeof schema>;
+
+const BLANK_CONTACT: FormValues = {
+  first_name: "",
+  last_name: "",
+  email: "",
+  phone: "",
+  job_title: "",
+  organization_id: null,
+  status: "lead",
+};
+
+/** The form starts blank for a new contact, or with the contact's details when editing. */
+function startingValues(initial: ContactInput | null | undefined): FormValues {
+  if (!initial) return BLANK_CONTACT;
+  return {
+    first_name: initial.first_name,
+    last_name: initial.last_name,
+    email: initial.email ?? "",
+    phone: initial.phone ?? "",
+    job_title: initial.job_title ?? "",
+    organization_id: initial.organization_id,
+    status: initial.status,
+  };
+}
+
 interface Props {
   initial?: ContactInput | null;
   organizations: PickerOption[];
@@ -30,17 +56,9 @@ interface Props {
 }
 
 export function ContactForm({ initial, organizations, onSubmit, onCancel, pending }: Props) {
-  const form = useForm<z.input<typeof schema>, unknown, z.output<typeof schema>>({
+  const form = useForm<FormValues, unknown, z.output<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      first_name: initial?.first_name ?? "",
-      last_name: initial?.last_name ?? "",
-      email: initial?.email ?? "",
-      phone: initial?.phone ?? "",
-      job_title: initial?.job_title ?? "",
-      organization_id: initial?.organization_id ?? null,
-      status: (initial?.status ?? "lead") as ContactStatus,
-    },
+    defaultValues: startingValues(initial),
   });
   const { errors } = form.formState;
 
@@ -64,7 +82,12 @@ export function ContactForm({ initial, organizations, onSubmit, onCancel, pendin
             control={form.control}
             name="organization_id"
             render={({ field }) => (
-              <RecordPicker label="Organization" value={field.value} onChange={field.onChange} options={organizations} />
+              <RecordPicker
+                label="Organization"
+                value={field.value}
+                onChange={field.onChange}
+                options={organizations}
+              />
             )}
           />
         </div>

@@ -24,7 +24,10 @@ const BAR_RADIUS = 6;
 
 /** A bar's top and bottom, whichever way Recharts measured it. */
 function edges(y: number | string, height: number | string) {
-  return { top: Math.min(Number(y), Number(y) + Number(height)), bottom: Math.max(Number(y), Number(y) + Number(height)) };
+  return {
+    top: Math.min(Number(y), Number(y) + Number(height)),
+    bottom: Math.max(Number(y), Number(y) + Number(height)),
+  };
 }
 
 /** A won bar (above the line) or a lost one (below it), with the gap on the centre line's side. */
@@ -33,7 +36,16 @@ function roundedBar(below: boolean) {
     const { top, bottom } = edges(y, height);
     const barHeight = bottom - top - GAP;
     if (barHeight <= 0) return <g />;
-    return <rect x={Number(x)} y={below ? top + GAP : top} width={Number(width)} height={barHeight} rx={BAR_RADIUS} fill={fill} />;
+    return (
+      <rect
+        x={Number(x)}
+        y={below ? top + GAP : top}
+        width={Number(width)}
+        height={barHeight}
+        rx={BAR_RADIUS}
+        fill={fill}
+      />
+    );
   }
   return RoundedBar;
 }

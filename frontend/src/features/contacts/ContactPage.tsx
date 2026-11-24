@@ -18,7 +18,12 @@ export function ContactPage() {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  if (query.isPending) return <div className="page"><LoadingState label="Loading contact..." /></div>;
+  if (query.isPending)
+    return (
+      <div className="page">
+        <LoadingState label="Loading contact..." />
+      </div>
+    );
   if (query.isError) {
     return (
       <div className="page">
@@ -66,7 +71,13 @@ export function ContactPage() {
                 )}
               </dd>
               <dt>Email</dt>
-              <dd>{contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : <span className="muted">Not set</span>}</dd>
+              <dd>
+                {contact.email ? (
+                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                ) : (
+                  <span className="muted">Not set</span>
+                )}
+              </dd>
               <dt>Phone</dt>
               <dd>{contact.phone ?? <span className="muted">Not set</span>}</dd>
               <dt>Job title</dt>
@@ -99,10 +110,14 @@ export function ContactPage() {
         </div>
       </div>
       {editing && <ContactFormDialog open onOpenChange={setEditing} contact={contact} />}
-      <DeleteContactDialog target={deleting ? contact : null} onClose={() => setDeleting(false)} onDeleting={() => {
+      <DeleteContactDialog
+        target={deleting ? contact : null}
+        onClose={() => setDeleting(false)}
+        onDeleting={() => {
           setLeaving(true);
           navigate("/contacts");
-        }} />
+        }}
+      />
     </div>
   );
 }

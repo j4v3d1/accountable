@@ -12,7 +12,13 @@ import "./contacts.css";
 
 export const contactColumns: TableColumn<Contact>[] = [
   { id: "name", header: "Name", value: (c) => c.name, search: true },
-  { id: "status", header: "Status", value: (c) => statusLabel(c.status), cell: (c) => <StatusChip status={c.status} />, search: true },
+  {
+    id: "status",
+    header: "Status",
+    value: (c) => statusLabel(c.status),
+    cell: (c) => <StatusChip status={c.status} />,
+    search: true,
+  },
   { id: "organization", header: "Organization", value: (c) => c.organization_name, search: true },
   { id: "email", header: "Email", value: (c) => c.email, search: true, nowrap: true },
   { id: "phone", header: "Phone", value: (c) => c.phone, search: true, nowrap: true },
@@ -20,12 +26,19 @@ export const contactColumns: TableColumn<Contact>[] = [
     id: "last_activity",
     header: "Last activity",
     value: (c) => c.last_activity_at,
-    cell: (c) => (c.last_activity_at ? formatTimestampDate(c.last_activity_at) : <span className="muted">None yet</span>),
+    cell: (c) =>
+      c.last_activity_at ? formatTimestampDate(c.last_activity_at) : <span className="muted">None yet</span>,
     mono: true,
   },
 ];
 
-function StatusFilter({ value, onChange }: { value: ContactStatus | "all"; onChange: (v: ContactStatus | "all") => void }) {
+function StatusFilter({
+  value,
+  onChange,
+}: {
+  value: ContactStatus | "all";
+  onChange: (v: ContactStatus | "all") => void;
+}) {
   const options = [{ key: "all" as const, label: "All" }, ...STATUSES];
   return (
     <div className="segmented" role="radiogroup" aria-label="Status">
@@ -79,7 +92,9 @@ export function ContactsPage() {
           rowHref={(c) => `/contacts/${c.id}`}
           rowLabel={(c) => c.name}
           emptyMessage={
-            status === "all" ? "No contacts yet. Add your first lead to start." : `No contacts with the ${statusLabel(status)} status.`
+            status === "all"
+              ? "No contacts yet. Add your first lead to start."
+              : `No contacts with the ${statusLabel(status)} status.`
           }
           emptyAction={
             <button type="button" className="btn btn-quiet" onClick={() => setEditing(null)}>

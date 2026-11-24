@@ -16,7 +16,10 @@ const dialogs = [
 describe.each(dialogs)("the $name delete dialog", ({ Dialog }) => {
   beforeEach(() => {
     // The dev proxy answers 502 when the backend isn't running.
-    vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 502 })));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("", { status: 502 })),
+    );
   });
 
   afterEach(() => {

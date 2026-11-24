@@ -1,3 +1,8 @@
+from typing import get_args
+
+from app.deals.stages import STAGE_KEYS, StageKey
+
+
 def test_stages_come_in_order_with_probabilities_and_open_flags(client):
     response = client.get("/api/stages")
 
@@ -11,3 +16,7 @@ def test_stages_come_in_order_with_probabilities_and_open_flags(client):
         {"key": "closed_won", "label": "Closed (Won)", "probability": 100, "open": False},
         {"key": "lost", "label": "Lost", "probability": 0, "open": False},
     ]
+
+
+def test_the_stage_key_type_accepts_exactly_the_stages_in_board_order():
+    assert list(get_args(StageKey)) == STAGE_KEYS

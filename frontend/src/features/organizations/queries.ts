@@ -9,7 +9,11 @@ export function useOrganizations() {
 
 /** One record. `enabled` goes false when the record is being deleted, so it isn't fetched again. */
 export function useOrganization(id: number, enabled = true) {
-  return useQuery({ queryKey: ["organizations", id], queryFn: () => api<OrganizationDetail>(`/organizations/${id}`), enabled });
+  return useQuery({
+    queryKey: ["organizations", id],
+    queryFn: () => api<OrganizationDetail>(`/organizations/${id}`),
+    enabled,
+  });
 }
 
 export function useOrganizationImpact(id: number | null) {

@@ -13,39 +13,80 @@ reset on the same day gives the same result.
 import calendar
 import random
 from datetime import date, datetime, time, timedelta
+from itertools import pairwise
+from typing import NamedTuple, TypedDict
 
 from sqlalchemy import Connection, Engine, delete, insert
 
 from app.core import config
-from app.core.db import create_tables, make_engine
+from app.core.db import create_tables, insert_row, make_engine
 from app.core.tables import activities, contacts, deals, organizations
-from app.deals.stages import BY_KEY, STAGE_KEYS
+from app.deals.stages import BY_KEY, CLOSED_STAGES, STAGE_KEYS
 
 RANDOM_SEED = 2026
 
 # key, name, industry, website, notes
 ORGANIZATIONS = [
-    ("northgate", "Northgate Realty Partners", "Brokerage", "https://northgaterealty.example.com",
-     "Co-op brokerage covering Northgate and the north shore of Cedar Bay."),
-    ("keystone", "Keystone Brokerage Group", "Brokerage", "https://keystonebrokerage.example.com",
-     "Refers out-of-area buyers to us."),
-    ("harborpoint", "Harbor Point Lending", "Mortgage lending", "https://harborpointlending.example.com",
-     "Quick pre-approvals, usually within two days."),
+    (
+        "northgate",
+        "Northgate Realty Partners",
+        "Brokerage",
+        "https://northgaterealty.example.com",
+        "Co-op brokerage covering Northgate and the north shore of Cedar Bay.",
+    ),
+    (
+        "keystone",
+        "Keystone Brokerage Group",
+        "Brokerage",
+        "https://keystonebrokerage.example.com",
+        "Refers out-of-area buyers to us.",
+    ),
+    (
+        "harborpoint",
+        "Harbor Point Lending",
+        "Mortgage lending",
+        "https://harborpointlending.example.com",
+        "Quick pre-approvals, usually within two days.",
+    ),
     ("stonebridge", "Stonebridge Mortgage", "Mortgage lending", "https://stonebridgemortgage.example.com", None),
-    ("fairway", "Fairway Home Loans", "Mortgage lending", "https://fairwayhomeloans.example.com",
-     "Good for first-time buyer programs."),
-    ("ridgeline", "Ridgeline Development", "Development", "https://ridgelinedev.example.com",
-     "Building the Riverside lots on the east side."),
-    ("lakeshore", "Lakeshore Builders", "Development", "https://lakeshorebuilders.example.com",
-     "New-build condos on the waterfront, Phase 2 starts next spring."),
+    (
+        "fairway",
+        "Fairway Home Loans",
+        "Mortgage lending",
+        "https://fairwayhomeloans.example.com",
+        "Good for first-time buyer programs.",
+    ),
+    (
+        "ridgeline",
+        "Ridgeline Development",
+        "Development",
+        "https://ridgelinedev.example.com",
+        "Building the Riverside lots on the east side.",
+    ),
+    (
+        "lakeshore",
+        "Lakeshore Builders",
+        "Development",
+        "https://lakeshorebuilders.example.com",
+        "New-build condos on the waterfront, Phase 2 starts next spring.",
+    ),
     ("oakwell", "Oakwell Property Management", "Property management", "https://oakwellpm.example.com", None),
-    ("summit", "Summit Residential Management", "Property management", None,
-     "Manages rentals around Summit View."),
-    ("meridian", "Meridian Relocation Services", "Relocation", "https://meridianrelocation.example.com",
-     "Sends corporate transferees our way."),
+    ("summit", "Summit Residential Management", "Property management", None, "Manages rentals around Summit View."),
+    (
+        "meridian",
+        "Meridian Relocation Services",
+        "Relocation",
+        "https://meridianrelocation.example.com",
+        "Sends corporate transferees our way.",
+    ),
     ("corpmove", "Corporate Move Partners", "Relocation", "https://corporatemove.example.com", None),
-    ("bayline", "Bayline Title & Escrow", "Other", "https://baylinetitle.example.com",
-     "Our usual title and escrow company."),
+    (
+        "bayline",
+        "Bayline Title & Escrow",
+        "Other",
+        "https://baylinetitle.example.com",
+        "Our usual title and escrow company.",
+    ),
 ]
 
 # first name, last name, status, organization key, job title
@@ -232,162 +273,271 @@ def stage_path(stage: str, furthest: str | None = None) -> list[str]:
     if stage == "closed_won":
         return STAGE_KEYS[: STAGE_KEYS.index("under_contract") + 1] + ["closed_won"]
     if stage == "lost":
+        if furthest is None:
+            raise ValueError("A lost deal needs the furthest stage it reached")
         return STAGE_KEYS[: STAGE_KEYS.index(furthest) + 1] + ["lost"]
     return STAGE_KEYS[: STAGE_KEYS.index(stage) + 1]
 
 
-def load(conn: Connection, today: date) -> dict:
-    rng = random.Random(RANDOM_SEED)
+class PlannedDeal(NamedTuple):
+    """A deal's row, the stages it passed through, and the window its history spans."""
 
+    name: str
+    stage: str
+    contact: str | None
+    org_key: str | None
+    value: int
+    close: date
+    probability: int | None
+    path: list[str]
+    started: date
+    last_move: date
+
+
+class ActivityRow(TypedDict):
+    type: str
+    deal_id: int | None
+    contact_id: int | None
+    description: str
+    occurred_at: datetime
+    follow_up_date: date | None
+    done: bool
+    from_stage: str | None
+    to_stage: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+def activity_row(
+    kind: str,
+    description: str,
+    occurred_at: datetime,
+    *,
+    deal_id: int | None = None,
+    contact_id: int | None = None,
+    follow_up_date: date | None = None,
+    done: bool = False,
+    from_stage: str | None = None,
+    to_stage: str | None = None,
+) -> ActivityRow:
+    return {
+        "type": kind,
+        "deal_id": deal_id,
+        "contact_id": contact_id,
+        "description": description,
+        "occurred_at": occurred_at,
+        "follow_up_date": follow_up_date,
+        "done": done,
+        "from_stage": from_stage,
+        "to_stage": to_stage,
+        "created_at": occurred_at,
+        "updated_at": occurred_at,
+    }
+
+
+def _load_organizations(conn: Connection, today: date) -> dict[str, int]:
     org_ids = {}
     for index, (key, name, industry, website, notes) in enumerate(ORGANIZATIONS):
         created = at(today - timedelta(days=420 - index * 9), 9)
-        org_ids[key] = conn.execute(
-            insert(organizations).values(
-                name=name, industry=industry, website=website, notes=notes, created_at=created, updated_at=created
-            )
-        ).inserted_primary_key[0]
+        org_ids[key] = insert_row(
+            conn,
+            organizations,
+            name=name,
+            industry=industry,
+            website=website,
+            notes=notes,
+            created_at=created,
+            updated_at=created,
+        )
+    return org_ids
 
+
+def _email_domain(org_key: str | None) -> str:
+    websites = {key: website for key, _name, _industry, website, _notes in ORGANIZATIONS}
+    website = websites[org_key] if org_key else None
+    return website.removeprefix("https://") if website else "example.com"
+
+
+def _load_contacts(
+    conn: Connection, today: date, rng: random.Random, org_ids: dict[str, int]
+) -> tuple[dict[str, int], dict[int, str]]:
+    """The contacts' ids by full name, and their first names by id."""
     contact_ids, first_names = {}, {}
     for index, (first, last, status, org_key, job_title) in enumerate(CONTACTS):
-        domain = ORGANIZATIONS[[o[0] for o in ORGANIZATIONS].index(org_key)][3] if org_key else None
-        email_domain = domain.removeprefix("https://") if domain else "example.com"
         created = at(today - timedelta(days=320 + rng.randint(0, 60)), 10)
-        contact_id = conn.execute(
-            insert(contacts).values(
-                first_name=first,
-                last_name=last,
-                email=f"{first}.{last}@{email_domain}".lower() if index % 9 != 4 else None,
-                phone=f"(206) 555-01{index:02d}" if index % 7 != 3 else None,
-                job_title=job_title,
-                organization_id=org_ids[org_key] if org_key else None,
-                status=status,
-                created_at=created,
-                updated_at=created,
-            )
-        ).inserted_primary_key[0]
+        contact_id = insert_row(
+            conn,
+            contacts,
+            first_name=first,
+            last_name=last,
+            email=f"{first}.{last}@{_email_domain(org_key)}".lower() if index % 9 != 4 else None,
+            phone=f"(206) 555-01{index:02d}" if index % 7 != 3 else None,
+            job_title=job_title,
+            organization_id=org_ids[org_key] if org_key else None,
+            status=status,
+            created_at=created,
+            updated_at=created,
+        )
         contact_ids[f"{first} {last}"] = contact_id
         first_names[contact_id] = first
+    return contact_ids, first_names
 
-    # Each deal: its row, the stages it passed through, and the window its history spans.
+
+def _plan_deals(today: date, rng: random.Random) -> list[PlannedDeal]:
     planned = []
     for name, stage, contact, org_key, value, days, probability in OPEN_DEALS:
         started = today - timedelta(days=30 + 12 * STAGE_KEYS.index(stage) + rng.randint(0, 20))
         last_move = today - timedelta(days=1 if name == MOVED_YESTERDAY else rng.randint(1, 6))
-        planned.append((name, stage, contact, org_key, value, today + timedelta(days=days), probability,
-                        stage_path(stage), started, last_move))
+        close = today + timedelta(days=days)
+        planned.append(
+            PlannedDeal(name, stage, contact, org_key, value, close, probability, stage_path(stage), started, last_move)
+        )
     for name, contact, org_key, value, months_back, day in WON_DEALS:
         close = closed_on(today, months_back, day)
-        planned.append((name, "closed_won", contact, org_key, value, close, None, stage_path("closed_won"),
-                        close - timedelta(days=45 + rng.randint(0, 60)), close))
+        started = close - timedelta(days=45 + rng.randint(0, 60))
+        path = stage_path("closed_won")
+        planned.append(PlannedDeal(name, "closed_won", contact, org_key, value, close, None, path, started, close))
     for name, contact, org_key, value, months_back, day, furthest in LOST_DEALS:
         close = closed_on(today, months_back, day)
-        planned.append((name, "lost", contact, org_key, value, close, None, stage_path("lost", furthest),
-                        close - timedelta(days=30 + rng.randint(0, 45)), close))
+        started = close - timedelta(days=30 + rng.randint(0, 45))
+        path = stage_path("lost", furthest)
+        planned.append(PlannedDeal(name, "lost", contact, org_key, value, close, None, path, started, close))
+    return planned
 
-    # Positions: open columns in the order listed, closed columns newest first.
+
+def _board_positions(planned: list[PlannedDeal]) -> dict[str, int]:
+    """Each deal's place in its column: open columns in the order listed, closed columns newest first."""
+    closed = sorted((plan for plan in planned if plan.stage in CLOSED_STAGES), key=lambda p: p.close, reverse=True)
+    still_open = [plan for plan in planned if plan.stage not in CLOSED_STAGES]
     positions, columns = {}, {}
-    for plan in sorted(planned, key=lambda p: p[5] if p[1] in ("closed_won", "lost") else date.min, reverse=True):
-        if plan[1] in ("closed_won", "lost"):
-            positions[plan[0]] = columns.setdefault(plan[1], 0)
-            columns[plan[1]] += 1
+    for plan in closed + still_open:
+        positions[plan.name] = columns.setdefault(plan.stage, 0)
+        columns[plan.stage] += 1
+    return positions
+
+
+def _move_times(plan: PlannedDeal, today: date) -> list[datetime]:
+    """When each stage change happened, spread over the deal's window."""
+    move_count = len(plan.path) - 1
+    span = (plan.last_move - plan.started).days
+    return [
+        stamp(
+            plan.started + timedelta(days=round(span * (n + 1) / move_count)),
+            8 + n,
+            42 if n == move_count - 1 else 10,
+            today,
+        )
+        for n in range(move_count)
+    ]
+
+
+def _load_deals(
+    conn: Connection,
+    today: date,
+    planned: list[PlannedDeal],
+    contact_ids: dict[str, int],
+    org_ids: dict[str, int],
+) -> tuple[dict[str, int], list[ActivityRow]]:
+    """The deals' ids by name, and their stage-change history."""
+    positions = _board_positions(planned)
+    deal_ids, history = {}, []
     for plan in planned:
-        if plan[1] not in ("closed_won", "lost"):
-            positions[plan[0]] = columns.setdefault(plan[1], 0)
-            columns[plan[1]] += 1
-
-    deal_ids, deal_windows, deal_contacts = {}, {}, {}
-    history = []
-    for name, stage, contact, org_key, value, close, probability, path, started, last_move in planned:
-        moves = list(zip(path, path[1:]))
-        span = (last_move - started).days
-        move_times = [
-            stamp(started + timedelta(days=round(span * (n + 1) / len(moves))), 8 + n, 42 if n == len(moves) - 1 else 10, today)
-            for n in range(len(moves))
-        ]
-        created = at(started, 9)
-        deal_id = conn.execute(
-            insert(deals).values(
-                name=name,
-                contact_id=contact_ids.get(contact),
-                organization_id=org_ids.get(org_key),
-                stage=stage,
-                value=value,
-                probability=probability if probability is not None else BY_KEY[stage].probability,
-                close_date=close,
-                position=positions[name],
-                notes=None,
-                created_at=created,
-                updated_at=move_times[-1] if move_times else created,
-            )
-        ).inserted_primary_key[0]
-        deal_ids[name] = deal_id
-        deal_contacts[deal_id] = contact_ids.get(contact)
-        deal_windows[deal_id] = (started, min(last_move, today - timedelta(days=1)))
-        for (from_stage, to_stage), when in zip(moves, move_times):
+        move_times = _move_times(plan, today)
+        created = at(plan.started, 9)
+        deal_id = insert_row(
+            conn,
+            deals,
+            name=plan.name,
+            contact_id=contact_ids.get(plan.contact) if plan.contact else None,
+            organization_id=org_ids.get(plan.org_key) if plan.org_key else None,
+            stage=plan.stage,
+            value=plan.value,
+            probability=plan.probability if plan.probability is not None else BY_KEY[plan.stage].probability,
+            close_date=plan.close,
+            position=positions[plan.name],
+            notes=None,
+            created_at=created,
+            updated_at=move_times[-1] if move_times else created,
+        )
+        deal_ids[plan.name] = deal_id
+        for (from_stage, to_stage), when in zip(pairwise(plan.path), move_times, strict=True):
+            description = f"Moved from {BY_KEY[from_stage].label} to {BY_KEY[to_stage].label}"
             history.append(
-                {
-                    "type": "stage_change",
-                    "deal_id": deal_id,
-                    "contact_id": None,
-                    "description": f"Moved from {BY_KEY[from_stage].label} to {BY_KEY[to_stage].label}",
-                    "occurred_at": when,
-                    "follow_up_date": None,
-                    "done": False,
-                    "from_stage": from_stage,
-                    "to_stage": to_stage,
-                    "created_at": when,
-                    "updated_at": when,
-                }
+                activity_row(
+                    "stage_change", description, when, deal_id=deal_id, from_stage=from_stage, to_stage=to_stage
+                )
             )
+    return deal_ids, history
 
+
+def _named_activities(today: date, deal_ids: dict[str, int], contact_ids: dict[str, int]) -> list[ActivityRow]:
     logged = []
     for kind, owner, description, days_ago, follow_up, done, (hour, minute) in NAMED_ACTIVITIES:
         owner_kind, owner_name = owner.split(":", 1)
-        when = stamp(today - timedelta(days=days_ago), hour, minute, today)
         logged.append(
-            {
-                "type": kind,
-                "deal_id": deal_ids[owner_name] if owner_kind == "deal" else None,
-                "contact_id": contact_ids[owner_name] if owner_kind == "contact" else None,
-                "description": description,
-                "occurred_at": when,
-                "follow_up_date": today + timedelta(days=follow_up) if follow_up is not None else None,
-                "done": done,
-            }
+            activity_row(
+                kind,
+                description,
+                stamp(today - timedelta(days=days_ago), hour, minute, today),
+                deal_id=deal_ids[owner_name] if owner_kind == "deal" else None,
+                contact_id=contact_ids[owner_name] if owner_kind == "contact" else None,
+                follow_up_date=today + timedelta(days=follow_up) if follow_up is not None else None,
+                done=done,
+            )
         )
+    return logged
 
+
+def _general_activities(
+    today: date,
+    rng: random.Random,
+    planned: list[PlannedDeal],
+    deal_ids: dict[str, int],
+    contact_ids: dict[str, int],
+    first_names: dict[int, str],
+) -> list[ActivityRow]:
+    """Everyday notes, calls and emails, spread over each deal's window or the last four months."""
+    plans_by_id = {deal_ids[plan.name]: plan for plan in planned}
     owners = [("deal", deal_id) for deal_id in deal_ids.values()] + [("contact", c) for c in contact_ids.values()]
     rng.shuffle(owners)
+    logged = []
     for n in range(GENERAL_ACTIVITY_COUNT):
         owner_kind, owner_id = owners[n % len(owners)]
         kind = rng.choice(["note", "call", "call", "email"])
         if owner_kind == "deal":
-            start, end = deal_windows[owner_id]
-            first = first_names.get(deal_contacts[owner_id], "the client")
-            name = next(deal_name for deal_name, deal_id in deal_ids.items() if deal_id == owner_id)
-            description = rng.choice(DEAL_NOTES[kind]).format(first=first, deal=name)
+            plan = plans_by_id[owner_id]
+            start, end = plan.started, min(plan.last_move, today - timedelta(days=1))
+            contact_id = contact_ids.get(plan.contact) if plan.contact else None
+            first = first_names.get(contact_id, "the client") if contact_id is not None else "the client"
+            description = rng.choice(DEAL_NOTES[kind]).format(first=first, deal=plan.name)
         else:
             start, end = today - timedelta(days=120), today - timedelta(days=1)
             description = rng.choice(CONTACT_NOTES[kind]).format(first=first_names[owner_id])
         day = start + timedelta(days=rng.randint(0, max((end - start).days, 0)))
+        when = stamp(day, rng.randint(8, 17), rng.choice([0, 10, 15, 25, 30, 40, 45, 55]), today)
         logged.append(
-            {
-                "type": kind,
-                "deal_id": owner_id if owner_kind == "deal" else None,
-                "contact_id": owner_id if owner_kind == "contact" else None,
-                "description": description,
-                "occurred_at": stamp(day, rng.randint(8, 17), rng.choice([0, 10, 15, 25, 30, 40, 45, 55]), today),
-                "follow_up_date": None,
-                "done": False,
-            }
+            activity_row(
+                kind,
+                description,
+                when,
+                deal_id=owner_id if owner_kind == "deal" else None,
+                contact_id=owner_id if owner_kind == "contact" else None,
+            )
         )
-    for activity in logged:
-        activity.update(from_stage=None, to_stage=None, created_at=activity["occurred_at"],
-                        updated_at=activity["occurred_at"])
+    return logged
 
-    all_activities = sorted(history + logged, key=lambda a: a["occurred_at"])
-    conn.execute(insert(activities), all_activities)
+
+def load(conn: Connection, today: date) -> dict:
+    # One random generator, drawn from in a fixed order, so every reset on the same day matches.
+    rng = random.Random(RANDOM_SEED)
+    org_ids = _load_organizations(conn, today)
+    contact_ids, first_names = _load_contacts(conn, today, rng, org_ids)
+    planned = _plan_deals(today, rng)
+    deal_ids, history = _load_deals(conn, today, planned, contact_ids, org_ids)
+    logged = _named_activities(today, deal_ids, contact_ids)
+    logged += _general_activities(today, rng, planned, deal_ids, contact_ids, first_names)
+
+    conn.execute(insert(activities), sorted(history + logged, key=lambda a: a["occurred_at"]))
     return {
         "organizations": len(org_ids),
         "contacts": len(contact_ids),

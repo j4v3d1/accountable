@@ -81,7 +81,7 @@ def test_open_value_expected_revenue_and_its_share(sales):
         "offer": (500000, 1),
         "under_contract": (0, 0),
     }
-    assert [s["label"] for s in pipeline["stages"]][0] == "New Lead"
+    assert pipeline["stages"][0]["label"] == "New Lead"
 
 
 def test_deals_won_this_month_last_month_and_the_win_rate(sales):
@@ -128,7 +128,13 @@ def test_the_funnel_counts_each_deal_up_to_its_furthest_stage(api):
     ]
     shares = [s["share_from_previous"] for s in funnel]
     assert shares[0] is None
-    assert shares[1:] == [pytest.approx(80.0), pytest.approx(75.0), pytest.approx(200 / 3), pytest.approx(50.0), pytest.approx(100.0)]
+    assert shares[1:] == [
+        pytest.approx(80.0),
+        pytest.approx(75.0),
+        pytest.approx(200 / 3),
+        pytest.approx(50.0),
+        pytest.approx(100.0),
+    ]
 
 
 def test_a_funnel_share_is_blank_when_the_stage_before_had_no_deals(api):

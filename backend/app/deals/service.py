@@ -1,10 +1,11 @@
 """Deals, and the deal rules: probability (R14), close date on win or loss (R15),
 the late flag (R16), stage-change entries (R19) and positions in a column (R23, R25)."""
 
-from sqlalchemy import Connection, case, delete, exists, func, insert, select, update
+from sqlalchemy import Connection, case, delete, exists, func, select, update
 
 from app.activities import service as activities_service
 from app.core.config import today
+from app.core.db import insert_row
 from app.core.errors import Invalid, NotFound
 from app.core.tables import activities, contacts, deals, organizations
 from app.deals.schemas import DealCreate
@@ -63,12 +64,12 @@ def _current(conn: Connection, deal_id: int):
 
 
 def _check_links(conn: Connection, values: dict) -> None:
-    if values.get("contact_id") is not None:
-        if not conn.scalar(select(exists().where(contacts.c.id == values["contact_id"]))):
-            raise Invalid("contact_id", "That contact doesn't exist", values["contact_id"])
-    if values.get("organization_id") is not None:
-        if not conn.scalar(select(exists().where(organizations.c.id == values["organization_id"]))):
-            raise Invalid("organization_id", "That organization doesn't exist", values["organization_id"])
+    contact_id = values.get("contact_id")
+    if contact_id is not None and not conn.scalar(select(exists().where(contacts.c.id == contact_id))):
+        raise Invalid("contact_id", "That contact doesn't exist", contact_id)
+    organization_id = values.get("organization_id")
+    if organization_id is not None and not conn.scalar(select(exists().where(organizations.c.id == organization_id))):
+        raise Invalid("organization_id", "That organization doesn't exist", organization_id)
 
 
 def _column(conn: Connection, stage: str, leave_out: int | None = None) -> list[int]:
@@ -94,7 +95,7 @@ def create_deal(conn: Connection, data: DealCreate) -> dict:
         values["probability"] = BY_KEY[values["stage"]].probability
     # A new deal goes to the top of its column (R25).
     _push_down(conn, values["stage"])
-    deal_id = conn.execute(insert(deals).values(**values, position=0)).inserted_primary_key[0]
+    deal_id = insert_row(conn, deals, **values, position=0)
     return get_deal(conn, deal_id)
 
 
