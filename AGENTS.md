@@ -31,6 +31,6 @@ Update `docs/STATUS.md` when you finish a piece of work
 
 - `npm run check` runs every check: Prettier and ESLint (frontend), `ruff format` and `ruff check` (backend), complexity of at most 15 per function, `tsc` and `ty`, gitleaks, `npm test` with at least 80% unit test coverage, and a check that every Playwright baseline screenshot has both a Mac (`-darwin`) and a Linux (`-linux`) copy. It fails if any of them fails.
 - `npm run check:quick` runs the same without the end-to-end tests and the baseline check; `npm run format` fixes the formatting.
-- CI runs `npm run check` on Linux, and your machine is a Mac, so a change isn't done until CI has passed on the pushed branch. You don't push, so ask the person to push and tell you the result.
+- CI runs `npm run check:quick` on Linux (no end-to-end tests, so those run only on your Mac), and your machine is a Mac, so a change isn't done until CI has passed on the pushed branch. You don't push, so ask the person to push and tell you the result.
 - Hooks run these for you: a git pre-commit hook (`lefthook.yml`) formats, lints, type-checks and scans the staged files, and a Claude Code Stop hook runs `npm run check:quick` when you finish a turn and sends failures back once. You can't edit `.env`.
 - Run `npm run check`, and get it passing, before calling a piece of work done. Fix what it finds; don't weaken a rule, add a disable or ignore comment, or exclude code from coverage. If a rule doesn't suit the project, ask first.

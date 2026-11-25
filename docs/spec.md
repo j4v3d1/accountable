@@ -78,7 +78,7 @@ These settle points where the brand, the platform or the data left a choice. Req
 
     Everything else that sits on a panel, such as tinted chips, icon circles, avatars, row washes, hover rows and chart axes, has its own dark value.
 14. **Where the mode is kept.** The choice is saved in the browser's `localStorage` under `accountable-theme`, as `light` or `dark`. Anything else, or nothing, means light. It belongs to that browser on that computer: there's no backend setting, and `npm run seed` doesn't touch it. A small script in `index.html` reads it and marks the page before anything is drawn, so a dark page never flashes light on load.
-15. **Proving light mode hasn't changed.** Moving every color into tokens touches most style files, so a Playwright visual test compares each page in light mode with screenshots taken before the change, with the toggle hidden. Dates in the sample data and on screen follow today, so the visual test fixes today's date in both the backend and the browser. Screenshots differ slightly between Mac and Linux, so there's a baseline for each platform `npm run check` runs on: Mac locally and Linux in CI.
+15. **Proving light mode hasn't changed.** Moving every color into tokens touches most style files, so a Playwright visual test compares each page in light mode with screenshots taken before the change, with the toggle hidden. Dates in the sample data and on screen follow today, so the visual test fixes today's date in both the backend and the browser. Screenshots differ slightly between Mac and Linux, so there's a Mac baseline and a Linux baseline. `npm run check` on a Mac compares against the Mac one. CI no longer runs the end-to-end tests (R47), so the Linux baselines are kept but nothing compares against them.
 
 ## Requirements
 
@@ -240,7 +240,7 @@ Each requirement has an ID, so tests and status notes can point at it.
 - **R44** `npm run check` runs every check and fails if any of them fails: Prettier and ESLint (recommended TypeScript, React Hooks and accessibility rules) for the frontend, `ruff format` and `ruff check` for the backend, a cyclomatic complexity of at most 15 per function (ESLint's `complexity`, ruff's `C901`), `tsc` for the frontend and `ty` for the backend, gitleaks across the working files and the git history (the git-ignored `.env` is allowed), and `npm test`. `npm run check:quick` runs the same checks without the end-to-end tests. `npm run format` fixes the formatting.
 - **R45** A git pre-commit hook (lefthook, installed by `npm install`) formats the staged files with Prettier and `ruff format` and stages the result, then runs ESLint, `ruff check`, `tsc`, `ty` and gitleaks on the staged changes. It skips the tests so commits stay quick, and refuses the commit if any of them fails.
 - **R46** Claude Code hooks in `.claude/settings.json`: when the agent finishes a turn, `npm run check:quick` runs and any failure is sent back to the agent to fix. It blocks the stop once, then lets the agent stop, so it can't loop. The agent can't write or edit `.env` or `.env.*` files (`.env.example` is allowed).
-- **R47** GitHub Actions (`.github/workflows/ci.yml`) runs one job, `check`, on every push to any branch. It installs gitleaks and scans the working files and the whole git history first, so a leaked secret fails the run straight away. Then it installs Node and uv and runs `npm run check`, using the Google Chrome already on the runner. When the run fails, the Playwright HTML report and test results are uploaded. The workflow uses no secrets.
+- **R47** GitHub Actions (`.github/workflows/ci.yml`) runs one job, `check`, on every push to any branch. It installs gitleaks and scans the working files and the whole git history first, so a leaked secret fails the run straight away. Then it installs Node and uv and runs `npm run check:quick`: every check except the end-to-end tests and the baseline check, which run only locally with `npm run check`. The workflow uses no secrets.
 - **R48** Two Claude Code subagents in `.claude/agents/`, both on Sonnet. `reviewer` reviews a branch's changes against `docs/REVIEW.md` and reports findings by severity (Important, other findings, at most five nits); it can read files and run commands that only read, such as `git diff`, `git log` and `git show`, and changes nothing. `ui-check` opens each page of the running app (`npm run dev`) with the Playwright MCP server in light and dark mode, screenshots it into `.playwright-mcp/` (git-ignored), checks it against the brand skill and this spec, and reports anything broken or off-brand; it has no tools to change files.
 
 ## Design
@@ -378,7 +378,7 @@ e2e/                   Playwright tests, and fixtures.ts shared by all of them; 
                        baseline screenshots sit beside the visual test (concern 15)
 scripts/              test-all.mjs (npm test), check.mjs (npm run check), run-steps.mjs (runs steps, prints the summary)
 lefthook.yml           the git pre-commit hook
-.github/workflows/     ci.yml (npm run check on every push)
+.github/workflows/     ci.yml (npm run check:quick on every push)
 .claude/hooks/         Claude Code hooks: check-on-stop.mjs (check:quick when a turn ends), protect-env.mjs
 .claude/agents/        Claude Code subagents: reviewer.md (reviews a branch, read-only), ui-check.md (checks the running app in the browser)
 ```

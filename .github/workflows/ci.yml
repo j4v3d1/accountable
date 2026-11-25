@@ -1,4 +1,5 @@
-# Runs every check on every push: the secrets scan first, then `npm run check`.
+# Runs the quick checks on every push: the secrets scan first, then
+# `npm run check:quick` (everything except the end-to-end tests and the baseline check).
 name: CI
 
 on:
@@ -49,18 +50,5 @@ jobs:
           npm ci
           uv sync
 
-      - name: Run every check
-        run: npm run check
-
-      # The snapshot folders carry any missing Linux baselines that Playwright wrote.
-      - name: Upload the Playwright report
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-report
-          path: |
-            playwright-report/
-            test-results/
-            e2e/**/*-snapshots/
-          if-no-files-found: ignore
-          retention-days: 14
+      - name: Run the quick checks
+        run: npm run check:quick

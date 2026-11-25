@@ -114,7 +114,7 @@ Still open:
 - **Linux baselines (added, with weaker proof).**
   - Source: CI runs 45506381893 and 45512832437, which were byte-identical. The repo itself can't confirm this; rerunning the visual test on CI and comparing is the only check.
   - Caveat: both runs came after the CSS had moved to tokens, not before as plan step 4 asked. On Linux, the visual test guards light mode from here on, but doesn't prove the token move left light mode unchanged. The Mac baselines, taken before the move, still prove that.
-  - Remedy: run the visual test on `main` (no CSS changes) in CI, and use those PNGs instead.
+  - Remedy: run the visual test on Linux against `main` (no CSS changes), and use those PNGs instead. CI no longer runs the end-to-end tests (see "CI runs the quick checks" below), so this needs a Linux machine or a one-off workflow.
 - **Late and overdue pills in light mode** measure 4.33:1 (`--raspberry-text` on `--raspberry-pill`), under 4.5:1. This was already so before dark mode; fixing it would change light mode, which this change mustn't, so the contrast test lists it as a known light-mode gap. Dark mode passes.
 - The walkthrough was done in Chrome through Playwright, which fails on any console error, rather than by hand.
 
@@ -135,4 +135,8 @@ Two Claude Code subagents added in `.claude/agents/` (see `docs/changes/subagent
 - **reviewer** reviews the branch's changes against `docs/REVIEW.md` and reports findings by severity. It has Read, Grep, Glob and Bash; its instructions allow only commands that read (`git diff`, `git log`, `git show`, `grep` and the like) and forbid edits, commits, installs, running the tests and reading `.env`. Bash itself isn't locked down, so the read-only rule rests on the instructions.
 - **ui-check** opens every route of the running app with the Playwright MCP server, at 1600 wide in light and dark mode and 1280 wide for the dashboard and pipeline, saves screenshots to `.playwright-mcp/` (already git-ignored), and checks them against the brand skill (preloaded) and the spec. It has no Edit, Write or Bash tools, doesn't start the app, and doesn't create or change records.
 
-Not yet tried: running each agent once (the reviewer on this branch, ui-check with `npm run dev` running).
+Tried once each (2026-11-25): ui-check on the dashboard and pipeline found nothing broken, and the spec's pipeline wording was made exact (columns are as tall as their cards, up to the board's height). The reviewer on "Deploy: CI fix" found nothing Important; its notes were fixed in the Linux baselines entry above and the dark-mode harness section.
+
+### CI runs the quick checks
+
+`.github/workflows/ci.yml` now runs `npm run check:quick` instead of `npm run check`, so CI leaves out the end-to-end tests and the baseline check. The step that uploaded the Playwright report and snapshot folders on failure is gone, since only the end-to-end tests wrote them. The gitleaks, Node, uv and dependency steps stay, because the quick checks still need them. `AGENTS.md`, `docs/TECH_STACK.md` and `docs/spec.md` (concern 15, R47, the structure line) now say so. End-to-end tests and the Mac baselines are now checked only by `npm run check` on a Mac; the Linux baselines are kept but nothing compares against them.

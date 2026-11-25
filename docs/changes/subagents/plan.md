@@ -6,6 +6,7 @@
 - `.claude/agents/ui-check.md`: the ui-check subagent. Tools: Read, Grep, Glob and the Playwright MCP browser tools (no Edit, Write or Bash). Preloads the brand skill. Model: Sonnet.
 - `docs/spec.md`: R48 and the code structure line for `.claude/agents/`.
 - `docs/STATUS.md`: what was done.
+- `.github/workflows/ci.yml` (added during the build, at the person's request): run `npm run check:quick` instead of `npm run check`, and drop the Playwright report upload. `AGENTS.md`, `docs/TECH_STACK.md` and `docs/spec.md` (concern 15, R47, structure line) updated to match.
 
 ## Order of work
 
