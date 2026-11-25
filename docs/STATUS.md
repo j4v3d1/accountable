@@ -7,8 +7,9 @@
 
 ## Everyday commands
 
-- `npm run dev` starts Accountable. Open the address it prints (http://localhost:5173).
-- `npm run seed` resets the data to the sample data.
+- `npm run dev` starts Accountable with local sign-in. Open the address it prints (http://localhost:5173) and sign in as a made-up teammate, such as `maya.torres@example.com` with the password `local`.
+- `npm start` runs the built app against the database and Supabase sign-in set in `.env`, and names any missing setting.
+- `npm run seed` resets the local data to the sample data. `npm run seed:live` does the same to the database in `.env`, after asking for "yes".
 - `npm test` runs every test: backend (pytest), frontend (TypeScript check and Vitest) and end to end (Playwright in Chrome). It runs all of them even when one fails, prints a summary, and fails if any test fails. The tests use their own database and ports, so they never touch your data.
 - `npm run check` runs every check: formatting, linting, complexity, type checks, the secrets scan, `npm test` with at least 80% unit test coverage, and a check that every baseline screenshot has a Mac and a Linux copy. `npm run check:quick` leaves out the end-to-end tests and the baseline check. `npm run format` fixes the formatting.
 
@@ -59,7 +60,7 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 
 **Security**
 
-4. **The API answers requests for any host name.** Uvicorn on port 8000 didn't check the `Host` header, so a malicious web page could reach the local API with DNS rebinding. Low risk for a local app, but cheap to close. **Fixed:** the API refuses any host but `localhost` and `127.0.0.1` with 400. Checked on a running server as well as in `test_hosts.py`. When the app is deployed to Render, its address has to be added to `ALLOWED_HOSTS` in `core/config.py`.
+4. **The API answers requests for any host name.** Uvicorn on port 8000 didn't check the `Host` header, so a malicious web page could reach the local API with DNS rebinding. Low risk for a local app, but cheap to close. **Fixed:** the API refuses any host but `localhost` and `127.0.0.1` with 400. Checked on a running server as well as in `test_hosts.py`. On Render, `config.allowed_hosts()` also allows the address Render gives the app (`RENDER_EXTERNAL_HOSTNAME`).
 
 **Differences from the spec and plan**
 
@@ -93,7 +94,7 @@ The `mvp` branch was reviewed against `main` using `docs/REVIEW.md`. `npm test` 
 
 ## CI (2026-11-24, `harness` branch)
 
-`.github/workflows/ci.yml` runs one job, `check`, on every push to any branch: it installs gitleaks 8.30.1 (checksum checked) and scans the files and full history first, then installs Node 26 and uv (`astral-sh/setup-uv@v10.4.0`, latest uv) and runs `npm run check` with the runner's Google Chrome. On failure it uploads `playwright-report/` and `test-results/`. No secrets. Playwright now also writes an HTML report to `playwright-report/` (git-ignored, never opens by itself). Checked locally with actionlint, by running the gitleaks download and checksum steps, and by running the end-to-end tests to see the report appear. It passed on GitHub for the `harness` branch on the fork (2026-11-24, 3 minutes).
+`.github/workflows/ci.yml` runs one job, `check`, on every push to any branch: it installs gitleaks 8.30.1 (checksum checked) and scans the files and full history first, then installs Node 26 and uv (`astral-sh/setup-uv@v10.4.0`, latest uv) and runs the checks; since "CI runs the quick checks" below, that's `npm run check:quick`, with no end-to-end tests and no report upload. No secrets. Playwright now also writes an HTML report to `playwright-report/` (git-ignored, never opens by itself). Checked locally with actionlint, by running the gitleaks download and checksum steps, and by running the end-to-end tests to see the report appear. It passed on GitHub for the `harness` branch on the fork (2026-11-24, 3 minutes).
 
 ## Improving the harness (2026-11-24, `harness` branch)
 
@@ -151,19 +152,36 @@ The spec now describes sign-in, search and the user menu as they'll be once `mul
 
 ## Multi-user build, Phase 1: sign-in and the database (2026-11-25, `multi-user` branch)
 
-Built from `docs/changes/multi-user/plan.md`, steps 1 to 4. Not committed yet.
+Built from `docs/changes/multi-user/plan.md`, steps 1 to 4.
 
 - **Backend:** Alembic migrations run on every start (`0001` baseline, `0002` users, who-added columns and row-level security on Postgres); a database from before migrations is marked at the baseline first. A copy of the real `backend/data/accountable.db` migrated with every row and link kept (12 organizations, 40 contacts, 30 deals, 177 activities), all credited to "Sample data". `DATABASE_URL` replaces `ACCOUNTABLE_DATABASE_URL`. Every route but `/api/config`, `/api/health` and local `/api/auth/local` needs a token, checked against Supabase's public keys or, in local mode, a key made at startup. Every record and activity carries who added and last changed it. A database with no records is seeded on start. `npm run seed` asks for "yes" against anything but SQLite. FastAPI serves the built frontend with an `index.html` fallback.
 - **Frontend:** the sign-in screen at every address while signed out, local and Supabase sessions, the token on every request, "Your session ended. Sign in again." after a 401, a 64px top bar (empty until Phases 2 and 3), and "Added by" / "Last changed by" on record pages, with names in timelines and recent activity.
 - **Running:** `npm run dev` uses local sign-in (`scripts/dev-api.mjs`); `npm start` and `npm run seed:live` read `.env` and name any missing setting; `render.yaml` and `.env.example` added. The end-to-end tests sign in as Maya Torres through the sign-in screen.
 - **Tests:** 420 backend (99% coverage), 315 frontend (98%), and new end-to-end `sign-in.spec.ts` and `who-added.spec.ts`. Every unit test now fails at a second or more (R66).
-- **Checks:** `npm run check` passes except the 10 light-mode screenshots, which differ only by the new top bar moving each page down 64px and the names in recent activity. They're retaken in Phase 3 (plan step 12), once the top bar holds the search box and the user menu.
-- **Interim baselines (2026-11-25):** so `npm run check` passes now, the 10 Mac light-mode baselines were retaken with the empty top bar, each checked by eye first. The Linux copies are still the old ones. Both get retaken in plan steps 12 and 13.
+- **Checks:** `npm run check` passes. The 10 light-mode screenshots changed only by the new top bar moving each page down 64px and the names in recent activity, so the Mac baselines were retaken with the empty top bar, each checked by eye first. These are stand-ins: the Linux copies are still the old ones, and both get retaken in plan steps 12 and 13, once the top bar holds the search box and the user menu.
 - **Review fix (2026-11-25):** a first visit's parallel requests each tried to add the person to `users`, and on Postgres all but one failed with a 500. `auth.add_user` now uses `ON CONFLICT DO NOTHING`. Still open from the review, waiting on the person: R40 re-seeds any database with no records, live included.
 
-Waiting on the person: plan step 5 (fill in `.env`, add two teammates in Supabase) and step 6 (`npm start` against Supabase).
+Waiting on the person: confirm plan steps 5 and 6. The live database looked done on 2026-11-25 (migration `0002`, the sample data, and two rows in `users`), but nobody has said what they saw on the `npm start` run, and a second teammate's sign-in isn't confirmed.
 
 Notes for setting up Supabase and Render:
 
 - `DATABASE_URL` must be Supabase's **session pooler** address (port 5432). The direct connection is IPv6 only on the free plan, and Render can't reach it.
 - `render.yaml` sets the region to `virginia`. Change it if the Supabase project isn't in US East.
+
+## Improving the harness (2026-11-25, `multi-user` branch)
+
+`docs/IMPROVE.md` was run at the end of Phase 1, not at Deploy: plan steps 5 to 18 aren't done, and the branch hasn't been pushed, so there's no CI run yet. The review's one Important finding (a first visit's parallel requests failing with a 500) is fixed.
+
+Happened twice, now covered:
+
+- **Words set in the figure font.** The MVP walkthrough found "None yet" and "No closed deals yet" in JetBrains Mono. This round, ui-check found the whole "3 deals" in mono on the pipeline's "Past close date" tile (`PipelineBoard.tsx:212`). That tile is older than this change and still unfixed. `docs/REVIEW.md` now has a pass for it. A tool check was considered and dropped, because dates and amounts are meant to be mono and the words around them aren't, so a simple pattern can't tell them apart.
+
+Happened once, watch for a repeat:
+
+- **A race between parallel requests.** `keep_user` read, then inserted, and failed when another request inserted first. The tests run one request at a time on SQLite, so only the review caught it. If a second race turns up, add a pass to `docs/REVIEW.md` or a test that sends parallel requests.
+- **The live database check didn't go through the project's own Supabase server.** `.mcp.json` still has `PROJECT_REF`. The check reached the right project through another configured Supabase server, which may be neither read-only nor limited to the project as `docs/specs/running.md` asks. Plan step 15 still needs the reference filled in.
+- **Subagents written for the finished change.** ui-check's steps use the user menu (Phase 3) to switch themes and sign out, so a run after Phase 1 needed telling to use the rail's toggle instead.
+- **The reviewer skipped passes.** It didn't check the plan's steps one by one or the spec area files, which `docs/REVIEW.md` asks for, and listed them under "Not checked".
+- **Seeding an emptied database (R40).** The spec re-seeds any database with no records, live included. That's waiting on the person's decision, not a code fix.
+
+Out of date and fixed: the everyday commands (sign-in, `npm start`, `npm run seed:live`), the MVP review's note about adding Render's address by hand (`config.allowed_hosts()` does it now), the CI section's `npm run check` (CI runs the quick checks), and the Phase 1 section's "not committed yet" and "passes except the screenshots". `docs/IMPROVE.md` now asks for the plan's unfinished steps up front, and for what the subagents listed as not checked.

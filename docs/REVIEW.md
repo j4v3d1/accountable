@@ -6,7 +6,7 @@ Every change is reviewed against this policy before it merges. The reviewer repo
 
 Make a separate pass over every change for each of these:
 
-- **Bugs:** the code does what it's meant to, including when something goes wrong.
+- **Bugs:** the code does what it's meant to, including when something goes wrong.- **Words in the figure font:** JetBrains Mono (the `mono` class) is for money, counts, percentages and dates only; wording around a figure, such as "deals" in "3 deals" or "None yet", stays in Instrument Sans (`docs/specs/visual-design.md`). Check every element given `mono`. Missed twice so far.
 - **Security:** no secrets or personal data are exposed, and nobody can do what they shouldn't.
 - **Matches the spec and plan.md:** the change does what `docs/spec.md`, the area files in `docs/specs/` and the change's `plan.md` (in `docs/changes/<branch name>/`) say, with nothing missing and nothing extra. Every step in the plan's order of work was done as written; a step that was skipped, swapped for something else or left to "still open" is a finding.
 - **Described by the spec:** flag any code that neither `docs/spec.md` nor an area file in `docs/specs/` describes.
