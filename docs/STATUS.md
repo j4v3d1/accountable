@@ -111,7 +111,7 @@ Built from `docs/changes/dark-mode/plan.md`, in its order. A Dark button at the 
 
 Still open:
 
-- **Linux baselines.** Only the Mac baselines exist. CI uploads `e2e/**/*-snapshots/` when it fails, so the first push fails and carries the Linux PNGs; download them into `e2e/light-mode.spec.ts-snapshots/` and push again.
+- **Linux baselines (added, with weaker proof).** The Linux PNGs came from CI runs 45506381893 and 45512832437, which were byte-identical. Both ran after the CSS had moved to tokens, not before as plan step 4 asked. On Linux, the visual test now guards light mode from here on, but it doesn't prove that the token move left light mode unchanged. The Mac baselines, taken before the move, still prove that. Matching Linux proof would need the visual test run on `main` with no CSS changes, then those PNGs used instead.
 - **Late and overdue pills in light mode** measure 4.33:1 (`--raspberry-text` on `--raspberry-pill`), under 4.5:1. This was already so before dark mode; fixing it would change light mode, which this change mustn't, so the contrast test lists it as a known light-mode gap. Dark mode passes.
 - The walkthrough was done in Chrome through Playwright, which fails on any console error, rather than by hand.
 
