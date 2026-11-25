@@ -46,6 +46,8 @@ class ContactOut(BaseModel):
     last_activity_at: datetime | None
     created_at: datetime
     updated_at: datetime
+    created_by_name: str
+    updated_by_name: str
 
 
 class ContactDetail(ContactOut):

@@ -45,14 +45,43 @@ class UTCDateTime(TypeDecorator):
         return value
 
 
+def _same_as_created(context) -> datetime:
+    """A new row's updated_at is exactly its created_at, so "changed since it was added"
+    means updated_at moved on (R57)."""
+    return context.get_current_parameters()["created_at"]
+
+
 def _timestamps() -> list[Column]:
     return [
         Column("created_at", UTCDateTime, nullable=False, default=utcnow),
-        Column("updated_at", UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow),
+        Column("updated_at", UTCDateTime, nullable=False, default=_same_as_created, onupdate=utcnow),
     ]
 
 
+def _who_added() -> list[Column]:
+    """Who added the record and who last changed it (R56). A person's row is never
+    deleted, so their records keep their name."""
+    return [
+        Column("created_by", Text, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+        Column("updated_by", Text, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False),
+    ]
+
+
+# The reserved person the sample data is credited to (concern 18).
+SAMPLE_DATA_USER_ID = "sample-data"
+SAMPLE_DATA_USER_NAME = "Sample data"
+
 metadata = MetaData()
+
+# Everyone who has signed in, kept from their token (R55), plus the sample data's person.
+users = Table(
+    "users",
+    metadata,
+    Column("id", Text, primary_key=True),
+    Column("name", Text, nullable=False),
+    Column("email", Text),
+    *_timestamps(),
+)
 
 organizations = Table(
     "organizations",
@@ -63,6 +92,7 @@ organizations = Table(
     Column("industry", Text),
     Column("notes", Text),
     *_timestamps(),
+    *_who_added(),
 )
 
 contacts = Table(
@@ -77,6 +107,7 @@ contacts = Table(
     Column("organization_id", Integer, ForeignKey("organizations.id", ondelete="SET NULL"), index=True),
     Column("status", Text, nullable=False),
     *_timestamps(),
+    *_who_added(),
 )
 
 deals = Table(
@@ -93,6 +124,7 @@ deals = Table(
     Column("position", Integer, nullable=False),
     Column("notes", Text),
     *_timestamps(),
+    *_who_added(),
     CheckConstraint("value >= 0", name="deal_value_not_negative"),
     CheckConstraint("probability BETWEEN 0 AND 100", name="deal_probability_range"),
     Index("deals_stage_position", "stage", "position"),
@@ -112,6 +144,7 @@ activities = Table(
     Column("from_stage", Text),
     Column("to_stage", Text),
     *_timestamps(),
+    *_who_added(),
     # Every activity belongs to exactly one contact or exactly one deal (concern 5).
     CheckConstraint("(contact_id IS NULL) <> (deal_id IS NULL)", name="activity_has_one_owner"),
 )

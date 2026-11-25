@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import { dragTo, expect, test } from "./fixtures";
+import { dragTo, expect, signedInHeaders, test } from "./fixtures";
 import { inDays } from "./today";
 
 function column(page: Page, label: string) {
@@ -88,9 +88,10 @@ test("move a card with the keyboard", async ({ page }) => {
 });
 
 test("drag a card into an empty column", async ({ page }) => {
-  const deals = (await (await page.request.get("/api/deals")).json()) as { id: number; stage: string }[];
+  const headers = await signedInHeaders(page);
+  const deals = (await (await page.request.get("/api/deals", { headers })).json()) as { id: number; stage: string }[];
   for (const deal of deals.filter((d) => d.stage === "under_contract")) {
-    await page.request.post(`/api/deals/${deal.id}/move`, { data: { stage: "offer", index: 0 } });
+    await page.request.post(`/api/deals/${deal.id}/move`, { headers, data: { stage: "offer", index: 0 } });
   }
   await page.goto("/pipeline");
   const underContract = column(page, "Under Contract");

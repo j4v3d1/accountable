@@ -4,6 +4,8 @@ from sqlalchemy import Connection, delete, exists, func, select, update
 
 from app.activities import service as activities_service
 from app.contacts.schemas import ContactCreate
+from app.core import added_by
+from app.core.auth import User
 from app.core.db import insert_row
 from app.core.errors import Invalid, NotFound
 from app.core.tables import activities, contacts, deals, organizations
@@ -22,7 +24,12 @@ def _select():
         organizations.c.name.label("organization_name"),
         own.scalar_subquery().label("own_activity_at"),
         via_deals.scalar_subquery().label("deal_activity_at"),
-    ).select_from(contacts.outerjoin(organizations, contacts.c.organization_id == organizations.c.id))
+        *added_by.names(),
+    ).select_from(
+        added_by.join_names(
+            contacts.outerjoin(organizations, contacts.c.organization_id == organizations.c.id), contacts
+        )
+    )
 
 
 def _out(row) -> dict:
@@ -65,18 +72,19 @@ def _check_links(conn: Connection, values: dict) -> None:
         raise Invalid("organization_id", "That organization doesn't exist", organization_id)
 
 
-def create_contact(conn: Connection, data: ContactCreate) -> dict:
+def create_contact(conn: Connection, user: User, data: ContactCreate) -> dict:
     values = data.model_dump()
     _check_links(conn, values)
-    contact_id = insert_row(conn, contacts, **values)
+    contact_id = insert_row(conn, contacts, **values, **added_by.added_by(user))
     return get_contact(conn, contact_id)
 
 
-def update_contact(conn: Connection, contact_id: int, changes: dict) -> dict:
+def update_contact(conn: Connection, user: User, contact_id: int, changes: dict) -> dict:
     _exists(conn, contact_id)
     _check_links(conn, changes)
     if changes:
-        conn.execute(update(contacts).where(contacts.c.id == contact_id).values(**changes))
+        values = {**changes, **added_by.changed_by(user)}
+        conn.execute(update(contacts).where(contacts.c.id == contact_id).values(**values))
     return get_contact(conn, contact_id)
 
 

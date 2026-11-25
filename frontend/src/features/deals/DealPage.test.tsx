@@ -29,6 +29,8 @@ const maple: DealDetail = {
   late: false,
   created_at: "2026-10-01T09:00:00Z",
   updated_at: "2026-10-01T09:00:00Z",
+  created_by_name: "Sample data",
+  updated_by_name: "Sample data",
   contact: { id: 4, name: "Dana Whitfield" },
   organization: { id: 2, name: "Northgate Realty" },
   timeline: [
@@ -47,6 +49,8 @@ const maple: DealDetail = {
       to_stage: null,
       created_at: "2026-11-02T15:30:00Z",
       updated_at: "2026-11-02T15:30:00Z",
+      created_by_name: "Sample data",
+      updated_by_name: "Sample data",
     },
   ],
 };
@@ -96,6 +100,28 @@ describe("a deal's page", () => {
     expect(details().getByRole("link", { name: "Northgate Realty" })).toHaveAttribute("href", "/organizations/2");
     expect(details().getByText("Buyer wants a January move-in.")).toBeInTheDocument();
     expect(screen.getByText("Talked through the counter-offer")).toBeInTheDocument();
+  });
+
+  it("says who added the deal, who last changed it, and who added each timeline entry", async () => {
+    api({
+      "GET /deals/3": {
+        ...maple,
+        created_by_name: "Priya Shah",
+        updated_by_name: "jordan@example.com",
+        updated_at: "2026-11-12T15:00:00Z",
+        timeline: [{ ...maple.timeline[0], created_by_name: "Sam Okafor" }],
+      },
+    });
+    renderApp("/deals/3");
+
+    await screen.findByRole("heading", { level: 1, name: "142 Maple Ave purchase" });
+    expect(details().getByText(/^Added by/)).toHaveTextContent("Added by Priya Shah on Oct 1, 2026");
+    expect(details().getByText(/^Last changed by/)).toHaveTextContent(
+      "Last changed by jordan@example.com on Nov 12, 2026",
+    );
+    expect(screen.getByText("Talked through the counter-offer").closest("li")).toHaveTextContent(
+      /Nov 2, 2026.*Sam Okafor/,
+    );
   });
 
   it("says when a deal has no contact, organization or notes, and marks it late", async () => {

@@ -24,6 +24,8 @@ const followUp: Activity = {
   to_stage: null,
   created_at: "2026-11-20T15:00:00Z",
   updated_at: "2026-11-20T15:00:00Z",
+  created_by_name: "Sample data",
+  updated_by_name: "Sample data",
 };
 
 function renderFollowUps() {

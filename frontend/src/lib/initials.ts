@@ -29,3 +29,16 @@ export function avatarFor(
   if (!name) return null;
   return { initials: initials(name), tint: tintFor(name), name };
 }
+
+/**
+ * A person's initials (R55): the first letters of the first and last words of their
+ * name ("Maya Torres" is MT, "Cher" is C), or, for someone known only by their email,
+ * the first two letters before the @ (jordan@example.com is JO).
+ */
+export function personInitials(name: string, email: string | null): string {
+  if (email && name === email) return email.split("@")[0].slice(0, 2).toUpperCase();
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "";
+  const last = words.length > 1 ? words[words.length - 1][0] : "";
+  return (words[0][0] + last).toUpperCase();
+}

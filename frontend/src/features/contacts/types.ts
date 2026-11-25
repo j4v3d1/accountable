@@ -23,6 +23,8 @@ export interface Contact {
   last_activity_at: string | null;
   created_at: string;
   updated_at: string;
+  created_by_name: string;
+  updated_by_name: string;
 }
 
 export interface ContactDetail extends Contact {

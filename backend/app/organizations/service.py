@@ -3,6 +3,8 @@
 from sqlalchemy import Connection, delete, exists, func, select, update
 
 from app.contacts import service as contacts_service
+from app.core import added_by
+from app.core.auth import User
 from app.core.db import insert_row
 from app.core.errors import NotFound
 from app.core.tables import contacts, deals, organizations
@@ -20,7 +22,8 @@ def _select():
         organizations,
         contact_count.scalar_subquery().label("contact_count"),
         open_deal_count.scalar_subquery().label("open_deal_count"),
-    )
+        *added_by.names(),
+    ).select_from(added_by.join_names(organizations, organizations))
 
 
 def list_organizations(conn: Connection) -> list[dict]:
@@ -43,15 +46,16 @@ def _exists(conn: Connection, organization_id: int) -> None:
         raise NotFound("Organization not found")
 
 
-def create_organization(conn: Connection, data: OrganizationCreate) -> dict:
-    organization_id = insert_row(conn, organizations, **data.model_dump())
+def create_organization(conn: Connection, user: User, data: OrganizationCreate) -> dict:
+    organization_id = insert_row(conn, organizations, **data.model_dump(), **added_by.added_by(user))
     return get_organization(conn, organization_id)
 
 
-def update_organization(conn: Connection, organization_id: int, changes: dict) -> dict:
+def update_organization(conn: Connection, user: User, organization_id: int, changes: dict) -> dict:
     _exists(conn, organization_id)
     if changes:
-        conn.execute(update(organizations).where(organizations.c.id == organization_id).values(**changes))
+        values = {**changes, **added_by.changed_by(user)}
+        conn.execute(update(organizations).where(organizations.c.id == organization_id).values(**values))
     return get_organization(conn, organization_id)
 
 

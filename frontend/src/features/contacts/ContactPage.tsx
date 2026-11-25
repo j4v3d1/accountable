@@ -2,6 +2,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { money } from "../../lib/format";
+import { AddedBy } from "../../ui/AddedBy";
 import { PageHeader } from "../../ui/PageHeader";
 import { ErrorState, LoadingState } from "../../ui/States";
 import { Timeline } from "../activities/Timeline";
@@ -83,6 +84,7 @@ export function ContactPage() {
               <dt>Job title</dt>
               <dd>{contact.job_title ?? <span className="muted">Not set</span>}</dd>
             </dl>
+            <AddedBy record={contact} />
           </section>
           <section className="panel record-panel" aria-labelledby="contact-deals">
             <h2 className="section-title" id="contact-deals">

@@ -1,0 +1,25 @@
+# The Render web service (R64). The three Supabase settings are entered in Render's
+# dashboard (sync: false) and never written here.
+services:
+  - type: web
+    name: accountable
+    runtime: python
+    plan: free
+    # Nearest to the Supabase project. Change it if the project isn't in US East.
+    region: virginia
+    buildCommand: pip install uv && uv sync --frozen --no-dev && npm ci && npm run build --workspace frontend
+    startCommand: uv run --frozen --no-dev --directory backend uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    # Deploy only once CI has passed on the commit.
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.16
+      - key: TZ
+        value: America/New_York
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false

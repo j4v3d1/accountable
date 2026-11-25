@@ -26,6 +26,8 @@ export interface Deal {
   late: boolean;
   created_at: string;
   updated_at: string;
+  created_by_name: string;
+  updated_by_name: string;
 }
 
 export interface DealDetail extends Deal {

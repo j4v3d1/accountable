@@ -22,6 +22,8 @@ export interface Organization {
   open_deal_count: number;
   created_at: string;
   updated_at: string;
+  created_by_name: string;
+  updated_by_name: string;
 }
 
 export interface OrganizationDetail extends Organization {

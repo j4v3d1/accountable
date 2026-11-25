@@ -24,6 +24,29 @@ export const queryClient = new QueryClient({
 });
 
 const UNREACHABLE = "Can't reach Accountable's server. Is it running?";
+export const SESSION_ENDED = "Your session ended. Sign in again.";
+
+/** How requests are signed in. The auth feature sets it, so this file needs no area. */
+export interface AuthHooks {
+  /** The current session's token, or null when signed out. */
+  getToken: () => Promise<string | null>;
+  /** The API answered 401: the session has ended (R52). */
+  onSessionEnded: () => void;
+}
+
+const signedOut: AuthHooks = { getToken: async () => null, onSessionEnded: () => {} };
+let auth: AuthHooks = signedOut;
+
+export function configureAuth(hooks: AuthHooks | null) {
+  auth = hooks ?? signedOut;
+}
+
+async function headersFor(hasBody: boolean): Promise<Record<string, string>> {
+  const headers: Record<string, string> = hasBody ? { "Content-Type": "application/json" } : {};
+  const token = await auth.getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
 
 function messageFrom(status: number, body: unknown): string {
   // The dev proxy answers 502 to 504 when the backend isn't running.
@@ -39,13 +62,16 @@ function messageFrom(status: number, body: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-/** The one fetch wrapper. Sends and receives JSON, and throws ApiError on failure. */
+/**
+ * The one fetch wrapper. Sends the session's token, sends and receives JSON, and
+ * throws ApiError on failure. A 401 drops every cached record and ends the session (R52).
+ */
 export async function api<T>(path: string, options: { method?: string; body?: unknown } = {}): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`/api${path}`, {
       method: options.method ?? "GET",
-      headers: options.body === undefined ? undefined : { "Content-Type": "application/json" },
+      headers: await headersFor(options.body !== undefined),
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
     });
   } catch {
@@ -57,6 +83,11 @@ export async function api<T>(path: string, options: { method?: string; body?: un
     body = text ? JSON.parse(text) : null;
   } catch {
     if (response.ok) throw new ApiError(response.status, "The server sent an answer Accountable can't read.");
+  }
+  if (response.status === 401) {
+    queryClient.clear();
+    auth.onSessionEnded();
+    throw new ApiError(401, SESSION_ENDED, body);
   }
   if (!response.ok) {
     throw new ApiError(response.status, messageFrom(response.status, body), body);

@@ -30,6 +30,8 @@ function deal(overrides: Partial<Deal> & Pick<Deal, "id" | "name">): Deal {
     late: false,
     created_at: "2026-10-01T09:00:00Z",
     updated_at: "2026-10-01T09:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...overrides,
   };
 }
@@ -238,6 +240,8 @@ describe("adding and editing deals from the list", () => {
           last_activity_at: null,
           created_at: "2026-10-01T09:00:00Z",
           updated_at: "2026-10-01T09:00:00Z",
+          created_by_name: "Sample data",
+          updated_by_name: "Sample data",
         },
       ],
       "GET /organizations": [
@@ -251,6 +255,8 @@ describe("adding and editing deals from the list", () => {
           open_deal_count: 1,
           created_at: "2026-10-01T09:00:00Z",
           updated_at: "2026-10-01T09:00:00Z",
+          created_by_name: "Sample data",
+          updated_by_name: "Sample data",
         },
       ],
       "PATCH /deals/1": (body: unknown) => ({ ...deals[0], ...(body as object) }),

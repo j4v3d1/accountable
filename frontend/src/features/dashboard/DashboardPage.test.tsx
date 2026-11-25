@@ -21,6 +21,8 @@ function activity(id: number, description: string, extra: Partial<Activity> = {}
     to_stage: null,
     created_at: "2026-11-20T12:00:00Z",
     updated_at: "2026-11-20T12:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...extra,
   };
 }
@@ -86,7 +88,7 @@ function dashboard(extra: Partial<Dashboard> = {}): Dashboard {
         deal_id: 4,
         deal_name: "12 Birch Lane purchase",
       }),
-      activity(11, "Talked through the inspection", { type: "note" }),
+      activity(11, "Talked through the inspection", { type: "note", created_by_name: "Maya Torres" }),
       activity(12, "A note on nothing", { type: "email", contact_id: null, contact_name: null }),
     ],
     ...extra,
@@ -263,6 +265,16 @@ describe("Dashboard", () => {
     expect(within(items[0]).getByRole("link", { name: "12 Birch Lane purchase" })).toBeInTheDocument();
     expect(within(items[1]).getByRole("link", { name: "Rachel Kim" })).toBeInTheDocument();
     expect(within(items[2]).queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  it("names who added each recent activity after its date", async () => {
+    mockApi({ "GET /dashboard": dashboard() });
+    renderApp("/");
+
+    const recent = await screen.findByRole("region", { name: "Recent activity" });
+    const items = within(recent).getAllByRole("listitem");
+    expect(items[1]).toHaveTextContent(/Maya Torres$/);
+    expect(items[0]).toHaveTextContent(/Sample data$/);
   });
 
   it("explains each empty panel when there's nothing yet", async () => {

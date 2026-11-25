@@ -4,7 +4,8 @@ import { defineConfig } from "@playwright/test";
 import { TIME_ZONE, TODAY } from "./e2e/today";
 
 // The end-to-end tests run their own backend and frontend on test ports, against
-// a temporary database, so they never touch the agent's data or a running dev server.
+// a temporary database with local sign-in, so they never touch the agent's data, a
+// running dev server or Supabase (concerns 16 and 23).
 const API_PORT = 8100;
 const WEB_PORT = 5180;
 
@@ -37,10 +38,10 @@ export default defineConfig({
   webServer: [
     {
       command: `uv run --directory backend uvicorn app.main:app --host 127.0.0.1 --port ${API_PORT}`,
-      url: `http://127.0.0.1:${API_PORT}/api/stages`,
+      url: `http://127.0.0.1:${API_PORT}/api/health`,
       reuseExistingServer: false,
       timeout: 60_000,
-      env: { ACCOUNTABLE_DATABASE_URL: E2E_DATABASE_URL, ACCOUNTABLE_TODAY: TODAY, TZ: TIME_ZONE },
+      env: { DATABASE_URL: E2E_DATABASE_URL, ACCOUNTABLE_AUTH: "local", ACCOUNTABLE_TODAY: TODAY, TZ: TIME_ZONE },
     },
     {
       command: "npm run dev --workspace frontend",

@@ -4,6 +4,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 
+class Unauthorized(Exception):
+    """No token, or one that doesn't check out: 401, which the browser takes as signed out (R51)."""
+
+
+class SignInUnavailable(Exception):
+    """Supabase's signing keys couldn't be fetched: 503, so a network blip doesn't sign anyone out."""
+
+
 class NotFound(Exception):
     """A record that doesn't exist: 404."""
 
@@ -23,6 +31,14 @@ class Invalid(Exception):
 
 
 def add_error_handlers(app: FastAPI) -> None:
+    @app.exception_handler(Unauthorized)
+    async def _unauthorized(_request: Request, exc: Unauthorized):
+        return JSONResponse(status_code=401, content={"detail": str(exc)}, headers={"WWW-Authenticate": "Bearer"})
+
+    @app.exception_handler(SignInUnavailable)
+    async def _sign_in_unavailable(_request: Request, exc: SignInUnavailable):
+        return JSONResponse(status_code=503, content={"detail": str(exc)})
+
     @app.exception_handler(NotFound)
     async def _not_found(_request: Request, exc: NotFound):
         return JSONResponse(status_code=404, content={"detail": str(exc)})

@@ -34,6 +34,8 @@ function deal(name: string, stage: StageKey, position: number, extra: Partial<De
     late: false,
     created_at: "",
     updated_at: "",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...extra,
   };
 }

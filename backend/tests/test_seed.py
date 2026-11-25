@@ -1,13 +1,9 @@
 """R40 to R42: the sample data, the seed on first start and the reset command."""
 
-import os
 import re
-import subprocess
-import sys
 from collections import Counter
 from datetime import date, datetime, timedelta
 from itertools import pairwise
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,12 +11,11 @@ from sqlalchemy import func, select
 
 from app import seed
 from app.core.db import make_engine
-from app.core.tables import activities, contacts, deals, metadata, organizations
+from app.core.tables import SAMPLE_DATA_USER_ID, activities, contacts, deals, organizations, users
 from app.deals.stages import STAGE_KEYS
 from app.main import create_app
-from conftest import make_empty_database
+from conftest import make_empty_database, sign_in
 
-BACKEND_DIR = Path(__file__).resolve().parents[1]
 RESERVED = re.compile(r".*@(([a-z0-9-]+\.)*example\.(com|net|org)|[a-z0-9.-]+\.example)$")
 
 
@@ -51,40 +46,96 @@ def seeded(test_env, today):
 
 def test_a_new_database_is_seeded_on_first_start(test_env):
     with TestClient(create_app(), base_url="http://localhost") as client:
+        client.headers.update(sign_in(client))
         assert len(client.get("/api/organizations").json()) == 12
         assert len(client.get("/api/deals").json()) == 30
 
 
-def test_an_existing_database_is_not_reseeded_on_start(test_env):
+def test_a_migrated_database_with_no_records_is_seeded_on_start(test_env):
+    # Such as a new, empty Supabase database, once the migrations have run (R40).
     make_empty_database(test_env)
 
     with TestClient(create_app(), base_url="http://localhost") as client:
-        assert client.get("/api/organizations").json() == []
+        client.headers.update(sign_in(client))
+        assert len(client.get("/api/organizations").json()) == 12
 
 
-def test_the_seed_command_resets_the_data_while_the_app_holds_the_database_open(test_env):
+def test_a_database_with_any_record_is_not_reseeded_on_start(test_env):
+    make_empty_database(test_env)
+    with TestClient(create_app(seed_if_empty=False), base_url="http://localhost") as client:
+        client.headers.update(sign_in(client))
+        client.post("/api/contacts", json={"first_name": "Only", "last_name": "Contact"})
+
     with TestClient(create_app(), base_url="http://localhost") as client:
+        client.headers.update(sign_in(client))
+        assert client.get("/api/organizations").json() == []
+        assert [c["name"] for c in client.get("/api/contacts").json()] == ["Only Contact"]
+
+
+def test_the_seed_command_resets_the_data_while_the_app_holds_the_database_open(test_env, capsys):
+    with TestClient(create_app(), base_url="http://localhost") as client:
+        client.headers.update(sign_in(client))
         client.post("/api/organizations", json={"name": "Added by hand"})
         client.delete(f"/api/deals/{client.get('/api/deals').json()[0]['id']}")
         with client.app.state.engine.connect() as held_open:
             held_open.execute(select(1))
 
-            result = subprocess.run(
-                [sys.executable, "-m", "app.seed"],
-                cwd=BACKEND_DIR,
-                env=dict(os.environ),
-                capture_output=True,
-                text=True,
-                timeout=60,
-                check=False,
-            )
+            seed.main()
 
-        assert result.returncode == 0, result.stderr
-        assert "Sample data loaded" in result.stdout
+        assert "Sample data loaded" in capsys.readouterr().out
         names = [org["name"] for org in client.get("/api/organizations").json()]
         assert "Added by hand" not in names
         assert len(names) == 12
         assert len(client.get("/api/deals").json()) == 30
+
+
+def test_a_reset_keeps_the_people_and_credits_every_record_to_sample_data(test_env):
+    with TestClient(create_app(), base_url="http://localhost") as client:
+        client.headers.update(sign_in(client))
+        client.get("/api/me")
+        engine = client.app.state.engine
+
+        seed.reset(engine)
+
+        assert {u["id"] for u in rows(engine, users)} == {SAMPLE_DATA_USER_ID, "local-maya-torres"}
+        for table in (organizations, contacts, deals, activities):
+            for row in rows(engine, table):
+                assert (row["created_by"], row["updated_by"]) == (SAMPLE_DATA_USER_ID, SAMPLE_DATA_USER_ID)
+        sample = client.get("/api/deals").json()[0]
+        assert sample["created_by_name"] == "Sample data"
+
+
+LIVE_URL = "postgresql+psycopg://postgres.project:secret@aws-0-us-east-1.pooler.supabase.example:5432/postgres"
+
+
+@pytest.mark.parametrize("answer", ["no", "", "YES please", "y"])
+def test_against_a_database_that_is_not_sqlite_anything_but_yes_stops_the_seed(monkeypatch, capsys, answer):
+    monkeypatch.setenv("DATABASE_URL", LIVE_URL)
+    monkeypatch.setattr("builtins.input", lambda _prompt: answer)
+    monkeypatch.setattr(seed, "make_engine", lambda _url: pytest.fail("reached the database"))
+
+    with pytest.raises(SystemExit, match="Nothing changed"):
+        seed.main()
+
+    assert "This will delete every record in the database at aws-0-us-east-1.pooler.supabase.example." in (
+        capsys.readouterr().out
+    )
+
+
+def test_against_a_database_that_is_not_sqlite_yes_goes_ahead(capsys):
+    assert seed.confirm_reset(LIVE_URL, ask=lambda _prompt: " yes ")
+    assert "pooler.supabase.example" in capsys.readouterr().out
+
+
+def test_with_no_one_to_answer_the_seed_stops():
+    def no_input(_prompt):
+        raise EOFError
+
+    assert not seed.confirm_reset(LIVE_URL, ask=no_input)
+
+
+def test_the_local_file_is_reset_without_asking():
+    assert seed.confirm_reset("sqlite:///somewhere/accountable.db", ask=lambda _prompt: pytest.fail("asked"))
 
 
 def test_there_is_about_the_right_amount_of_data(seeded):
@@ -204,7 +255,7 @@ def test_two_runs_give_the_same_data(tmp_path, today):
     seed.reset(first)
     seed.reset(second)
 
-    for table in metadata.sorted_tables:
+    for table in (organizations, contacts, deals, activities):
         assert rows(first, table) == rows(second, table), table.name
 
 

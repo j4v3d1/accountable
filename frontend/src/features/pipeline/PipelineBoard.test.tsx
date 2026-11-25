@@ -48,6 +48,8 @@ describe("Board", () => {
         late: false,
         created_at: "2026-01-01T00:00:00Z",
         updated_at: "2026-01-01T00:00:00Z",
+        created_by_name: "Sample data",
+        updated_by_name: "Sample data",
       },
     ]);
 

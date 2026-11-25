@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures";
+import { expect, signedInHeaders, test } from "./fixtures";
 
 // Every page in light mode must look exactly as it did before dark mode, apart from
 // the dark mode button, which is masked (concern 15). Today's date, the clock and
@@ -22,7 +22,7 @@ const PAGES: { name: string; path: string; heading: string }[] = [
 
 /** The record's heading, read from the API, which also proves the record exists. */
 async function recordHeading(page: Page, path: string): Promise<string> {
-  const response = await page.request.get(`/api${path}`);
+  const response = await page.request.get(`/api${path}`, { headers: await signedInHeaders(page) });
   expect(response.ok(), `${path} exists in the sample data`).toBe(true);
   const record = await response.json();
   return record.name ?? `${record.first_name} ${record.last_name}`;

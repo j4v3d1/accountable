@@ -23,6 +23,8 @@ export function RecentActivity({ activities }: { activities: Activity[] }) {
                   <RecordLink activity={activity} />
                   <span aria-hidden="true">·</span>
                   <time dateTime={activity.occurred_at}>{formatWhen(activity.occurred_at)}</time>
+                  <span aria-hidden="true">·</span>
+                  <span className="timeline-by">{activity.created_by_name}</span>
                 </p>
               </div>
             </li>

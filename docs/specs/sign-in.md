@@ -54,6 +54,6 @@ Organizations, contacts, deals and activities each gain `created_by` and `update
 | `POST /api/auth/local` | Local mode only (404 otherwise). Body `{email, password}`; returns `{token}` for a made-up teammate, or 401 |
 | `GET /api/me` | The signed-in person: `{id, name, email, initials}` |
 
-Every other route needs `Authorization: Bearer <token>`. Every record and activity in a response carries `created_by_name`, `updated_by_name`, `created_at` and `updated_at`.
+Every other route needs `Authorization: Bearer <token>`. If Supabase's signing keys can't be fetched, the route answers 503 rather than 401, so a network blip doesn't sign anyone out. Every record and activity in a response carries `created_by_name`, `updated_by_name`, `created_at` and `updated_at`. A new record's `updated_at` equals its `created_at`, so "Last changed by" (R57) shows once `updated_at` has moved on. A deal that only shifts up or down its column because another deal moved isn't changed.
 
 In Supabase mode the browser signs in, renews the session and signs out directly with Supabase Auth, using the project URL and publishable key from `/api/config`. The backend only checks the tokens.

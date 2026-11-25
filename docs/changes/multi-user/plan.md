@@ -28,6 +28,11 @@ A few files wire the parts together: `backend/app/main.py`, `frontend/src/App.ts
 | `backend/tests/conftest.py` | `DATABASE_URL`, `ACCOUNTABLE_AUTH=local`, a signed-in client by default (Maya Torres), a signed-out client, a second teammate, and a fake JWKS key set made once per session |
 | `backend/tests/test_config.py`, `test_hosts.py`, `test_seed.py`, `test_persistence.py`, `test_transactions.py` | Follow the renamed setting and the migrations; Render hostname; the seed's "yes" check |
 | `backend/tests/test_auth.py`, `test_account.py`, `test_migrations.py`, `test_signed_out.py` (new) | See Proof |
+| `backend/migrations/script.py.mako` (new, added in the build) | The template `alembic revision` uses for the next migration |
+| `backend/app/account/schemas.py` (new, added in the build) | The account endpoints' response shapes, as in the other areas |
+| `backend/tests/test_frontend_files.py` (new, added in the build) | The built frontend and its `index.html` fallback, signed out; unknown `/api/` addresses stay 404 |
+
+Added in the build: `errors.py` also has a 503 for when Supabase's keys can't be fetched, so a network blip doesn't sign anyone out. `create_app(seed_if_empty=False)` lets tests start with a database that has no records, since R40 now seeds any such database. `conftest.py` fails any test whose setup and run take a second or more (R66). A new row's `updated_at` defaults to its `created_at` (`tables.py`), and renumbering a column keeps `updated_at` (`deals/service.py`), so "Last changed by" means a real change. Row-level security is turned on in `0002`, not `env.py`, so each migration turns it on for the tables it adds (concern 20). The seed test runs `seed.main()` in the test's process rather than a subprocess, to stay under a second.
 
 ### Part 2: Backend who-added-it in every area
 
@@ -40,6 +45,9 @@ A few files wire the parts together: `backend/app/main.py`, `frontend/src/App.ts
 | `backend/app/dashboard/routes.py`, `schemas.py`, `service.py` | Recent activity carries `created_by_name`; routes take `CurrentUser` |
 | `backend/tests/test_lists.py`, `test_activities.py`, `test_deal_rules.py`, `test_move.py`, `test_deletes.py`, `test_validation.py`, `test_dashboard.py`, `test_stages.py` | Keep passing with the signed-in client; assert the new fields where the area adds them |
 | `backend/tests/test_who_added.py` (new) | See Proof |
+| `backend/app/core/added_by.py` (new, added in the build) | The who-added values to save and the joins for the two names, shared by the four areas |
+
+The dashboard routes need no `CurrentUser`: every router but the public one is included with the sign-in dependency in `main.py`, and the dashboard writes nothing.
 
 ### Part 3: Frontend sign-in and the app shell
 
@@ -57,6 +65,8 @@ A few files wire the parts together: `backend/app/main.py`, `frontend/src/App.ts
 | `frontend/src/lib/initials.ts` | Initials from a display name or an email (R55) |
 | `frontend/vite.config.ts` | No change expected; listed so nobody else edits it |
 | Tests beside the code: `SignInPage.test.tsx`, `session.test.ts`, `RequireSignIn.test.tsx`, `client.test.ts`, `client.errors.test.ts`, `App.test.tsx`, `initials.test.ts`, `src/test/renderApp.tsx` (renders signed in by default) | See Proof |
+
+As built: `RequireSignIn` wraps the routes in `App.tsx`, so `main.tsx` doesn't change. `client.ts` gets the token through `configureAuth`, which the session sets, so `api/` imports no area. `TopBar` and `AppLayout` take the search box and the user menu as props from `App.tsx`, so `ui/` imports no area either. `frontend/package.json` gains a `build` script for `npm start` and Render. `vite.config.ts` sets `testTimeout: 1000`, so a unit test that takes a second fails (R66).
 
 ### Part 4: Frontend who-added-it display
 
@@ -86,6 +96,9 @@ A few files wire the parts together: `backend/app/main.py`, `frontend/src/App.ts
 | `e2e/sign-in.spec.ts`, `who-added.spec.ts` (new) | See Proof |
 | `.mcp.json` | The Supabase MCP server, read-only and limited to the project, for the live database check |
 | `.claude/agents/ui-check.md` | Sign in as a made-up teammate before checking pages (R48) |
+| `scripts/dev-api.mjs`, `scripts/env-file.mjs` (new, added in the build) | `dev:api` sets `ACCOUNTABLE_AUTH=local` in Node, so it works on Windows too; `start.mjs` and `seed-live.mjs` share the `.env` reading |
+
+Added in the build: `e2e/fixtures.ts` has `signedInHeaders(page)` for the specs that call the API directly (`pipeline.spec.ts` and `light-mode.spec.ts`).
 
 ### Part 6: Search
 

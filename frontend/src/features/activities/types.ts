@@ -15,6 +15,8 @@ export interface Activity {
   to_stage: string | null;
   created_at: string;
   updated_at: string;
+  created_by_name: string;
+  updated_by_name: string;
 }
 
 export interface ActivityInput {

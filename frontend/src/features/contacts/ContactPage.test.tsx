@@ -29,6 +29,8 @@ function deal(id: number, name: string, fields: Partial<Deal> = {}): Deal {
     late: false,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...fields,
   };
 }
@@ -49,6 +51,8 @@ function contactDetail(fields: Partial<ContactDetail> = {}): ContactDetail {
     last_activity_at: null,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     deals: [deal(5, "12 Elm Street purchase")],
     timeline: [],
     ...fields,
@@ -79,6 +83,18 @@ describe("a contact's page", () => {
     expect(deals.getByText("$485,000")).toBeInTheDocument();
     expect(await deals.findByText("Offer")).toBeInTheDocument();
     expect(screen.getByRole("main")).toHaveTextContent("First-time buyer");
+  });
+
+  it("says a sample contact was added by Sample data", async () => {
+    mockApi({
+      "GET /contacts/3": contactDetail({ created_at: "2026-06-01T15:00:00Z", updated_at: "2026-06-01T15:00:00Z" }),
+      "GET /stages": stages,
+    });
+    renderApp("/contacts/3");
+
+    await screen.findByRole("heading", { level: 1, name: "Lucy Chen" });
+    expect(details().getByText(/^Added by/)).toHaveTextContent("Added by Sample data on Jun 1, 2026");
+    expect(details().queryByText(/^Last changed by/)).not.toBeInTheDocument();
   });
 
   it("says which details aren't set and when there are no deals", async () => {

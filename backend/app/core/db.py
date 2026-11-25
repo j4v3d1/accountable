@@ -1,12 +1,16 @@
-"""The engine, and one database transaction per request."""
+"""The engine, the migrations, and one database transaction per request."""
 
 from collections.abc import Iterator
 from typing import Annotated
 
+from alembic import command
+from alembic.config import Config
 from fastapi import Depends, Request
-from sqlalchemy import Connection, Engine, Table, create_engine, event, insert
+from sqlalchemy import Connection, Engine, Table, create_engine, event, insert, inspect
 
-from app.core.tables import metadata
+from app.core.config import BACKEND_DIR
+
+BASELINE_REVISION = "0001"
 
 
 def make_engine(url: str) -> Engine:
@@ -23,8 +27,32 @@ def make_engine(url: str) -> Engine:
     return create_engine(url)
 
 
-def create_tables(engine: Engine) -> None:
-    metadata.create_all(engine)
+def _made_before_migrations(conn: Connection) -> bool:
+    tables = inspect(conn).get_table_names()
+    return "organizations" in tables and "alembic_version" not in tables
+
+
+def run_migrations(engine: Engine) -> None:
+    """Bring the database up to the latest migration (R65). A database made before
+    migrations existed is marked as at the baseline first, so its data is kept."""
+    alembic_config = Config(str(BACKEND_DIR / "alembic.ini"))
+    with engine.connect() as conn:
+        sqlite = conn.dialect.name == "sqlite"
+        # SQLite rebuilds a table to change a column. With foreign keys on, dropping the
+        # old copy would unlink or delete the rows that point at it. Set outside a transaction.
+        if sqlite:
+            conn.exec_driver_sql("PRAGMA foreign_keys = OFF")
+        try:
+            alembic_config.attributes["connection"] = conn
+            if _made_before_migrations(conn):
+                command.stamp(alembic_config, BASELINE_REVISION)
+            command.upgrade(alembic_config, "head")
+            conn.commit()
+        finally:
+            conn.rollback()
+            if sqlite:
+                conn.exec_driver_sql("PRAGMA foreign_keys = ON")
+                conn.commit()
 
 
 def insert_row(conn: Connection, table: Table, **values) -> int:

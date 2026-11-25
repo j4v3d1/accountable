@@ -21,6 +21,8 @@ export default defineConfig({
     setupFiles: ["src/test/setup.ts"],
     // A stray it.only would quietly skip the other tests in its file, so it's always an error.
     allowOnly: false,
+    // Every unit test runs in under a second, because CI runs on a much slower machine (R66).
+    testTimeout: 1000,
     // `npm test` fails when unit tests cover less than 80% of the code.
     coverage: {
       provider: "v8",

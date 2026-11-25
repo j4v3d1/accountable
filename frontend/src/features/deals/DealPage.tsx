@@ -2,6 +2,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { money, percent } from "../../lib/format";
+import { AddedBy } from "../../ui/AddedBy";
 import { PageHeader } from "../../ui/PageHeader";
 import { ErrorState, LoadingState } from "../../ui/States";
 import { Timeline } from "../activities/Timeline";
@@ -92,6 +93,7 @@ export function DealPage() {
             <dt>Notes</dt>
             <dd className="notes">{deal.notes ?? <span className="muted">No notes</span>}</dd>
           </dl>
+          <AddedBy record={deal} />
         </section>
         <div className="record-main">
           <Timeline entries={deal.timeline} owner={{ deal_id: deal.id }} />

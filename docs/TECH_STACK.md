@@ -7,7 +7,7 @@ The frontend gets its data from the backend's JSON API. The backend keeps the da
 
 Prefer popular, well-supported libraries to custom code, such as for the data tables, the charts and the drag-and-drop pipeline. Don't hand-roll what a mature library does well.
 
-For now it runs locally. Later, Supabase will provide sign-in and the database, and the app will be deployed to Render.
+Supabase provides sign-in (Supabase Auth, through `@supabase/supabase-js` in the browser and PyJWT in the backend) and the live database (Postgres, reached with psycopg 3, with Alembic migrations), and the app is deployed to Render as one web service; `npm run dev` and the tests still run on a local SQLite file with local sign-in.
 
 Commands are npm scripts in a `package.json` at the repo root, with `frontend/` as an npm workspace, so they work the same on Mac, Linux and Windows:
 

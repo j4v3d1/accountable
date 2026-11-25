@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Response
 
+from app.core.auth import CurrentUser
 from app.core.db import Conn
 from app.organizations import service
 from app.organizations.schemas import (
@@ -19,8 +20,8 @@ def list_organizations(conn: Conn):
 
 
 @router.post("", status_code=201, response_model=OrganizationDetail)
-def create_organization(body: OrganizationCreate, conn: Conn):
-    return service.create_organization(conn, body)
+def create_organization(body: OrganizationCreate, conn: Conn, user: CurrentUser):
+    return service.create_organization(conn, user, body)
 
 
 @router.get("/{organization_id}", response_model=OrganizationDetail)
@@ -29,8 +30,8 @@ def get_organization(organization_id: int, conn: Conn):
 
 
 @router.patch("/{organization_id}", response_model=OrganizationDetail)
-def update_organization(organization_id: int, body: OrganizationUpdate, conn: Conn):
-    return service.update_organization(conn, organization_id, body.changes())
+def update_organization(organization_id: int, body: OrganizationUpdate, conn: Conn, user: CurrentUser):
+    return service.update_organization(conn, user, organization_id, body.changes())
 
 
 @router.delete("/{organization_id}", status_code=204)

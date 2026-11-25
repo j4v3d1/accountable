@@ -4,6 +4,8 @@ the late flag (R16), stage-change entries (R19) and positions in a column (R23, 
 from sqlalchemy import Connection, case, delete, exists, func, select, update
 
 from app.activities import service as activities_service
+from app.core import added_by
+from app.core.auth import User
 from app.core.config import today
 from app.core.db import insert_row
 from app.core.errors import Invalid, NotFound
@@ -16,10 +18,11 @@ BOARD_ORDER = (case({key: index for index, key in enumerate(STAGE_KEYS)}, value=
 
 def _select():
     contact_name = (contacts.c.first_name + " " + contacts.c.last_name).label("contact_name")
-    return select(deals, contact_name, organizations.c.name.label("organization_name")).select_from(
-        deals.outerjoin(contacts, deals.c.contact_id == contacts.c.id).outerjoin(
-            organizations, deals.c.organization_id == organizations.c.id
-        )
+    linked = deals.outerjoin(contacts, deals.c.contact_id == contacts.c.id).outerjoin(
+        organizations, deals.c.organization_id == organizations.c.id
+    )
+    return select(deals, contact_name, organizations.c.name.label("organization_name"), *added_by.names()).select_from(
+        added_by.join_names(linked, deals)
     )
 
 
@@ -81,21 +84,26 @@ def _column(conn: Connection, stage: str, leave_out: int | None = None) -> list[
 def _renumber(conn: Connection, ids: list[int]) -> None:
     """Positions 0, 1, 2... in the order given, so a column has no gaps or duplicates."""
     for position, deal_id in enumerate(ids):
-        conn.execute(update(deals).where(deals.c.id == deal_id).values(position=position))
+        # Moving up or down a column because of another deal isn't a change to this one.
+        conn.execute(
+            update(deals).where(deals.c.id == deal_id).values(position=position, updated_at=deals.c.updated_at)
+        )
 
 
 def _push_down(conn: Connection, stage: str) -> None:
-    conn.execute(update(deals).where(deals.c.stage == stage).values(position=deals.c.position + 1))
+    conn.execute(
+        update(deals).where(deals.c.stage == stage).values(position=deals.c.position + 1, updated_at=deals.c.updated_at)
+    )
 
 
-def create_deal(conn: Connection, data: DealCreate) -> dict:
+def create_deal(conn: Connection, user: User, data: DealCreate) -> dict:
     values = data.model_dump()
     _check_links(conn, values)
     if values["probability"] is None:
         values["probability"] = BY_KEY[values["stage"]].probability
     # A new deal goes to the top of its column (R25).
     _push_down(conn, values["stage"])
-    deal_id = insert_row(conn, deals, **values, position=0)
+    deal_id = insert_row(conn, deals, **values, position=0, **added_by.added_by(user))
     return get_deal(conn, deal_id)
 
 
@@ -110,7 +118,7 @@ def _stage_change_values(current, new_stage: str, changes: dict) -> dict:
     return values
 
 
-def update_deal(conn: Connection, deal_id: int, changes: dict) -> dict:
+def update_deal(conn: Connection, user: User, deal_id: int, changes: dict) -> dict:
     current = _current(conn, deal_id)
     _check_links(conn, changes)
     new_stage = changes.get("stage", current["stage"])
@@ -119,20 +127,22 @@ def update_deal(conn: Connection, deal_id: int, changes: dict) -> dict:
         _renumber(conn, _column(conn, current["stage"], leave_out=deal_id))
         _push_down(conn, new_stage)
         changes["position"] = 0
-        activities_service.log_stage_change(conn, deal_id, current["stage"], new_stage)
+        activities_service.log_stage_change(conn, user, deal_id, current["stage"], new_stage)
     if changes:
-        conn.execute(update(deals).where(deals.c.id == deal_id).values(**changes))
+        values = {**changes, **added_by.changed_by(user)}
+        conn.execute(update(deals).where(deals.c.id == deal_id).values(**values))
     return get_deal(conn, deal_id)
 
 
-def move_deal(conn: Connection, deal_id: int, stage: str, index: int) -> list[dict]:
+def move_deal(conn: Connection, user: User, deal_id: int, stage: str, index: int) -> list[dict]:
     """Put the deal at `index` in `stage`'s column, renumbering both columns. Returns the whole board."""
     current = _current(conn, deal_id)
+    values = added_by.changed_by(user)
     if stage != current["stage"]:
         _renumber(conn, _column(conn, current["stage"], leave_out=deal_id))
-        values = _stage_change_values(current, stage, {})
-        conn.execute(update(deals).where(deals.c.id == deal_id).values(**values))
-        activities_service.log_stage_change(conn, deal_id, current["stage"], stage)
+        values |= _stage_change_values(current, stage, {})
+        activities_service.log_stage_change(conn, user, deal_id, current["stage"], stage)
+    conn.execute(update(deals).where(deals.c.id == deal_id).values(**values))
     column = _column(conn, stage, leave_out=deal_id)
     column.insert(min(index, len(column)), deal_id)
     _renumber(conn, column)

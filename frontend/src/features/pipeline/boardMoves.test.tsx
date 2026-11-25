@@ -30,6 +30,8 @@ function deal(id: number, name: string, stage: StageKey, position: number, value
     late: false,
     created_at: "2026-10-01T00:00:00Z",
     updated_at: "2026-10-01T00:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
   };
 }
 
@@ -299,7 +301,7 @@ describe("Dragging a card with the mouse", () => {
       { x: 340, y: 230 },
       { x: 150, y: 290 },
     ]);
-    expect(requests.some((r) => r.path === "/deals/3/move")).toBe(true);
+    await waitFor(() => expect(requests.some((r) => r.path === "/deals/3/move")).toBe(true));
     fireEvent.click(screen.getByRole("button", { name: /Harbor Point/ }));
 
     await new Promise((resolve) => setTimeout(resolve, 50));

@@ -23,6 +23,8 @@ function contact(overrides: Partial<Contact> & Pick<Contact, "id" | "first_name"
     last_activity_at: null,
     created_at: "2026-10-01T09:00:00Z",
     updated_at: "2026-10-01T09:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...overrides,
   };
 }
@@ -43,6 +45,8 @@ function deal(overrides: Partial<Deal> & Pick<Deal, "id" | "name">): Deal {
     late: false,
     created_at: "2026-10-01T09:00:00Z",
     updated_at: "2026-10-01T09:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...overrides,
   };
 }
@@ -57,6 +61,8 @@ const northgate: OrganizationDetail = {
   open_deal_count: 2,
   created_at: "2026-10-01T09:00:00Z",
   updated_at: "2026-10-01T09:00:00Z",
+  created_by_name: "Sample data",
+  updated_by_name: "Sample data",
   contacts: [
     contact({ id: 4, first_name: "Dana", last_name: "Whitfield", job_title: "Broker", status: "customer" }),
     contact({ id: 5, first_name: "Luis", last_name: "Ortega", email: "luis@northgate.example.com" }),
@@ -98,6 +104,25 @@ describe("an organization's page", () => {
     expect(website).toHaveAttribute("href", "https://northgaterealty.example.com");
     expect(website).toHaveAttribute("target", "_blank");
     expect(details.getByText("Refers most of our buyers.")).toBeInTheDocument();
+  });
+
+  it("says at the bottom of the details who added it and who last changed it", async () => {
+    api({
+      "GET /organizations/1": {
+        ...northgate,
+        created_by_name: "Maya Torres",
+        updated_by_name: "Sam Okafor",
+        created_at: "2026-11-03T15:00:00Z",
+        updated_at: "2026-11-20T15:00:00Z",
+      },
+    });
+    renderApp("/organizations/1");
+
+    await screen.findByRole("heading", { level: 1, name: "Northgate Realty" });
+    expect(section("Details").getByText(/^Added by/)).toHaveTextContent("Added by Maya Torres on Nov 3, 2026");
+    expect(section("Details").getByText(/^Last changed by/)).toHaveTextContent(
+      "Last changed by Sam Okafor on Nov 20, 2026",
+    );
   });
 
   it("lists its contacts with their job title or email and status", async () => {

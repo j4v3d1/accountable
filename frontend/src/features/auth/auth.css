@@ -1,0 +1,65 @@
+/* The sign-in screen (R49): a card centred on the page, with no rail and no top bar. */
+.sign-in-page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  background: var(--page);
+}
+
+.sign-in-card {
+  width: 400px;
+  max-width: 100%;
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sign-in-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--sea-green);
+  color: var(--midnight);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 19px;
+}
+
+.sign-in-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.sign-in-local {
+  font-size: 13px;
+  color: var(--cerulean-text);
+}
+
+.sign-in-notice,
+.sign-in-problem {
+  font-size: 13px;
+  color: var(--raspberry-text);
+}
+
+.sign-in-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sign-in-button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.sign-in-help {
+  font-size: 13px;
+  color: var(--ink-muted);
+}

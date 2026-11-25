@@ -49,3 +49,5 @@ class ActivityOut(BaseModel):
     to_stage: str | None
     created_at: datetime
     updated_at: datetime
+    created_by_name: str
+    updated_by_name: str

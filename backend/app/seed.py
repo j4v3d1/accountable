@@ -1,8 +1,11 @@
 """The sample data (R42), and the reset command (R41).
 
 Run as a module (`npm run seed`, or `uv run --directory backend python -m app.seed`),
-it empties every table and refills it in one transaction. It never deletes the
-database file, so it's safe while the app is running.
+it empties every record table and refills it in one transaction. It keeps `users`,
+and never deletes the database file, so it's safe while the app is running. Against
+a database that isn't SQLite, such as Supabase's, it asks for "yes" first (R41).
+
+Every sample record is credited to the reserved "Sample data" person (concern 18).
 
 Everything is set in the fictional Cedar Bay metro area. Names are invented, emails
 use reserved domains and phone numbers use the fictional 555-01xx range. All dates
@@ -12,18 +15,21 @@ reset on the same day gives the same result.
 
 import calendar
 import random
+from collections.abc import Callable
 from datetime import date, datetime, time, timedelta
 from itertools import pairwise
 from typing import NamedTuple, TypedDict
 
 from sqlalchemy import Connection, Engine, delete, insert
+from sqlalchemy.engine import make_url
 
 from app.core import config
-from app.core.db import create_tables, insert_row, make_engine
-from app.core.tables import activities, contacts, deals, organizations
+from app.core.db import insert_row, make_engine, run_migrations
+from app.core.tables import SAMPLE_DATA_USER_ID, activities, contacts, deals, organizations
 from app.deals.stages import BY_KEY, CLOSED_STAGES, STAGE_KEYS
 
 RANDOM_SEED = 2026
+ADDED_BY_SAMPLE_DATA = {"created_by": SAMPLE_DATA_USER_ID, "updated_by": SAMPLE_DATA_USER_ID}
 
 # key, name, industry, website, notes
 ORGANIZATIONS = [
@@ -306,6 +312,8 @@ class ActivityRow(TypedDict):
     to_stage: str | None
     created_at: datetime
     updated_at: datetime
+    created_by: str
+    updated_by: str
 
 
 def activity_row(
@@ -332,6 +340,8 @@ def activity_row(
         "to_stage": to_stage,
         "created_at": occurred_at,
         "updated_at": occurred_at,
+        "created_by": SAMPLE_DATA_USER_ID,
+        "updated_by": SAMPLE_DATA_USER_ID,
     }
 
 
@@ -348,6 +358,7 @@ def _load_organizations(conn: Connection, today: date) -> dict[str, int]:
             notes=notes,
             created_at=created,
             updated_at=created,
+            **ADDED_BY_SAMPLE_DATA,
         )
     return org_ids
 
@@ -377,6 +388,7 @@ def _load_contacts(
             status=status,
             created_at=created,
             updated_at=created,
+            **ADDED_BY_SAMPLE_DATA,
         )
         contact_ids[f"{first} {last}"] = contact_id
         first_names[contact_id] = first
@@ -458,6 +470,7 @@ def _load_deals(
             notes=None,
             created_at=created,
             updated_at=move_times[-1] if move_times else created,
+            **ADDED_BY_SAMPLE_DATA,
         )
         deal_ids[plan.name] = deal_id
         for (from_stage, to_stage), when in zip(pairwise(plan.path), move_times, strict=True):
@@ -548,16 +561,31 @@ def load(conn: Connection, today: date) -> dict:
 
 
 def reset(engine: Engine) -> dict:
-    """Empty every table and load the sample data, in one transaction."""
-    create_tables(engine)
+    """Empty every record table and load the sample data, in one transaction. `users` is kept."""
+    run_migrations(engine)
     with engine.begin() as conn:
         for table in (activities, deals, contacts, organizations):
             conn.execute(delete(table))
         return load(conn, config.today())
 
 
+def confirm_reset(url: str, ask: Callable[[str], str]) -> bool:
+    """The local SQLite file is reset straight away. Any other database, such as the
+    live one on Supabase, only after the person types "yes" (R41)."""
+    if config.is_sqlite(url):
+        return True
+    print(f"This will delete every record in the database at {make_url(url).host}.")
+    try:
+        return ask('Type "yes" to go on: ').strip() == "yes"
+    except EOFError:
+        return False
+
+
 def main() -> None:
-    engine = make_engine(config.database_url())
+    url = config.database_url()
+    if not confirm_reset(url, input):
+        raise SystemExit("Nothing changed.")
+    engine = make_engine(url)
     counts = reset(engine)
     engine.dispose()
     print(

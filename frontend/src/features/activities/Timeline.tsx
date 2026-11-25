@@ -74,6 +74,8 @@ export function Timeline({ entries, owner, showDealNames }: Props) {
                     </>
                   )}
                   <time dateTime={activity.occurred_at}>{formatWhen(activity.occurred_at)}</time>
+                  <span aria-hidden="true"> · </span>
+                  <span className="timeline-by">{activity.created_by_name}</span>
                   <FollowUpTag activity={activity} />
                 </p>
               </div>

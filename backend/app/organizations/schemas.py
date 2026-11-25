@@ -37,6 +37,8 @@ class OrganizationOut(BaseModel):
     open_deal_count: int
     created_at: datetime
     updated_at: datetime
+    created_by_name: str
+    updated_by_name: str
 
 
 class OrganizationDetail(OrganizationOut):

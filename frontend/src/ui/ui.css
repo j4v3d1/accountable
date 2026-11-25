@@ -658,3 +658,17 @@ textarea.input {
 .data-table td {
   min-width: 108px;
 }
+
+/* At the bottom of a record's details panel (R57). */
+.added-by {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.added-by-name {
+  color: var(--ink);
+}

@@ -148,3 +148,20 @@ Tried once each (2026-11-25): ui-check on the dashboard and pipeline found nothi
 ## Multi-user design (2026-11-25, `multi-user` branch)
 
 The spec now describes sign-in, search and the user menu as they'll be once `multi-user` merges. Two new area files: `docs/specs/sign-in.md` (R49 to R57, concerns 16 to 18) and `docs/specs/search.md` (R58 to R62, concern 19). `shared.md`, `running.md` (R63 to R66, concern 23), `architecture.md` (concerns 20 to 22), `visual-design.md` and the record-page requirements changed to match, and `docs/spec.md`'s summary and index with them. No code yet; `plan.md` comes next.
+
+## Multi-user build, Phase 1: sign-in and the database (2026-11-25, `multi-user` branch)
+
+Built from `docs/changes/multi-user/plan.md`, steps 1 to 4. Not committed yet.
+
+- **Backend:** Alembic migrations run on every start (`0001` baseline, `0002` users, who-added columns and row-level security on Postgres); a database from before migrations is marked at the baseline first. A copy of the real `backend/data/accountable.db` migrated with every row and link kept (12 organizations, 40 contacts, 30 deals, 177 activities), all credited to "Sample data". `DATABASE_URL` replaces `ACCOUNTABLE_DATABASE_URL`. Every route but `/api/config`, `/api/health` and local `/api/auth/local` needs a token, checked against Supabase's public keys or, in local mode, a key made at startup. Every record and activity carries who added and last changed it. A database with no records is seeded on start. `npm run seed` asks for "yes" against anything but SQLite. FastAPI serves the built frontend with an `index.html` fallback.
+- **Frontend:** the sign-in screen at every address while signed out, local and Supabase sessions, the token on every request, "Your session ended. Sign in again." after a 401, a 64px top bar (empty until Phases 2 and 3), and "Added by" / "Last changed by" on record pages, with names in timelines and recent activity.
+- **Running:** `npm run dev` uses local sign-in (`scripts/dev-api.mjs`); `npm start` and `npm run seed:live` read `.env` and name any missing setting; `render.yaml` and `.env.example` added. The end-to-end tests sign in as Maya Torres through the sign-in screen.
+- **Tests:** 420 backend (99% coverage), 315 frontend (98%), and new end-to-end `sign-in.spec.ts` and `who-added.spec.ts`. Every unit test now fails at a second or more (R66).
+- **Checks:** `npm run check` passes except the 10 light-mode screenshots, which differ only by the new top bar moving each page down 64px and the names in recent activity. They're retaken in Phase 3 (plan step 12), once the top bar holds the search box and the user menu.
+
+Waiting on the person: plan step 5 (fill in `.env`, add two teammates in Supabase) and step 6 (`npm start` against Supabase).
+
+Notes for setting up Supabase and Render:
+
+- `DATABASE_URL` must be Supabase's **session pooler** address (port 5432). The direct connection is IPv6 only on the free plan, and Render can't reach it.
+- `render.yaml` sets the region to `virginia`. Change it if the Supabase project isn't in US East.

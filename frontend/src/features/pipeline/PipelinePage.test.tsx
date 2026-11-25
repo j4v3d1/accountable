@@ -34,6 +34,8 @@ function deal(id: number, name: string, stage: StageKey, position: number, extra
     late: false,
     created_at: "2026-10-01T00:00:00Z",
     updated_at: "2026-10-01T00:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...extra,
   };
 }

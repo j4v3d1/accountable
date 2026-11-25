@@ -4,7 +4,10 @@ version = "0.1.0"
 description = "Accountable, a real estate sales CRM"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "alembic>=1.20.1",
     "fastapi>=0.165.0",
+    "psycopg[binary]>=3.3.9",
+    "pyjwt[crypto]>=2.15.1",
     "sqlalchemy>=2.1.9",
     "uvicorn[standard]>=0.54.0",
 ]

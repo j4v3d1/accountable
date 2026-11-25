@@ -64,6 +64,8 @@ class DealOut(BaseModel):
     late: bool
     created_at: datetime
     updated_at: datetime
+    created_by_name: str
+    updated_by_name: str
 
 
 class DealDetail(DealOut):

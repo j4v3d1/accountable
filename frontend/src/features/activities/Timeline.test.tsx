@@ -21,6 +21,8 @@ function activity(id: number, description: string, fields: Partial<Activity> = {
     to_stage: null,
     created_at: "2026-11-20T15:00:00Z",
     updated_at: "2026-11-20T15:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...fields,
   };
 }
@@ -41,6 +43,8 @@ function lucy(timeline: Activity[]): ContactDetail {
     last_activity_at: null,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     deals: [],
     timeline,
   };
@@ -94,6 +98,13 @@ describe("a record's timeline", () => {
 
     expect(within(entry("Sent the pre-approval letter")).getByText("Follow up Dec 31")).toBeInTheDocument();
     expect(within(entry("Prefers mornings")).getByText("Followed up Nov 27")).toBeInTheDocument();
+  });
+
+  it("names who added each entry after its date", async () => {
+    await openContact([{ ...call, created_by_name: "Sam Okafor" }, note]);
+
+    expect(entry("Called about the counteroffer")).toHaveTextContent(/Nov 20, 2026 · Sam Okafor/);
+    expect(entry("Prefers mornings")).toHaveTextContent(/Nov 20, 2026 · Sample data/);
   });
 
   it("lets you edit and delete activities, but not stage changes", async () => {

@@ -21,6 +21,8 @@ function followUp(id: number, description: string, follow_up_date: string): Acti
     to_stage: null,
     created_at: "2026-11-20T15:00:00Z",
     updated_at: "2026-11-20T15:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
   };
 }
 

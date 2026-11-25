@@ -2,6 +2,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { money } from "../../lib/format";
+import { AddedBy } from "../../ui/AddedBy";
 import { Avatar } from "../../ui/Avatar";
 import { PageHeader } from "../../ui/PageHeader";
 import { ErrorState, LoadingState } from "../../ui/States";
@@ -72,6 +73,7 @@ export function OrganizationPage() {
             <dt>Notes</dt>
             <dd className="notes">{org.notes ?? <span className="muted">No notes</span>}</dd>
           </dl>
+          <AddedBy record={org} />
         </section>
         <div className="record-main">
           <section className="panel record-panel" aria-labelledby="org-contacts">

@@ -13,6 +13,8 @@ function organization(overrides: Partial<Organization> & Pick<Organization, "id"
     open_deal_count: 0,
     created_at: "2026-10-01T09:00:00Z",
     updated_at: "2026-10-01T09:00:00Z",
+    created_by_name: "Sample data",
+    updated_by_name: "Sample data",
     ...overrides,
   };
 }

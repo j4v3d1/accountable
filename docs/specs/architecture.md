@@ -77,7 +77,7 @@ Each table is described in its area's file: `organizations.md`, `contacts.md`, `
 
 ## API
 
-All responses are JSON. Creating returns 201, and deleting returns 204 with no body. Errors use FastAPI's standard shape, with status 401 when signed out, 404 for missing records, 409 for a refused change and 422 for invalid input.
+All responses are JSON. Creating returns 201, and deleting returns 204 with no body. Errors use FastAPI's standard shape, with status 401 when signed out, 503 when Supabase's signing keys can't be fetched, 404 for missing records, 409 for a refused change and 422 for invalid input.
 
 Each area's endpoints, and the rules the backend applies to them, are in its own file.
 
@@ -94,7 +94,8 @@ backend/app/
     auth.py            checks the token, local or Supabase, and keeps the person in users (R51, R55)
     db.py              engine, foreign keys on, one transaction per request
     tables.py          all tables, in one place
-    errors.py          401, 404, 409 and 422 errors, raised by services
+    errors.py          401, 503, 404, 409 and 422 errors, raised by services
+    added_by.py        who added and last changed a record: the values to save and the names to show (R56, R57)
     fields.py          field types shared by the request schemas
   organizations/       routes.py, schemas.py, service.py
   contacts/            routes.py, schemas.py, service.py
@@ -134,7 +135,8 @@ e2e/                   Playwright tests, and fixtures.ts shared by all of them; 
                        date, the clock and the time zone for the whole run; the light-mode
                        baseline screenshots sit beside the visual test (concern 15)
 scripts/              test-all.mjs (npm test), check.mjs (npm run check), run-steps.mjs (runs steps, prints the summary),
-                       start.mjs (npm start: reads .env, builds, starts)
+                       start.mjs (npm start: reads .env, builds, starts), seed-live.mjs (npm run seed:live),
+                       env-file.mjs (reads .env for those two), dev-api.mjs (the backend for npm run dev, local sign-in)
 render.yaml            the Render web service (R64)
 lefthook.yml           the git pre-commit hook
 .github/workflows/     ci.yml (npm run check:quick on every push)
