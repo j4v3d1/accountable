@@ -11,7 +11,7 @@ How Accountable is started, seeded, migrated, tested, checked and deployed, and 
 ## Requirements
 
 - **R39** `npm run dev` starts the backend and the frontend together and prints the address to open. It works on Mac, Linux and Windows. It runs against the local SQLite file with local sign-in (R54), needs no internet connection, and never reads `.env` (concern 23).
-- **R40** When the backend starts, it runs the migrations (R65). Then, when the database has no organizations, contacts, deals or activities at all, such as a new local file or a new, empty Supabase database, it fills it with the sample data.
+- **R40** When the backend starts with a database that has no organizations table yet, it runs the migrations (R65) and fills the new database with sample data. On later starts it runs any new migrations but does not seed again, even if every record has been deleted. This preserves intentional deletions (R5).
 - **R41** `npm run seed` deletes every organization, contact, deal and activity and loads the sample data again, in the database `DATABASE_URL` names, or the local SQLite file when it's not set. It keeps the `users` table. It's safe to run while the app is running. Against a database that isn't SQLite, it first prints "This will delete every record in the database at <host>." and waits for the person to type "yes"; anything else stops it with nothing changed. `npm run seed:live` does the same with the settings from `.env`, so it always asks.
 - **R42** The sample data is set in Cedar Bay, a fictional US metro area, so every screen looks alive the first time the app starts:
   - 12 organizations across the industries in R7;
@@ -56,7 +56,7 @@ How Accountable is started, seeded, migrated, tested, checked and deployed, and 
   - delete rules and delete-impact counts (R4);
   - list columns, validation (422) and missing records (404);
   - each dashboard figure against hand-worked data (R31 to R38), including zero cases and week, month and year boundaries;
-  - the seed's counts and spread (R40 to R42), and that data survives a restart (R5).
+  - the seed's counts and spread (R40 to R42), that data survives a restart, and that an existing database emptied by the team stays empty after a restart (R5).
 - **Frontend (Vitest, beside the code it tests)**: money, date and percent formatting; initials; the table's search and sort; the delete dialog, including when its counts can't load; website links; form validation; the drag-time totals and rollback in `board.ts`; the summary line; reading and saving the mode, including a missing or unknown saved value meaning system, and system following the device as it changes; the user menu's name, its items and the ticked theme; initials from a name or an email; the sign-in form's errors; the search box's states and keyboard use.
 - **End to end (Playwright with installed Chrome, `e2e/`)**: Playwright starts its own backend and frontend on ports 8100 and 5180 against a temporary database with local sign-in, runs one test at a time and reseeds before each. Each test signs in as a made-up teammate through the sign-in screen, unless it's testing the signed-out state. A test fails if the browser console logs an error or the page requests anything off localhost. These flows are covered:
   - signed out, every route shows the sign-in screen and the API refuses; a wrong password shows its error; signing in opens the page that was asked for; signing out shows the sign-in screen again (R49 to R53);

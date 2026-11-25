@@ -8,7 +8,7 @@ from pathlib import Path
 from fastapi import Depends, FastAPI
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse
-from sqlalchemy import Engine, exists, select
+from sqlalchemy import inspect
 
 from app import seed
 from app.account.routes import public_router as account_public_router
@@ -19,7 +19,6 @@ from app.core import config
 from app.core.auth import current_user, make_token_checker
 from app.core.db import make_engine, run_migrations
 from app.core.errors import NotFound, add_error_handlers
-from app.core.tables import activities, contacts, deals, organizations
 from app.dashboard.routes import router as dashboard_router
 from app.deals.routes import router as deals_router
 from app.organizations.routes import router as organizations_router
@@ -32,13 +31,6 @@ SIGNED_IN_ROUTERS = (
     activities_router,
     dashboard_router,
 )
-
-
-def _has_no_records(engine: Engine) -> bool:
-    with engine.connect() as conn:
-        return not any(
-            conn.scalar(select(exists().select_from(table))) for table in (organizations, contacts, deals, activities)
-        )
 
 
 def _serve_frontend(app: FastAPI, dist: Path) -> None:
@@ -63,9 +55,11 @@ def create_app(*, seed_if_empty: bool = True) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         engine = app.state.engine
+        new_database = not inspect(engine).has_table("organizations")
         run_migrations(engine)
-        # A new database, local or on Supabase, gets the sample data, so every screen has something to show (R40).
-        if seed_if_empty and _has_no_records(engine):
+        # Only a new database gets sample data. An existing empty one may have
+        # had all its records deleted intentionally (R5, R40).
+        if seed_if_empty and new_database:
             seed.reset(engine)
         yield
         engine.dispose()

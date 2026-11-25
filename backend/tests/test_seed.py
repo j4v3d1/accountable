@@ -51,13 +51,14 @@ def test_a_new_database_is_seeded_on_first_start(test_env):
         assert len(client.get("/api/deals").json()) == 30
 
 
-def test_a_migrated_database_with_no_records_is_seeded_on_start(test_env):
-    # Such as a new, empty Supabase database, once the migrations have run (R40).
+def test_a_migrated_database_with_no_records_stays_empty_on_start(test_env):
+    # Empty records can mean the team deleted its data; a restart must preserve that.
     make_empty_database(test_env)
 
     with TestClient(create_app(), base_url="http://localhost") as client:
         client.headers.update(sign_in(client))
-        assert len(client.get("/api/organizations").json()) == 12
+        assert client.get("/api/organizations").json() == []
+        assert client.get("/api/deals").json() == []
 
 
 def test_a_database_with_any_record_is_not_reseeded_on_start(test_env):

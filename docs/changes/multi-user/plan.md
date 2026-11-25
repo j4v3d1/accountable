@@ -23,7 +23,7 @@ A few files wire the parts together: `backend/app/main.py`, `frontend/src/App.ts
 | `backend/app/core/auth.py` (new) | Token checks: Supabase via the JWKS keys, fetched once and again only for an unknown `kid` (concern 17); local tokens signed with a key made at startup (R54); upserts the person into `users` only when their name or email changed (R55); the `CurrentUser` dependency services receive |
 | `backend/app/core/errors.py` | 401 error |
 | `backend/app/account/__init__.py`, `routes.py`, `service.py` (new) | `GET /api/config`, `GET /api/health`, `GET /api/me`, `POST /api/auth/local` (local mode only, 404 otherwise) |
-| `backend/app/main.py` | Migrations instead of `create_all`; seed when there are no records at all (R40); sign-in required on every router but the public ones; serve the built frontend with an `index.html` fallback outside `/api/`; host check from `allowed_hosts()`; includes the search router in Phase 2 |
+| `backend/app/main.py` | Migrations instead of `create_all`; seed only when the database has no organizations table before migration (R40), preserving an existing database whose records were deleted; sign-in required on every router but the public ones; serve the built frontend with an `index.html` fallback outside `/api/`; host check from `allowed_hosts()`; includes the search router in Phase 2 |
 | `backend/app/seed.py` | Credit the sample data to `sample-data`; keep `users` on reset (R41); against a non-SQLite database, print the host and wait for "yes" (R41) |
 | `backend/tests/conftest.py` | `DATABASE_URL`, `ACCOUNTABLE_AUTH=local`, a signed-in client by default (Maya Torres), a signed-out client, a second teammate, and a fake JWKS key set made once per session |
 | `backend/tests/test_config.py`, `test_hosts.py`, `test_seed.py`, `test_persistence.py`, `test_transactions.py` | Follow the renamed setting and the migrations; Render hostname; the seed's "yes" check |
@@ -146,7 +146,7 @@ Each phase ends with `npm run check` passing and `docs/STATUS.md` updated. Steps
    - **Part 3**: the sign-in screen, the session, the token in `client.ts`, `RequireSignIn`, the top bar (empty on the right for now). The frontend dependencies go in here, the dropdown menu's too, so Part 7 doesn't touch the lock file.
    - **Part 4**: `AddedBy` and the names on record pages, the timeline and recent activity, against the fields Part 2 returns.
    - **Part 5**: scripts, `render.yaml`, `.env.example`, the Playwright config and the signed-in fixture, `sign-in.spec.ts` and `who-added.spec.ts`. The sign-out test in `sign-in.spec.ts` waits for Phase 3.
-3. Part 1 finishes `main.py`: the built frontend and its fallback, the seed-on-empty check, the "yes" check in the seed.
+3. Part 1 finishes `main.py`: the built frontend and its fallback, the seed-on-new-database check, the "yes" check in the seed.
 4. `npm run check` passes. Every API route answers 401 signed out, and every page shows the sign-in screen.
 5. **Ask the person** to fill in `.env` with `DATABASE_URL`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`, and to add at least two teammates in Supabase's dashboard, one with a display name and one without. The agent can't edit `.env`.
 6. **Ask the person** to run `npm start`, sign in with a real account, add a record, and say what they see. That run migrates the empty Supabase database and loads the sample data.
