@@ -140,3 +140,7 @@ Tried once each (2026-11-25): ui-check on the dashboard and pipeline found nothi
 ### CI runs the quick checks
 
 `.github/workflows/ci.yml` now runs `npm run check:quick` instead of `npm run check`, so CI leaves out the end-to-end tests and the baseline check. The step that uploaded the Playwright report and snapshot folders on failure is gone, since only the end-to-end tests wrote them. The gitleaks, Node, uv and dependency steps stay, because the quick checks still need them. `AGENTS.md`, `docs/TECH_STACK.md` and `docs/spec.md` (concern 15, R47, the structure line) now say so. End-to-end tests and the Mac baselines are now checked only by `npm run check` on a Mac; the Linux baselines are kept but nothing compares against them.
+
+## Spec split by area (2026-11-25, `multi-user` branch)
+
+`docs/spec.md` is now a short summary of the product with an index, and the detail moved, unchanged, into one file per area in `docs/specs/`: `shared.md`, `organizations.md`, `contacts.md`, `deals.md`, `pipeline.md`, `activities.md`, `dashboard.md`, `running.md`, `architecture.md` and `visual-design.md`. Each concern and requirement keeps its number and sits in its area's file; the index in `docs/spec.md` says where. `AGENTS.md` now says to read `docs/spec.md` first, then only the area files a change touches, and to keep the affected files up to date in the same change. `docs/REVIEW.md` and the reviewer and ui-check subagents now cover the area files, and the review has a new "Spec kept up to date" pass. No code changed.

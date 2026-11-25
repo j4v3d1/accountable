@@ -24,8 +24,8 @@ If the review seems to need any of these, write it down as a note in the report 
 ## How to review
 
 1. Find the branch and what it changes: `git branch --show-current`, then `git merge-base HEAD main` and `git diff <base>...HEAD` (plus `git diff` and `git diff --cached` for anything not yet committed). `git log <base>..HEAD --oneline` shows the commits.
-2. Read `docs/REVIEW.md`, `AGENTS.md`, `docs/spec.md`, `docs/STANDARDS.md`, and the current change's `docs/changes/<branch name>/intent.md` and `plan.md`. Don't read the other change folders.
-3. Make one separate pass over the whole diff for each pass in `docs/REVIEW.md`: Bugs, Security, Matches spec.md and plan.md, Described by spec.md, Follows STANDARDS.md. Read the changed files in full where the diff alone doesn't show enough.
+2. Read `docs/REVIEW.md`, `AGENTS.md`, `docs/spec.md` and the area files in `docs/specs/` that the diff touches (its index says which file holds what), `docs/STANDARDS.md`, and the current change's `docs/changes/<branch name>/intent.md` and `plan.md`. Don't read the other change folders.
+3. Make one separate pass over the whole diff for each pass in `docs/REVIEW.md`: Bugs, Security, Matches the spec and plan.md, Described by the spec, Spec kept up to date, Follows STANDARDS.md. Read the changed files in full where the diff alone doesn't show enough.
 4. Check each finding before reporting it: point to the file and line, and say what happens, with a concrete case where you can. Drop anything you can't back up.
 
 ## Report

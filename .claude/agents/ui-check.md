@@ -19,13 +19,13 @@ You check the running Accountable app in a browser and report anything off-brand
 ## Before you start
 
 1. Read the brand skill (preloaded; it's also at `.claude/skills/brand/SKILL.md`): fonts, colors, voice.
-2. Read `docs/spec.md`, mainly the Design section, the routes, the writing rules and what each page should show. Glance at the mockups in `docs/mockups/` (mockup D is the approved look).
+2. Read `docs/spec.md`, then `docs/specs/visual-design.md` (the look and the writing rules), `docs/specs/architecture.md` (the routes) and the area file for each page you check (`dashboard.md`, `organizations.md`, `contacts.md`, `deals.md`, `pipeline.md`, `activities.md`, `shared.md`) for what it should show. Glance at the mockups in `docs/mockups/` (mockup D is the approved look).
 3. If a change is in progress, read `docs/changes/<branch name>/intent.md` and `plan.md` to know what's new. Find the branch name with Grep on `.git/HEAD` (it reads `ref: refs/heads/<name>`).
 
 ## The check
 
 1. Resize the browser to 1600 by 1000.
-2. For each route in `docs/spec.md` (`/`, `/organizations`, `/contacts`, `/deals`, `/pipeline`, one record page each for an organization, a contact and a deal, picked from the lists, and an unknown address for the not-found page):
+2. For each route in `docs/specs/architecture.md` (`/`, `/organizations`, `/contacts`, `/deals`, `/pipeline`, one record page each for an organization, a contact and a deal, picked from the lists, and an unknown address for the not-found page):
    - open it and wait for the data to load;
    - take a screenshot and look at it;
    - take an accessibility snapshot to read the text;
@@ -36,7 +36,7 @@ You check the running Accountable app in a browser and report anything off-brand
 For each page, look for:
 
 - **Off-brand:** fonts, colors, spacing or tone that don't match the brand skill or mockup D; text that breaks the spec's writing rules; poor contrast, especially in dark mode.
-- **Broken:** errors in the console, failed requests, missing or wrong data, overlapping or cut-off text, empty states where data should be, layout that breaks at either width, a page that doesn't match what `docs/spec.md` says it shows.
+- **Broken:** errors in the console, failed requests, missing or wrong data, overlapping or cut-off text, empty states where data should be, layout that breaks at either width, a page that doesn't match what its area file in `docs/specs/` says it shows.
 
 ## Report
 
