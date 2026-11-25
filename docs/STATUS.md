@@ -111,16 +111,28 @@ Built from `docs/changes/dark-mode/plan.md`, in its order. A Dark button at the 
 
 Still open:
 
-- **Linux baselines (added, with weaker proof).** The Linux PNGs came from CI runs 45506381893 and 45512832437, which were byte-identical. Both ran after the CSS had moved to tokens, not before as plan step 4 asked. On Linux, the visual test now guards light mode from here on, but it doesn't prove that the token move left light mode unchanged. The Mac baselines, taken before the move, still prove that. Matching Linux proof would need the visual test run on `main` with no CSS changes, then those PNGs used instead.
+- **Linux baselines (added, with weaker proof).**
+  - Source: CI runs 45506381893 and 45512832437, which were byte-identical. The repo itself can't confirm this; rerunning the visual test on CI and comparing is the only check.
+  - Caveat: both runs came after the CSS had moved to tokens, not before as plan step 4 asked. On Linux, the visual test guards light mode from here on, but doesn't prove the token move left light mode unchanged. The Mac baselines, taken before the move, still prove that.
+  - Remedy: run the visual test on `main` (no CSS changes) in CI, and use those PNGs instead.
 - **Late and overdue pills in light mode** measure 4.33:1 (`--raspberry-text` on `--raspberry-pill`), under 4.5:1. This was already so before dark mode; fixing it would change light mode, which this change mustn't, so the contrast test lists it as a known light-mode gap. Dark mode passes.
 - The walkthrough was done in Chrome through Playwright, which fails on any console error, rather than by hand.
 
 ## Improving the harness (2026-11-24, `dark-mode` branch)
 
-`docs/IMPROVE.md` was run before the review fixes. The review's Important finding (no Linux baselines) is still open. Three mistakes had happened at least twice:
+`docs/IMPROVE.md` was run before the review fixes. The review's Important finding (no Linux baselines) was open at the time; the baselines were added later in "Deploy: CI fix", with the weaker proof noted under "Still open" above. Three mistakes had happened at least twice:
 
 - **Plan steps that need the person got skipped or swapped.** On the MVP, the Wi-Fi-off walkthrough wasn't done. On dark mode, step 4 (push and get the Linux baselines before any CSS changed) was skipped, and the walkthrough by hand was done through Playwright instead. `AGENTS.md` now says to stop and ask at such a step, and `docs/REVIEW.md` counts a skipped or swapped plan step as a finding.
 - **Only a Mac checked the work.** The MVP didn't run on Linux (R39), and dark mode had no Linux baselines. `npm run check` now runs `scripts/check-baselines.mjs`, which fails when a baseline screenshot is missing its Mac or Linux copy. It's left out of `check:quick` so the end-of-turn hook doesn't keep blocking. `AGENTS.md` now says a change isn't done until CI has passed on the pushed branch.
 - **The build added things the plan and spec didn't list.** On the MVP, there were four files not in the plan (finding 7). On dark mode, the `--selected` and `--on-selected` tokens aren't in the spec. `AGENTS.md` now says to add them to `plan.md` and `spec.md` in the same step.
 
 Also out of date and fixed: the History line that said dark mode had no code yet, and the CI section's "Not yet run on GitHub". `docs/IMPROVE.md` now checks the review fixes are in first and says where to look for repeats. It also asks for this section each round.
+
+## Subagents (2026-11-25, `subagents` branch)
+
+Two Claude Code subagents added in `.claude/agents/` (see `docs/changes/subagents/` and R48 in `docs/spec.md`), both on Sonnet:
+
+- **reviewer** reviews the branch's changes against `docs/REVIEW.md` and reports findings by severity. It has Read, Grep, Glob and Bash; its instructions allow only commands that read (`git diff`, `git log`, `git show`, `grep` and the like) and forbid edits, commits, installs, running the tests and reading `.env`. Bash itself isn't locked down, so the read-only rule rests on the instructions.
+- **ui-check** opens every route of the running app with the Playwright MCP server, at 1600 wide in light and dark mode and 1280 wide for the dashboard and pipeline, saves screenshots to `.playwright-mcp/` (already git-ignored), and checks them against the brand skill (preloaded) and the spec. It has no Edit, Write or Bash tools, doesn't start the app, and doesn't create or change records.
+
+Not yet tried: running each agent once (the reviewer on this branch, ui-check with `npm run dev` running).

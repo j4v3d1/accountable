@@ -241,6 +241,7 @@ Each requirement has an ID, so tests and status notes can point at it.
 - **R45** A git pre-commit hook (lefthook, installed by `npm install`) formats the staged files with Prettier and `ruff format` and stages the result, then runs ESLint, `ruff check`, `tsc`, `ty` and gitleaks on the staged changes. It skips the tests so commits stay quick, and refuses the commit if any of them fails.
 - **R46** Claude Code hooks in `.claude/settings.json`: when the agent finishes a turn, `npm run check:quick` runs and any failure is sent back to the agent to fix. It blocks the stop once, then lets the agent stop, so it can't loop. The agent can't write or edit `.env` or `.env.*` files (`.env.example` is allowed).
 - **R47** GitHub Actions (`.github/workflows/ci.yml`) runs one job, `check`, on every push to any branch. It installs gitleaks and scans the working files and the whole git history first, so a leaked secret fails the run straight away. Then it installs Node and uv and runs `npm run check`, using the Google Chrome already on the runner. When the run fails, the Playwright HTML report and test results are uploaded. The workflow uses no secrets.
+- **R48** Two Claude Code subagents in `.claude/agents/`, both on Sonnet. `reviewer` reviews a branch's changes against `docs/REVIEW.md` and reports findings by severity (Important, other findings, at most five nits); it can read files and run commands that only read, such as `git diff`, `git log` and `git show`, and changes nothing. `ui-check` opens each page of the running app (`npm run dev`) with the Playwright MCP server in light and dark mode, screenshots it into `.playwright-mcp/` (git-ignored), checks it against the brand skill and this spec, and reports anything broken or off-brand; it has no tools to change files.
 
 ## Design
 
@@ -379,6 +380,7 @@ scripts/              test-all.mjs (npm test), check.mjs (npm run check), run-st
 lefthook.yml           the git pre-commit hook
 .github/workflows/     ci.yml (npm run check on every push)
 .claude/hooks/         Claude Code hooks: check-on-stop.mjs (check:quick when a turn ends), protect-env.mjs
+.claude/agents/        Claude Code subagents: reviewer.md (reviews a branch, read-only), ui-check.md (checks the running app in the browser)
 ```
 
 Rules that keep it this way:
@@ -451,7 +453,7 @@ Every dark text token passes 4.5:1 on the dark page, on black, on `--soft` and o
 - **Pipeline**:
   - **Header:** the open-deal count above the title. On the right are a hint about keyboard dragging and "New deal".
   - **Summary panel** (R21): open value, expected revenue, the late count in Raspberry, and a thin strip with stage names lined up under their segments.
-  - **Columns:** seven columns, each a rounded light-gray panel (dark gray-navy in dark mode) holding its heading, its cards and an "Add deal" button at the bottom. The board fills the window height, and each column scrolls on its own inside it, so its heading and totals stay in view (concern 9). The columns scroll sideways as a group on narrow screens. Closed (Won) and Lost columns are a shade closer to the page color, and their cards are a shade off the panel color with no shadow, so open deals stand out in both modes.
+  - **Columns:** seven columns, each a rounded light-gray panel (dark gray-navy in dark mode) holding its heading, its cards and an "Add deal" button at the bottom. The board fills the window height. Each column is as tall as its cards, up to the board's height, and then scrolls on its own inside it, so its heading and totals stay in view (concern 9). The columns scroll sideways as a group on narrow screens. Closed (Won) and Lost columns are a shade closer to the page color, and their cards are a shade off the panel color with no shadow, so open deals stand out in both modes.
   - **Cards** (R20): the value is in full (`$585,000`). The five-dot probability meter is Cerulean. The late label is a Raspberry pill.
   - **Dragging:** while a card is being dragged, it tilts slightly, gains a Sea Green outline and a deeper shadow, and leaves a hatched gap where it came from.
 
