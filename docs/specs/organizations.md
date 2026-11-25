@@ -12,7 +12,7 @@ The companies we work with. Part of the spec; the summary and index are in `docs
 
   A website is shown without its `http://` or `https://`. Its link is the website as typed when it starts with `http://` or `https://` (in any case), and otherwise has `https://` added.
 - **R8** Table columns: name, industry, website, number of contacts, number of open deals.
-- **R9** The organization's page shows its details, a list of its contacts and a list of its deals. Each item links to its record's page.
+- **R9** The organization's page shows its details, who added and last changed it (R57), a list of its contacts and a list of its deals. Each item links to its record's page.
 
 ## Data model
 

@@ -17,7 +17,7 @@ The people we deal with: buyers, sellers and leads. Part of the spec; the summar
   - status (Lead, Qualified or Customer; required, default Lead).
 - **R11** Table columns: name, status, organization, email, phone, last activity date (the local day it happened). A status filter (All, Lead, Qualified, Customer) sits next to the search box and works together with it.
 - **R12** The contact's page shows:
-  - their details and a link to their organization;
+  - their details, a link to their organization, and who added and last changed them (R57);
   - their deals;
   - their timeline (see concern 5), newest first;
   - a "Log activity" button.

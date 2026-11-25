@@ -30,7 +30,7 @@ The landing page: how sales are going at a glance. Part of the spec; the summary
   - **Later**.
 
   Each group is in date order, oldest first. Each follow-up has a round checkbox to mark it done, which removes it from the list, and links to its contact or deal.
-- **R37** **Recent activity**: the latest 10 activities of every kind, including stage changes, each linked to its contact or deal.
+- **R37** **Recent activity**: the latest 10 activities of every kind, including stage changes, each linked to its contact or deal, with who added it (R57).
 - **R38** Every dashboard figure is worked out by the backend from the current data. It changes as soon as the data changes, such as a deal moving to Closed (Won) or a new follow-up being saved.
 
 ## API

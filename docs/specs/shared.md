@@ -1,15 +1,15 @@
 # Shared behavior
 
-What every page and list has in common: navigation, tables, forms, deleting, saving, how values are written, and the dark mode button. Part of the spec; the summary and index are in `docs/spec.md`.
+What every page and list has in common: navigation, the top bar, the user menu and its color mode, tables, forms, deleting, saving, and how values are written. Part of the spec; the summary and index are in `docs/spec.md`.
 
 ## Concerns
 
 - **10. How money is written.** Amounts are US dollars, written as `$485,000`, with "USD" in the heading where the amount appears, such as "Value (USD)" or "Revenue won (USD)". Large amounts on chart axes and tiles are shortened, as in `$1.2M`.
-- **14. Where the mode is kept.** The choice is saved in the browser's `localStorage` under `accountable-theme`, as `light` or `dark`. Anything else, or nothing, means light. It belongs to that browser on that computer: there's no backend setting, and `npm run seed` doesn't touch it. A small script in `index.html` reads it and marks the page before anything is drawn, so a dark page never flashes light on load.
+- **14. Where the mode is kept.** The choice is saved in the browser's `localStorage` under `accountable-theme`, as `light`, `dark` or `system`. Anything else, or nothing, means system, so a browser with no saved choice follows the device, and a `light` or `dark` saved before the user menu existed stays as it was. System follows the device's `prefers-color-scheme` setting and changes as soon as the device does, without a reload. The choice belongs to that browser on that computer: there's no backend setting, it isn't tied to the person signed in, and `npm run seed` doesn't touch it. A small script in `index.html` reads it, works out light or dark, and marks the page before anything is drawn, so a dark page never flashes light on load. The sign-in screen follows the same choice.
 
 ## Requirements
 
-- **R1** The app opens on the Dashboard. A navigation rail on the left links to Dashboard, Organizations, Contacts, Deals and Pipeline, and marks the current section. An address that matches no page shows "Page not found" with a link to the dashboard.
+- **R1** Once signed in (R49), the app opens on the Dashboard. A navigation rail on the left links to Dashboard, Organizations, Contacts, Deals and Pipeline, and marks the current section. A **top bar** runs across the top of every page, to the right of the rail, with the search box on the left (R58) and the user menu on the right (R6a). An address that matches no page shows "Page not found" with a link to the dashboard.
 - **R2** Every list page (Organizations, Contacts, Deals) has a table with:
   - a search box that filters rows as you type, matching any text column, including a contact's status and a deal's stage;
   - column headings that sort when clicked (ascending, then descending, then back to the default order);
@@ -26,4 +26,9 @@ What every page and list has in common: navigation, tables, forms, deleting, sav
   While the counts load, the dialog says "Checking linked records...". If they can't be loaded, it says "Couldn't check linked records" with the reason, keeps Delete disabled, and offers "Try again".
 - **R5** Every change is saved to the database straight away. It's still there after a refresh and after a restart.
 - **R6** Dates are shown as `Nov 23, 2026`. Money follows concern 10. Probabilities are shown as `60%`.
-- **R6a** A dark mode button sits at the bottom of the navigation rail on every page: a moon icon with the short label "Dark", styled like the section links. Its screen-reader name is "Dark mode", and it reads as pressed while dark mode is on, when its icon is Sea Green. Pressing it switches every page between light and dark at once, without a reload. Charts, dialogs, menus, pickers and confirmations follow the mode. The app opens in light mode until dark is chosen, and remembers the choice after a reload or restart (concern 14).
+- **R6a** The **user menu** is a round button at the right of the top bar showing the signed-in person's initials (R55), with the screen-reader name "Account menu". It opens a menu with:
+  - the person's name, and their email under it in smaller muted text (just the email when they have no name);
+  - **Theme**, with three choices, Light, Dark and System, as radio items with the current one ticked. Choosing one switches every page at once, without a reload. Charts, dialogs, menus, pickers and confirmations follow the mode. The choice is remembered after a reload or restart (concern 14);
+  - **Sign out** (R53).
+
+  The menu works with the keyboard: Enter or space opens it, the arrow keys move through it, and Escape closes it. The rail no longer has a dark mode button.

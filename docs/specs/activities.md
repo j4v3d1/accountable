@@ -17,7 +17,7 @@ Notes, calls and emails, with optional follow-ups, plus the stage changes the sy
   - done (only shown when there's a follow-up date).
 
   An activity belongs to one contact or one deal (concern 5).
-- **R29** Activities are logged from the contact's or deal's page. The dashboard's "Log activity" asks first whether it's for a contact or a deal, and which one, from a searchable list. Each timeline entry shows an icon for its type, the description, the date, and the follow-up date if there is one. Entries for note, call and email activities can be edited and deleted. Stage-change entries can't (concern 6).
+- **R29** Activities are logged from the contact's or deal's page. The dashboard's "Log activity" asks first whether it's for a contact or a deal, and which one, from a searchable list. Each timeline entry shows an icon for its type, the description, the date, who added it (R57), and the follow-up date if there is one. Entries for note, call and email activities can be edited and deleted. Stage-change entries can't (concern 6).
 - **R30** A follow-up that isn't done is **overdue** if its date is before today, and **upcoming** if it's today or later. It shows on the dashboard until it's marked done.
 
 ## Data model

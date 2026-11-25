@@ -144,3 +144,7 @@ Tried once each (2026-11-25): ui-check on the dashboard and pipeline found nothi
 ## Spec split by area (2026-11-25, `multi-user` branch)
 
 `docs/spec.md` is now a short summary of the product with an index, and the detail moved, unchanged, into one file per area in `docs/specs/`: `shared.md`, `organizations.md`, `contacts.md`, `deals.md`, `pipeline.md`, `activities.md`, `dashboard.md`, `running.md`, `architecture.md` and `visual-design.md`. Each concern and requirement keeps its number and sits in its area's file; the index in `docs/spec.md` says where. `AGENTS.md` now says to read `docs/spec.md` first, then only the area files a change touches, and to keep the affected files up to date in the same change. `docs/REVIEW.md` and the reviewer and ui-check subagents now cover the area files, and the review has a new "Spec kept up to date" pass. No code changed.
+
+## Multi-user design (2026-11-25, `multi-user` branch)
+
+The spec now describes sign-in, search and the user menu as they'll be once `multi-user` merges. Two new area files: `docs/specs/sign-in.md` (R49 to R57, concerns 16 to 18) and `docs/specs/search.md` (R58 to R62, concern 19). `shared.md`, `running.md` (R63 to R66, concern 23), `architecture.md` (concerns 20 to 22), `visual-design.md` and the record-page requirements changed to match, and `docs/spec.md`'s summary and index with them. No code yet; `plan.md` comes next.

@@ -34,7 +34,7 @@ The property transactions, with their stages, value, probability of close and cl
   - in the deals table, with a "Late" badge and the close date in Raspberry;
   - on their pipeline card, with the same badge.
 - **R17** Table columns: name, stage, value, probability, expected value (value times probability), close date, contact, organization.
-- **R18** The deal's page shows its details, links to its contact and organization, its timeline newest first, and a "Log activity" button.
+- **R18** The deal's page shows its details, who added and last changed it (R57), links to its contact and organization, its timeline newest first, and a "Log activity" button.
 - **R19** Every stage change creates a `stage_change` activity on the deal, worded "Moved from Showing to Offer". This happens whether the change is made from the pipeline, the edit form or anywhere else.
 
 ## Data model
