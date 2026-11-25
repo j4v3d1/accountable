@@ -18,7 +18,9 @@ from typing import Annotated
 
 import jwt
 from fastapi import Depends, Request
-from sqlalchemy import Connection, insert, select, update
+from sqlalchemy import Connection, select, update
+from sqlalchemy.dialects.postgresql import insert as postgresql_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from app.core import config
 from app.core.db import Conn
@@ -179,12 +181,20 @@ def make_token_checker() -> SupabaseTokens | LocalTokens:
     return SupabaseTokens(config.supabase_url())
 
 
+def add_user(conn: Connection, user: User) -> None:
+    """Add the person to `users`, unless another request has just added them: a first
+    visit sends several requests at once, and each finds no row (R55)."""
+    dialect_insert = sqlite_insert if conn.dialect.name == "sqlite" else postgresql_insert
+    statement = dialect_insert(users).values(id=user.id, name=user.name, email=user.email)
+    conn.execute(statement.on_conflict_do_nothing(index_elements=[users.c.id]))
+
+
 def keep_user(conn: Connection, user: User) -> None:
     """Add the person to `users`, or update their row when their name or email has
     changed. Reads first, so most requests don't write (R55)."""
     stored = conn.execute(select(users.c.name, users.c.email).where(users.c.id == user.id)).first()
     if stored is None:
-        conn.execute(insert(users).values(id=user.id, name=user.name, email=user.email))
+        add_user(conn, user)
     elif (stored.name, stored.email) != (user.name, user.email):
         conn.execute(update(users).where(users.c.id == user.id).values(name=user.name, email=user.email))
 

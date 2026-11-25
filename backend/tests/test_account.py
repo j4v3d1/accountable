@@ -2,12 +2,12 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 
-from app.core.auth import LocalTokens, initials
+from app.core.auth import LocalTokens, User, add_user, initials
 from app.core.tables import users
 from app.main import create_app
-from conftest import JORDAN, SAM, make_empty_database, sign_in
+from conftest import JORDAN, MAYA, SAM, make_empty_database, sign_in
 
 
 def stored_users(client) -> dict[str, dict]:
@@ -76,6 +76,20 @@ def test_the_person_is_added_to_users_on_their_first_request(client, as_sam):
     stored = stored_users(client)
     assert stored["local-sam-okafor"]["name"] == "Sam Okafor"
     assert stored["local-sam-okafor"]["email"] == SAM
+
+
+def test_adding_someone_another_request_already_added_is_not_an_error(client):
+    # A first visit sends several requests at once. Each finds no row, so all but the
+    # first find the row already there by the time they add it.
+    client.get("/api/me")
+    maya = User(id="local-maya-torres", name="Maya Torres", email=MAYA)
+
+    with client.app.state.engine.begin() as conn:
+        add_user(conn, maya)
+
+    with client.app.state.engine.connect() as conn:
+        count = conn.execute(select(func.count()).select_from(users).where(users.c.id == maya.id)).scalar()
+    assert count == 1
 
 
 def test_the_stored_name_follows_the_token_when_it_changes(client):
