@@ -158,6 +158,7 @@ Built from `docs/changes/multi-user/plan.md`, steps 1 to 4. Not committed yet.
 - **Running:** `npm run dev` uses local sign-in (`scripts/dev-api.mjs`); `npm start` and `npm run seed:live` read `.env` and name any missing setting; `render.yaml` and `.env.example` added. The end-to-end tests sign in as Maya Torres through the sign-in screen.
 - **Tests:** 420 backend (99% coverage), 315 frontend (98%), and new end-to-end `sign-in.spec.ts` and `who-added.spec.ts`. Every unit test now fails at a second or more (R66).
 - **Checks:** `npm run check` passes except the 10 light-mode screenshots, which differ only by the new top bar moving each page down 64px and the names in recent activity. They're retaken in Phase 3 (plan step 12), once the top bar holds the search box and the user menu.
+- **Interim baselines (2026-11-25):** so `npm run check` passes now, the 10 Mac light-mode baselines were retaken with the empty top bar, each checked by eye first. The Linux copies are still the old ones. Both get retaken in plan steps 12 and 13.
 
 Waiting on the person: plan step 5 (fill in `.env`, add two teammates in Supabase) and step 6 (`npm start` against Supabase).
 
